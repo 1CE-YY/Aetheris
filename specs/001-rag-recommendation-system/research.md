@@ -118,61 +118,64 @@ model-gateway:
 **重试策略实现**：
 ```java
 public class ModelRetryStrategy {
-    private final int maxAttempts;
-    private final Duration backoff;
 
-    public <T> T executeWithRetry(Supplier<T> operation) {
-        int attempts = 0;
-        Exception lastException = null;
+  private final int maxAttempts;
+  private final Duration backoff;
 
-        while (attempts < maxAttempts) {
-            try {
-                return operation.get();
-            } catch (ApiException e) {
-                lastException = e;
-                if (shouldRetry(e.getStatusCode())) {
-                    attempts++;
-                    Duration delay = backoff.multipliedBy((long) Math.pow(2, attempts - 1));
-                    Thread.sleep(delay.toMillis());
-                } else {
-                    break;
-                }
-            }
+  public <T> T executeWithRetry(Supplier<T> operation) {
+    int attempts = 0;
+    Exception lastException = null;
+
+    while (attempts < maxAttempts) {
+      try {
+        return operation.get();
+      } catch (ApiException e) {
+        lastException = e;
+        if (shouldRetry(e.getStatusCode())) {
+          attempts++;
+          Duration delay = backoff.multipliedBy((long) Math.pow(2, attempts - 1));
+          Thread.sleep(delay.toMillis());
+        } else {
+          break;
         }
-
-        throw new ModelException("API 调用失败，已重试 " + attempts + " 次", lastException);
+      }
     }
 
-    private boolean shouldRetry(int statusCode) {
-        return statusCode == 429 || statusCode == 500 || statusCode == 502 || statusCode == 503;
-    }
+    throw new ModelException("API 调用失败，已重试 " + attempts + " 次", lastException);
+  }
+
+  private boolean shouldRetry(int statusCode) {
+    return statusCode == 429 || statusCode == 500 || statusCode == 502
+        || statusCode == 503;
+  }
 }
 ```
 
 **日志脱敏实现**：
 ```java
 public class LogSanitizer {
-    private static final int MAX_INPUT_LENGTH = 200;
 
-    public static String sanitize(String input) {
-        if (input == null) return null;
-        return input.length() > MAX_INPUT_LENGTH
-            ? input.substring(0, MAX_INPUT_LENGTH) + "...[截断]"
-            : input;
-    }
+  private static final int MAX_INPUT_LENGTH = 200;
 
-    public static String maskApiKey(String apiKey) {
-        return apiKey == null ? null : apiKey.substring(0, 8) + "****";
+  public static String sanitize(String input) {
+    if (input == null) {
+      return null;
     }
+    return input.length() > MAX_INPUT_LENGTH ? input.substring(0, MAX_INPUT_LENGTH)
+        + "...[截断]" : input;
+  }
+
+  public static String maskApiKey(String apiKey) {
+    return apiKey == null ? null : apiKey.substring(0, 8) + "****";
+  }
 }
 
 // 使用示例
 log.info("调用 Embedding API: model={}, input={}, timeout={}ms",
     modelName,
     LogSanitizer.sanitize(userInput),
-    timeout.toMillis()
-    // 不记录 API key 或 Authorization 头
-);
+    timeout.toMillis());
+// 不记录 API key 或 Authorization 头
 ```
 
 #### 理由
@@ -200,77 +203,78 @@ log.info("调用 Embedding API: model={}, input={}, timeout={}ms",
 **PDF 解析服务**：
 ```java
 public class PdfDocumentProcessor {
-    private static final int CHUNK_SIZE = 1000;  // 字符数
-    private static final int OVERLAP = 200;      // 重叠字符数
 
-    public List<Chunk> processPdf(Path filePath, String resourceId) throws IOException {
-        List<Chunk> chunks = new ArrayList<>();
-        try (PDDocument document = PDDocument.load(filePath.toFile())) {
-            int totalPages = document.getNumberOfPages();
+  private static final int CHUNK_SIZE = 1000;  // 字符数
+  private static final int OVERLAP = 200;      // 重叠字符数
 
-            // 第一步：提取所有页的文本
-            List<PageContent> pages = new ArrayList<>();
-            for (int pageNum = 0; pageNum < totalPages; pageNum++) {
-                PDPage page = document.getPage(pageNum);
-                String text = new PDFTextStripper().getText(document);
-                // 提取单页文本（需要设置 startPage 和 endPage）
-                PDFTextStripper stripper = new PDFTextStripper();
-                stripper.setStartPage(pageNum + 1);
-                stripper.setEndPage(pageNum + 1);
-                String pageText = stripper.getText(document).trim();
-                pages.add(new PageContent(pageNum + 1, pageText));
-            }
+  public List<Chunk> processPdf(Path filePath, String resourceId) throws IOException {
+    List<Chunk> chunks = new ArrayList<>();
+    try (PDDocument document = PDDocument.load(filePath.toFile())) {
+      int totalPages = document.getNumberOfPages();
 
-            // 第二步：合并页面文本并切分，同时记录页码范围
-            StringBuilder buffer = new StringBuilder();
-            int chunkIndex = 0;
-            int startPage = 1;
-            int currentPage = 1;
+      // 第一步：提取所有页的文本
+      List<PageContent> pages = new ArrayList<>();
+      for (int pageNum = 0; pageNum < totalPages; pageNum++) {
+        PDPage page = document.getPage(pageNum);
+        String text = new PDFTextStripper().getText(document);
+        // 提取单页文本（需要设置 startPage 和 endPage）
+        PDFTextStripper stripper = new PDFTextStripper();
+        stripper.setStartPage(pageNum + 1);
+        stripper.setEndPage(pageNum + 1);
+        String pageText = stripper.getText(document).trim();
+        pages.add(new PageContent(pageNum + 1, pageText));
+      }
 
-            for (PageContent pageContent : pages) {
-                buffer.append(pageContent.text).append("\n");
-                currentPage = pageContent.pageNum;
+      // 第二步：合并页面文本并切分，同时记录页码范围
+      StringBuilder buffer = new StringBuilder();
+      int chunkIndex = 0;
+      int startPage = 1;
+      int currentPage = 1;
 
-                // 当缓冲区达到 CHUNK_SIZE 时，创建 chunk
-                if (buffer.length() >= CHUNK_SIZE) {
-                    String chunkText = buffer.substring(0, CHUNK_SIZE);
-                    String remaining = buffer.substring(CHUNK_SIZE);
+      for (PageContent pageContent : pages) {
+        buffer.append(pageContent.text).append("\n");
+        currentPage = pageContent.pageNum;
 
-                    chunks.add(new Chunk(
-                        UUID.randomUUID().toString(),
-                        resourceId,
-                        chunkText,
-                        chunkIndex++,
-                        String.format("PDF 第 %d-%d 页", startPage, currentPage),
-                        "pdf"
-                    ));
+        // 当缓冲区达到 CHUNK_SIZE 时，创建 chunk
+        if (buffer.length() >= CHUNK_SIZE) {
+          String chunkText = buffer.substring(0, CHUNK_SIZE);
+          String remaining = buffer.substring(CHUNK_SIZE);
 
-                    // 重置缓冲区，保留重叠部分
-                    buffer = new StringBuilder(remaining);
-                    if (remaining.length() < OVERLAP) {
-                        buffer.append("\n");
-                    }
-                    startPage = currentPage;  // 更新起始页
-                }
-            }
+          chunks.add(new Chunk(
+              UUID.randomUUID().toString(),
+              resourceId,
+              chunkText,
+              chunkIndex++,
+              String.format("PDF 第 %d-%d 页", startPage, currentPage),
+              "pdf"
+          ));
 
-            // 处理最后剩余的文本
-            if (buffer.length() > 0) {
-                chunks.add(new Chunk(
-                    UUID.randomUUID().toString(),
-                    resourceId,
-                    buffer.toString(),
-                    chunkIndex,
-                    String.format("PDF 第 %d-%d 页", startPage, currentPage),
-                    "pdf"
-                ));
-            }
+          // 重置缓冲区，保留重叠部分
+          buffer = new StringBuilder(remaining);
+          if (remaining.length() < OVERLAP) {
+            buffer.append("\n");
+          }
+          startPage = currentPage;  // 更新起始页
         }
+      }
 
-        return chunks;
+      // 处理最后剩余的文本
+      if (buffer.length() > 0) {
+        chunks.add(new Chunk(
+            UUID.randomUUID().toString(),
+            resourceId,
+            buffer.toString(),
+            chunkIndex,
+            String.format("PDF 第 %d-%d 页", startPage, currentPage),
+            "pdf"
+        ));
+      }
     }
 
-    private record PageContent(int pageNum, String text) {}
+    return chunks;
+  }
+
+  private record PageContent(int pageNum, String text) {}
 }
 ```
 
@@ -298,98 +302,100 @@ public class PdfDocumentProcessor {
 **Markdown 解析服务**：
 ```java
 public class MarkdownDocumentProcessor {
-    private static final int CHUNK_SIZE = 1000;
-    private static final int OVERLAP = 200;
 
-    public List<Chunk> processMarkdown(Path filePath, String resourceId) throws IOException {
-        String content = Files.readString(filePath, StandardCharsets.UTF_8);
-        List<Chunk> chunks = new ArrayList<>();
+  private static final int CHUNK_SIZE = 1000;
+  private static final int OVERLAP = 200;
 
-        // 解析 Markdown AST
-        Parser parser = Parser.builder().build();
-        Node document = parser.parse(content);
-        HeadingVisitor visitor = new HeadingVisitor();
-        document.accept(visitor);
+  public List<Chunk> processMarkdown(Path filePath, String resourceId) throws IOException {
+    String content = Files.readString(filePath, StandardCharsets.UTF_8);
+    List<Chunk> chunks = new ArrayList<>();
 
-        // 获取按 heading 分割的章节
-        List<Section> sections = visitor.getSections();
+    // 解析 Markdown AST
+    Parser parser = Parser.builder().build();
+    Node document = parser.parse(content);
+    HeadingVisitor visitor = new HeadingVisitor();
+    document.accept(visitor);
 
-        // 对每个章节进行切分
-        int chunkIndex = 0;
-        for (Section section : sections) {
-            String sectionText = section.text();
-            String sectionPath = section.path();  // 如 "第一章 > 1.1 节"
+    // 获取按 heading 分割的章节
+    List<Section> sections = visitor.getSections();
 
-            // 简单固定窗口切分
-            int start = 0;
-            while (start < sectionText.length()) {
-                int end = Math.min(start + CHUNK_SIZE, sectionText.length());
-                String chunkText = sectionText.substring(start, end);
+    // 对每个章节进行切分
+    int chunkIndex = 0;
+    for (Section section : sections) {
+      String sectionText = section.text();
+      String sectionPath = section.path();  // 如 "第一章 > 1.1 节"
 
-                chunks.add(new Chunk(
-                    UUID.randomUUID().toString(),
-                    resourceId,
-                    chunkText,
-                    chunkIndex++,
-                    sectionPath,  // 章节路径作为定位信息
-                    "markdown"
-                ));
+      // 简单固定窗口切分
+      int start = 0;
+      while (start < sectionText.length()) {
+        int end = Math.min(start + CHUNK_SIZE, sectionText.length());
+        String chunkText = sectionText.substring(start, end);
 
-                start = end - OVERLAP;
-            }
-        }
+        chunks.add(new Chunk(
+            UUID.randomUUID().toString(),
+            resourceId,
+            chunkText,
+            chunkIndex++,
+            sectionPath,  // 章节路径作为定位信息
+            "markdown"
+        ));
 
-        return chunks;
+        start = end - OVERLAP;
+      }
     }
 
-    private static class HeadingVisitor extends AbstractVisitor {
-        private final List<Section> sections = new ArrayList<>();
-        private final LinkedList<String> headingStack = new LinkedList<>();
-        private final StringBuilder currentSectionText = new StringBuilder();
+    return chunks;
+  }
 
-        public List<Section> getSections() {
-            // 完成最后一个 section
-            if (currentSectionText.length() > 0) {
-                sections.add(new Section(
-                    String.join(" > ", headingStack),
-                    currentSectionText.toString()
-                ));
-            }
-            return sections;
-        }
+  private static class HeadingVisitor extends AbstractVisitor {
 
-        @Override
-        public void visit(Heading heading) {
-            // 保存上一个 section
-            if (currentSectionText.length() > 0) {
-                sections.add(new Section(
-                    String.join(" > ", headingStack),
-                    currentSectionText.toString()
-                ));
-                currentSectionText.setLength(0);
-            }
+    private final List<Section> sections = new ArrayList<>();
+    private final LinkedList<String> headingStack = new LinkedList<>();
+    private final StringBuilder currentSectionText = new StringBuilder();
 
-            // 更新 heading 栈
-            int level = heading.getLevel();
-            String title = ((Text) heading.getFirstChild()).getLiteral();
-            updateHeadingStack(level, title);
-        }
+    public List<Section> getSections() {
+      // 完成最后一个 section
+      if (currentSectionText.length() > 0) {
+        sections.add(new Section(
+        String.join(" > ", headingStack),
+        currentSectionText.toString()
+    ));
+  }
+  return sections;
+}
 
-        @Override
-        public void visit(Text text) {
-            currentSectionText.append(text.getLiteral());
-        }
+@Override
+public void visit(Heading heading) {
+  // 保存上一个 section
+  if (currentSectionText.length() > 0) {
+    sections.add(new Section(
+        String.join(" > ", headingStack),
+        currentSectionText.toString()
+    ));
+    currentSectionText.setLength(0);
+  }
 
-        private void updateHeadingStack(int level, String title) {
-            // 移除更深层级的 heading
-            while (headingStack.size() >= level) {
-                headingStack.removeLast();
-            }
-            headingStack.add(title);
-        }
+  // 更新 heading 栈
+  int level = heading.getLevel();
+  String title = ((Text) heading.getFirstChild()).getLiteral();
+  updateHeadingStack(level, title);
+}
+
+@Override
+public void visit(Text text) {
+  currentSectionText.append(text.getLiteral());
+}
+
+private void updateHeadingStack(int level, String title) {
+  // 移除更深层级的 heading
+  while (headingStack.size() >= level) {
+    headingStack.removeLast();
+  }
+  headingStack.add(title);
+}
     }
 
-    private record Section(String path, String text) {}
+  private record Section(String path, String text) {}
 }
 ```
 

@@ -24,6 +24,8 @@
 **主要依赖**：
 - **核心框架**：Spring Boot 3.2+ (Spring MVC、Spring Transaction)
 - **持久层**：MyBatis 3.5+（标准 MyBatis，企业级 ORM 框架）、MyBatis Spring Boot Starter
+  - SQL 语句统一定义在 XML 文件中（非注解方式），便于维护和优化
+  - Mapper 接口与 XML 分离，符合企业级最佳实践
 - **代码简化**：Lombok（减少样板代码：@Data、@Slf4j、@Builder 等）
 - **日志**：Slf4j + Logback（Spring Boot 默认日志）
 - **RAG 编排**：LangChain4j 0.29+
@@ -44,16 +46,19 @@
 - **HTTP 客户端**：Axios（Promise based）
 - **工具库**：Day.js（日期处理）、Lodash-es（工具函数）
 **代码规范**：
+- **统一配置**：项目根目录包含 `.editorconfig` 文件，统一所有文件类型的编码风格
 - **Java**：遵循 [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html)
   - 2 空格缩进
   - 命名规范：类名（PascalCase）、方法名（camelCase）、常量（UPPER_SNAKE_CASE）
   - 版权声明在每个文件顶部
   - 导入顺序：标准库 → 第三方库 → 项目内部
+  - Javadoc 注释：所有公共方法必须包含完整的 Javadoc（@param、@return）
 - **TypeScript/Vue**：遵循 [Google TypeScript Style Guide](https://google.github.io/styleguide/tsguide.html)
   - 2 空格缩进
   - 命名规范：类/接口/枚举（PascalCase）、变量/函数（camelCase）、常量（UPPER_SNAKE_CASE）
   - 字符串优先使用单引号
   - 组件文件名：PascalCase（如 `UserList.vue`）
+  - 严格的类型检查：strict mode enabled
 **目标平台**：Linux 服务器（开发环境支持 macOS/Windows + Docker Compose）
 **项目类型**：Web 应用（前后端分离）
 **性能目标**：
@@ -264,15 +269,25 @@ backend/                 # Spring Boot 后端
 │   │   │   │   ├── BehaviorController.java      # /api/behaviors/*
 │   │   │   │   └── EvalController.java          # /api/eval/*
 │   │   │   ├── service/                         # 业务服务层
-│   │   │   │   ├── AuthService.java             # 认证服务
-│   │   │   │   ├── ResourceService.java         # 资源管理服务
-│   │   │   │   ├── DocumentProcessor.java       # 文档处理（PDF/MD 解析、切片）
-│   │   │   │   ├── VectorService.java           # 向量化与索引服务
-│   │   │   │   ├── SearchService.java           # 语义检索服务
-│   │   │   │   ├── RagService.java              # RAG 问答编排服务
-│   │   │   │   ├── UserProfileService.java      # 用户画像服务
-│   │   │   │   ├── RecommendationService.java   # 推荐服务
-│   │   │   │   └── EvalService.java             # 离线评测服务
+│   │   │   │   ├── auth/                         # 认证服务
+│   │   │   │   │   ├── AuthService.java           # 认证服务接口
+│   │   │   │   │   ├── ResourceService.java       # 资源服务接口
+│   │   │   │   │   ├── SearchService.java         # 检索服务接口
+│   │   │   │   │   ├── RagService.java            # RAG 服务接口
+│   │   │   │   │   ├── UserProfileService.java   # 画像服务接口
+│   │   │   │   │   ├── RecommendationService.java # 推荐服务接口
+│   │   │   │   │   └── EvalService.java           # 评测服务接口
+│   │   │   │   ├── impl/                         # 服务实现类（统一放置）
+│   │   │   │   │   ├── AuthServiceImpl.java       # 认证服务实现
+│   │   │   │   │   ├── ResourceServiceImpl.java   # 资源服务实现
+│   │   │   │   │   ├── PdfProcessor.java          # PDF 处理器
+│   │   │   │   │   ├── MarkdownProcessor.java    # Markdown 处理器
+│   │   │   │   │   ├── VectorServiceImpl.java     # 向量化服务实现
+│   │   │   │   │   ├── SearchServiceImpl.java     # 检索服务实现
+│   │   │   │   │   ├── RagServiceImpl.java        # RAG 服务实现
+│   │   │   │   │   ├── UserProfileServiceImpl.java # 画像服务实现
+│   │   │   │   │   ├── RecommendationServiceImpl.java # 推荐服务实现
+│   │   │   │   │   └── EvalServiceImpl.java       # 评测服务实现
 │   │   │   ├── gateway/                         # 模型网关（核心）
 │   │   │   │   ├── ModelGateway.java            # ModelGateway 接口
 │   │   │   │   ├── EmbeddingGateway.java        # Embedding 网关实现
@@ -489,6 +504,8 @@ README.md                                        # 项目说明
    - 定义实体属性、关系、验证规则
    - 定义 MySQL 表结构（字段、类型、索引、约束）
    - 定义 Redis 向量索引 schema（字段、向量维度、距离算法）
+   - MyBatis Mapper 接口定义（符合 Google Java Style Guide）
+   - MyBatis Mapper XML 配置（SQL 语句与接口分离）
 
 2. **API 契约** (`contracts/`)
    - 从功能需求生成 RESTful API 端点
@@ -503,7 +520,12 @@ README.md                                        # 项目说明
    - 示例 API 调用（curl 或 Postman）
    - 常见问题排查
 
-4. **Agent 上下文更新**
+4. **代码规范配置** (`.editorconfig`)
+   - 统一 Java、TypeScript、XML、JSON、YAML 等文件类型的编码风格
+   - 符合 Google Java Style Guide 和 Google TypeScript Style Guide
+   - 配置缩进、换行符、字符编码等基础规范
+
+5. **Agent 上下文更新**
    - 运行 `.specify/scripts/bash/update-agent-context.sh claude`
    - 更新 Claude Code 的项目上下文文件，添加新技术栈（Java 17、Spring Boot、LangChain4j、Redis Stack、智谱 AI）
 

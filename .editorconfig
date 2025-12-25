@@ -1,0 +1,76 @@
+# EditorConfig for Aetheris RAG System
+# 符合 Google Java Style Guide 和 Google TypeScript Style Guide
+# https://google.github.io/styleguide/javaguide.html
+# https://google.github.io/styleguide/tsguide.html
+
+# 标识为最顶层的 EditorConfig 配置文件
+root = true
+
+# 所有文件的默认设置
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Java 源代码文件（Google Java Style Guide）
+[*.{java,xml}]
+indent_style = space
+indent_size = 2
+max_line_length = 100
+continuation_indent_size = 4
+
+# Kotlin 源代码文件
+[*.kt]
+indent_style = space
+indent_size = 2
+continuation_indent_size = 4
+
+# TypeScript/JavaScript/Vue 源代码文件（Google TypeScript Style Guide）
+[*.{ts,tsx,js,jsx,vue}]
+indent_style = space
+indent_size = 2
+max_line_length = 80
+
+# JSON/YAML 配置文件
+[*.{json,yaml,yml}]
+indent_style = space
+indent_size = 2
+
+# Markdown 文档
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = off
+
+# SQL 文件
+[*.sql]
+indent_style = space
+indent_size = 2
+
+# Shell 脚本
+[*.sh]
+indent_style = space
+indent_size = 2
+
+# HTML 文件
+[*.html]
+indent_style = space
+indent_size = 2
+
+# CSS/SCSS 文件
+[*.{css,scss}]
+indent_style = space
+indent_size = 2
+
+# Maven/Gradle 构建文件
+[{pom.xml,build.gradle,*.gradle.kts}]
+indent_style = space
+indent_size = 2
+
+# 忽略特定文件
+[.gitmodules]
+indent_style = unset
+
+# Makefile
+[Makefile]
+indent_style = tab

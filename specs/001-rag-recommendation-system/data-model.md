@@ -529,29 +529,65 @@ public class EvalRun {
 package com.aetheris.rag.mapper;
 
 import com.aetheris.rag.model.User;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.mapper.annotation.Mapper;
 
 import java.time.Instant;
 
+/**
+ * 用户数据访问接口
+ *
+ * <p>符合 Google Java Style Guide：
+ * <ul>
+ *   <li>方法名使用 camelCase</li>
+ *   <li>参数使用 @Param 注解</li>
+ *   <li>返回类型明确</li>
+ *   <li>SQL 语句定义在对应的 UserMapper.xml 文件中</li>
+ * </ul>
+ */
 @Mapper
 public interface UserMapper {
 
-    @Insert("INSERT INTO users (username, email, password_hash, created_at, updated_at) " +
-            "VALUES (#{username}, #{email}, #{passwordHash}, #{createdAt}, #{updatedAt})")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
-    int insert(User user);
+  /**
+   * 插入用户记录
+   *
+   * @param user 用户实体
+   * @return 影响行数
+   */
+  int insert(User user);
 
-    @Select("SELECT * FROM users WHERE id = #{id}")
-    User findById(Long id);
+  /**
+   * 根据 ID 查询用户
+   *
+   * @param id 用户ID
+   * @return 用户实体，不存在则返回 null
+   */
+  User findById(Long id);
 
-    @Select("SELECT * FROM users WHERE email = #{email}")
-    User findByEmail(String email);
+  /**
+   * 根据邮箱查询用户
+   *
+   * @param email 邮箱地址
+   * @return 用户实体，不存在则返回 null
+   */
+  User findByEmail(String email);
 
-    @Select("SELECT * FROM users WHERE username = #{username}")
-    User findByUsername(String username);
+  /**
+   * 根据用户名查询用户
+   *
+   * @param username 用户名
+   * @return 用户实体，不存在则返回 null
+   */
+  User findByUsername(String username);
 
-    @Update("UPDATE users SET last_active_at = #{lastActiveAt} WHERE id = #{id}")
-    int updateLastActiveAt(@Param("id") Long id, @Param("lastActiveAt") Instant lastActiveAt);
+  /**
+   * 更新最后活跃时间
+   *
+   * @param id 用户ID
+   * @param lastActiveAt 最后活跃时间
+   * @return 影响行数
+   */
+  int updateLastActiveAt(@Param("id") Long id, @Param("lastActiveAt") Instant lastActiveAt);
 }
 ```
 
@@ -561,34 +597,74 @@ public interface UserMapper {
 package com.aetheris.rag.mapper;
 
 import com.aetheris.rag.model.Resource;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.mapper.annotation.Mapper;
 
 import java.util.List;
 
+/**
+ * 学习资源数据访问接口
+ *
+ * <p>符合 Google Java Style Guide：
+ * <ul>
+ *   <li>方法名使用 camelCase</li>
+ *   <li>参数使用 @Param 注解</li>
+ *   <li>返回类型明确</li>
+ *   <li>SQL 语句定义在对应的 ResourceMapper.xml 文件中</li>
+ * </ul>
+ */
 @Mapper
 public interface ResourceMapper {
 
-    @Insert("INSERT INTO resources (title, tags, file_type, file_path, file_size, description, " +
-            "content_hash, uploaded_by, upload_time) " +
-            "VALUES (#{title}, #{tags}, #{fileType}, #{filePath}, #{fileSize}, #{description}, " +
-            "#{contentHash}, #{uploadedBy}, #{uploadTime})")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
-    int insert(Resource resource);
+  /**
+   * 插入资源记录
+   *
+   * @param resource 资源实体
+   * @return 影响行数
+   */
+  int insert(Resource resource);
 
-    @Select("SELECT * FROM resources WHERE id = #{id}")
-    Resource findById(Long id);
+  /**
+   * 根据ID查询资源
+   *
+   * @param id 资源ID
+   * @return 资源实体，不存在则返回 null
+   */
+  Resource findById(Long id);
 
-    @Select("SELECT * FROM resources WHERE content_hash = #{contentHash}")
-    Resource findByContentHash(String contentHash);
+  /**
+   * 根据内容哈希查询资源（用于去重检查）
+   *
+   * @param contentHash 内容哈希值（SHA-256）
+   * @return 资源实体，不存在则返回 null
+   */
+  Resource findByContentHash(String contentHash);
 
-    @Select("SELECT * FROM resources WHERE uploaded_by = #{userId} ORDER BY upload_time DESC LIMIT #{limit}")
-    List<Resource> findByUploader(@Param("userId") Long userId, @Param("limit") int limit);
+  /**
+   * 查询指定用户上传的资源列表（按上传时间倒序）
+   *
+   * @param userId 用户ID
+   * @param limit 返回数量限制
+   * @return 资源列表
+   */
+  List<Resource> findByUploader(@Param("userId") Long userId, @Param("limit") int limit);
 
-    @Update("UPDATE resources SET chunk_count = #{chunkCount}, vectorized = #{vectorized} WHERE id = #{id}")
-    int updateChunkStatus(Resource resource);
+  /**
+   * 更新资源的切片统计和向量化状态
+   *
+   * @param resource 资源实体（包含 id、chunkCount、vectorized 字段）
+   * @return 影响行数
+   */
+  int updateChunkStatus(Resource resource);
 
-    @Select("SELECT * FROM resources ORDER BY upload_time DESC LIMIT #{offset}, #{limit}")
-    List<Resource> listPaged(@Param("offset") int offset, @Param("limit") int limit);
+  /**
+   * 分页查询资源列表（按上传时间倒序）
+   *
+   * @param offset 偏移量
+   * @param limit 每页大小
+   * @return 资源列表
+   */
+  List<Resource> listPaged(@Param("offset") int offset, @Param("limit") int limit);
 }
 ```
 
@@ -598,37 +674,82 @@ public interface ResourceMapper {
 package com.aetheris.rag.mapper;
 
 import com.aetheris.rag.model.Chunk;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.mapper.annotation.Mapper;
 
 import java.util.List;
 
+/**
+ * 资源切片数据访问接口
+ *
+ * <p>符合 Google Java Style Guide：
+ * <ul>
+ *   <li>方法名使用 camelCase</li>
+ *   <li>参数使用 @Param 注解</li>
+ *   <li>返回类型明确</li>
+ *   <li>SQL 语句定义在对应的 ChunkMapper.xml 文件中</li>
+ * </ul>
+ */
 @Mapper
 public interface ChunkMapper {
 
-    @Insert("INSERT INTO resource_chunks (resource_id, chunk_index, chunk_text, location_info, " +
-            "page_start, page_end, chapter_path, text_hash, vectorized) " +
-            "VALUES (#{resourceId}, #{chunkIndex}, #{chunkText}, #{locationInfo}, " +
-            "#{pageStart}, #{pageEnd}, #{chapterPath}, #{textHash}, #{vectorized})")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
-    int insert(Chunk chunk);
+  /**
+   * 插入切片记录
+   *
+   * @param chunk 切片实体
+   * @return 影响行数
+   */
+  int insert(Chunk chunk);
 
-    @Select("SELECT * FROM resource_chunks WHERE id = #{id}")
-    Chunk findById(Long id);
+  /**
+   * 根据ID查询切片
+   *
+   * @param id 切片ID
+   * @return 切片实体，不存在则返回 null
+   */
+  Chunk findById(Long id);
 
-    @Select("SELECT * FROM resource_chunks WHERE resource_id = #{resourceId} ORDER BY chunk_index")
-    List<Chunk> findByResourceId(Long resourceId);
+  /**
+   * 查询指定资源的所有切片（按切片序号排序）
+   *
+   * @param resourceId 资源ID
+   * @return 切片列表
+   */
+  List<Chunk> findByResourceId(Long resourceId);
 
-    @Select("SELECT * FROM resource_chunks WHERE text_hash = #{textHash} LIMIT 1")
-    Chunk findByTextHash(String textHash);
+  /**
+   * 根据文本哈希查询切片（用于去重检查）
+   *
+   * @param textHash 文本哈希值
+   * @return 切片实体，不存在则返回 null
+   */
+  Chunk findByTextHash(String textHash);
 
-    @Select("SELECT * FROM resource_chunks WHERE resource_id = #{resourceId} AND vectorized = FALSE LIMIT #{limit}")
-    List<Chunk> findUnvectorizedByResourceId(@Param("resourceId") Long resourceId, @Param("limit") int limit);
+  /**
+   * 查询指定资源中未向量化的切片（用于批量向量化）
+   *
+   * @param resourceId 资源ID
+   * @param limit 返回数量限制
+   * @return 未向量化的切片列表
+   */
+  List<Chunk> findUnvectorizedByResourceId(@Param("resourceId") Long resourceId,
+      @Param("limit") int limit);
 
-    @Update("UPDATE resource_chunks SET vectorized = TRUE WHERE id = #{id}")
-    int markVectorized(Long id);
+  /**
+   * 标记切片为已向量化
+   *
+   * @param id 切片ID
+   * @return 影响行数
+   */
+  int markVectorized(Long id);
 
-    @Delete("DELETE FROM resource_chunks WHERE resource_id = #{resourceId}")
-    int deleteByResourceId(Long resourceId);
+  /**
+   * 删除指定资源的所有切片
+   *
+   * @param resourceId 资源ID
+   * @return 影响行数
+   */
+  int deleteByResourceId(Long resourceId);
 }
 ```
 
@@ -638,30 +759,61 @@ public interface ChunkMapper {
 package com.aetheris.rag.mapper;
 
 import com.aetheris.rag.model.UserBehavior;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.mapper.annotation.Mapper;
 
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * 用户行为数据访问接口
+ *
+ * <p>符合 Google Java Style Guide：
+ * <ul>
+ *   <li>方法名使用 camelCase</li>
+ *   <li>参数使用 @Param 注解</li>
+ *   <li>返回类型明确</li>
+ *   <li>SQL 语句定义在对应的 UserBehaviorMapper.xml 文件中</li>
+ * </ul>
+ */
 @Mapper
 public interface UserBehaviorMapper {
 
-    @Insert("INSERT INTO user_behaviors (user_id, behavior_type, resource_id, query_text, behavior_time, session_id) " +
-            "VALUES (#{userId}, #{behaviorType}, #{resourceId}, #{queryText}, #{behaviorTime}, #{sessionId})")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
-    int insert(UserBehavior behavior);
+  /**
+   * 插入用户行为记录
+   *
+   * @param behavior 行为实体
+   * @return 影响行数
+   */
+  int insert(UserBehavior behavior);
 
-    @Select("SELECT * FROM user_behaviors WHERE user_id = #{userId} AND behavior_type = 'QUERY' " +
-            "ORDER BY behavior_time DESC LIMIT #{limit}")
-    List<UserBehavior> findRecentQueries(@Param("userId") Long userId, @Param("limit") int limit);
+  /**
+   * 查询用户最近的查询行为（按时间倒序）
+   *
+   * @param userId 用户ID
+   * @param limit 返回数量限制
+   * @return 查询行为列表
+   */
+  List<UserBehavior> findRecentQueries(@Param("userId") Long userId, @Param("limit") int limit);
 
-    @Select("SELECT * FROM user_behaviors WHERE user_id = #{userId} " +
-            "AND behavior_time >= #{startTime} ORDER BY behavior_time DESC")
-    List<UserBehavior> findByUserIdAndTimeRange(@Param("userId") Long userId,
-                                                @Param("startTime") Instant startTime);
+  /**
+   * 查询用户在指定时间之后的所有行为
+   *
+   * @param userId 用户ID
+   * @param startTime 起始时间
+   * @return 行为列表
+   */
+  List<UserBehavior> findByUserIdAndTimeRange(@Param("userId") Long userId,
+      @Param("startTime") Instant startTime);
 
-    @Select("SELECT COUNT(*) FROM user_behaviors WHERE user_id = #{userId} AND behavior_type = #{type}")
-    int countByType(@Param("userId") Long userId, @Param("type") UserBehavior.BehaviorType type);
+  /**
+   * 统计用户指定类型的的行为数量
+   *
+   * @param userId 用户ID
+   * @param type 行为类型（QUERY、CLICK、FAVORITE）
+   * @return 行为数量
+   */
+  int countByType(@Param("userId") Long userId, @Param("type") UserBehavior.BehaviorType type);
 }
 ```
 
@@ -671,32 +823,54 @@ public interface UserBehaviorMapper {
 package com.aetheris.rag.mapper;
 
 import com.aetheris.rag.model.UserProfile;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.mapper.annotation.Mapper;
 
+/**
+ * 用户画像数据访问接口
+ *
+ * <p>符合 Google Java Style Guide：
+ * <ul>
+ *   <li>方法名使用 camelCase</li>
+ *   <li>参数使用 @Param 注解</li>
+ *   <li>返回类型明确</li>
+ *   <li>SQL 语句定义在对应的 UserProfileMapper.xml 文件中</li>
+ * </ul>
+ */
 @Mapper
 public interface UserProfileMapper {
 
-    @Insert("INSERT INTO user_profiles (user_id, profile_vector, window_size, query_count, " +
-            "click_count, favorite_count) " +
-            "VALUES (#{userId}, #{profileVector}, #{windowSize}, #{queryCount}, " +
-            "#{clickCount}, #{favoriteCount}) " +
-            "ON DUPLICATE KEY UPDATE " +
-            "profile_vector = VALUES(profile_vector), " +
-            "window_size = VALUES(window_size), " +
-            "query_count = VALUES(query_count), " +
-            "click_count = VALUES(click_count), " +
-            "favorite_count = VALUES(favorite_count), " +
-            "updated_at = CURRENT_TIMESTAMP")
-    int upsert(UserProfile profile);
+  /**
+   * 插入或更新用户画像（UPSERT 操作）
+   *
+   * @param profile 用户画像实体
+   * @return 影响行数
+   */
+  int upsert(UserProfile profile);
 
-    @Select("SELECT * FROM user_profiles WHERE user_id = #{userId}")
-    UserProfile findByUserId(Long userId);
+  /**
+   * 根据用户ID查询画像
+   *
+   * @param userId 用户ID
+   * @return 用户画像实体，不存在则返回 null
+   */
+  UserProfile findByUserId(Long userId);
 
-    @Update("UPDATE user_profiles SET query_count = query_count + 1 WHERE user_id = #{userId}")
-    int incrementQueryCount(Long userId);
+  /**
+   * 增加用户的查询次数计数
+   *
+   * @param userId 用户ID
+   * @return 影响行数
+   */
+  int incrementQueryCount(Long userId);
 
-    @Update("UPDATE user_profiles SET click_count = click_count + 1 WHERE user_id = #{userId}")
-    int incrementClickCount(Long userId);
+  /**
+   * 增加用户的点击次数计数
+   *
+   * @param userId 用户ID
+   * @return 影响行数
+   */
+  int incrementClickCount(Long userId);
 }
 ```
 
@@ -707,25 +881,46 @@ package com.aetheris.rag.mapper;
 
 import com.aetheris.rag.model.EvalQuery;
 import com.aetheris.rag.model.EvalRun;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.mapper.annotation.Mapper;
 
 import java.util.List;
 
+/**
+ * 评测数据访问接口
+ *
+ * <p>符合 Google Java Style Guide：
+ * <ul>
+ *   <li>方法名使用 camelCase</li>
+ *   <li>参数使用 @Param 注解</li>
+ *   <li>返回类型明确</li>
+ *   <li>SQL 语句定义在对应的 EvalMapper.xml 文件中</li>
+ * </ul>
+ */
 @Mapper
 public interface EvalMapper {
 
-    @Insert("INSERT INTO eval_queries (query_id, query_text, relevant_resources, created_by) " +
-            "VALUES (#{queryId}, #{queryText}, #{relevantResources}, #{createdBy})")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
-    int insertQuery(EvalQuery query);
+  /**
+   * 插入评测查询
+   *
+   * @param query 评测查询实体
+   * @return 影响行数
+   */
+  int insertQuery(EvalQuery query);
 
-    @Select("SELECT * FROM eval_queries ORDER BY id")
-    List<EvalQuery> findAllQueries();
+  /**
+   * 查询所有评测查询
+   *
+   * @return 评测查询列表
+   */
+  List<EvalQuery> findAllQueries();
 
-    @Insert("INSERT INTO eval_runs (run_name, config, use_profile, metrics) " +
-            "VALUES (#{runName}, #{config}, #{useProfile}, #{metrics})")
-    @Options(useGeneratedKeys = true, keyProperty = "id")
-    int insertRun(EvalRun run);
+  /**
+   * 插入评测运行记录
+   *
+   * @param run 评测运行实体
+   * @return 影响行数
+   */
+  int insertRun(EvalRun run);
 }
 ```
 
@@ -784,6 +979,361 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
 ```
+
+## MyBatis Mapper XML 配置
+
+根据企业级实践和便于维护的原则，SQL 语句统一定义在 XML 文件中，而非使用注解方式。
+XML 文件位于 `backend/src/main/resources/mapper/` 目录下。
+
+### UserMapper.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aetheris.rag.mapper.UserMapper">
+
+  <!-- ResultMap 定义 -->
+  <resultMap id="UserResultMap" type="com.aetheris.rag.model.User">
+    <id column="id" property="id"/>
+    <result column="username" property="username"/>
+    <result column="email" property="email"/>
+    <result column="password_hash" property="passwordHash"/>
+    <result column="created_at" property="createdAt"/>
+    <result column="updated_at" property="updatedAt"/>
+    <result column="last_active_at" property="lastActiveAt"/>
+  </resultMap>
+
+  <!-- 插入用户记录 -->
+  <insert id="insert" parameterType="com.aetheris.rag.model.User"
+      useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO users (username, email, password_hash, created_at, updated_at)
+    VALUES (#{username}, #{email}, #{passwordHash}, #{createdAt}, #{updatedAt})
+  </insert>
+
+  <!-- 根据 ID 查询用户 -->
+  <select id="findById" resultMap="UserResultMap">
+    SELECT * FROM users WHERE id = #{id}
+  </select>
+
+  <!-- 根据邮箱查询用户 -->
+  <select id="findByEmail" resultMap="UserResultMap">
+    SELECT * FROM users WHERE email = #{email}
+  </select>
+
+  <!-- 根据用户名查询用户 -->
+  <select id="findByUsername" resultMap="UserResultMap">
+    SELECT * FROM users WHERE username = #{username}
+  </select>
+
+  <!-- 更新最后活跃时间 -->
+  <update id="updateLastActiveAt">
+    UPDATE users
+    SET last_active_at = #{lastActiveAt}
+    WHERE id = #{id}
+  </update>
+
+</mapper>
+```
+
+### ResourceMapper.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aetheris.rag.mapper.ResourceMapper">
+
+  <resultMap id="ResourceResultMap" type="com.aetheris.rag.model.Resource">
+    <id column="id" property="id"/>
+    <result column="title" property="title"/>
+    <result column="tags" property="tags"/>
+    <result column="file_type" property="fileType"/>
+    <result column="file_path" property="filePath"/>
+    <result column="file_size" property="fileSize"/>
+    <result column="description" property="description"/>
+    <result column="content_hash" property="contentHash"/>
+    <result column="uploaded_by" property="uploadedBy"/>
+    <result column="upload_time" property="uploadTime"/>
+    <result column="chunk_count" property="chunkCount"/>
+    <result column="vectorized" property="vectorized"/>
+  </resultMap>
+
+  <insert id="insert" parameterType="com.aetheris.rag.model.Resource"
+      useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO resources (
+      title, tags, file_type, file_path, file_size, description,
+      content_hash, uploaded_by, upload_time
+    )
+    VALUES (
+      #{title}, #{tags}, #{fileType}, #{filePath}, #{fileSize}, #{description},
+      #{contentHash}, #{uploadedBy}, #{uploadTime}
+    )
+  </insert>
+
+  <select id="findById" resultMap="ResourceResultMap">
+    SELECT * FROM resources WHERE id = #{id}
+  </select>
+
+  <select id="findByContentHash" resultMap="ResourceResultMap">
+    SELECT * FROM resources WHERE content_hash = #{contentHash}
+  </select>
+
+  <select id="findByUploader" resultMap="ResourceResultMap">
+    SELECT * FROM resources
+    WHERE uploaded_by = #{userId}
+    ORDER BY upload_time DESC
+    LIMIT #{limit}
+  </select>
+
+  <update id="updateChunkStatus">
+    UPDATE resources
+    SET chunk_count = #{chunkCount}, vectorized = #{vectorized}
+    WHERE id = #{id}
+  </update>
+
+  <select id="listPaged" resultMap="ResourceResultMap">
+    SELECT * FROM resources
+    ORDER BY upload_time DESC
+    LIMIT #{offset}, #{limit}
+  </select>
+
+</mapper>
+```
+
+### ChunkMapper.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aetheris.rag.mapper.ChunkMapper">
+
+  <resultMap id="ChunkResultMap" type="com.aetheris.rag.model.Chunk">
+    <id column="id" property="id"/>
+    <result column="resource_id" property="resourceId"/>
+    <result column="chunk_index" property="chunkIndex"/>
+    <result column="chunk_text" property="chunkText"/>
+    <result column="location_info" property="locationInfo"/>
+    <result column="page_start" property="pageStart"/>
+    <result column="page_end" property="pageEnd"/>
+    <result column="chapter_path" property="chapterPath"/>
+    <result column="text_hash" property="textHash"/>
+    <result column="vectorized" property="vectorized"/>
+  </resultMap>
+
+  <insert id="insert" parameterType="com.aetheris.rag.model.Chunk"
+      useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO resource_chunks (
+      resource_id, chunk_index, chunk_text, location_info,
+      page_start, page_end, chapter_path, text_hash, vectorized
+    )
+    VALUES (
+      #{resourceId}, #{chunkIndex}, #{chunkText}, #{locationInfo},
+      #{pageStart}, #{pageEnd}, #{chapterPath}, #{textHash}, #{vectorized}
+    )
+  </insert>
+
+  <select id="findById" resultMap="ChunkResultMap">
+    SELECT * FROM resource_chunks WHERE id = #{id}
+  </select>
+
+  <select id="findByResourceId" resultMap="ChunkResultMap">
+    SELECT * FROM resource_chunks
+    WHERE resource_id = #{resourceId}
+    ORDER BY chunk_index
+  </select>
+
+  <select id="findByTextHash" resultMap="ChunkResultMap">
+    SELECT * FROM resource_chunks
+    WHERE text_hash = #{textHash}
+    LIMIT 1
+  </select>
+
+  <select id="findUnvectorizedByResourceId" resultMap="ChunkResultMap">
+    SELECT * FROM resource_chunks
+    WHERE resource_id = #{resourceId} AND vectorized = FALSE
+    LIMIT #{limit}
+  </select>
+
+  <update id="markVectorized">
+    UPDATE resource_chunks
+    SET vectorized = TRUE
+    WHERE id = #{id}
+  </update>
+
+  <delete id="deleteByResourceId">
+    DELETE FROM resource_chunks
+    WHERE resource_id = #{resourceId}
+  </delete>
+
+</mapper>
+```
+
+### UserBehaviorMapper.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aetheris.rag.mapper.UserBehaviorMapper">
+
+  <resultMap id="UserBehaviorResultMap" type="com.aetheris.rag.model.UserBehavior">
+    <id column="id" property="id"/>
+    <result column="user_id" property="userId"/>
+    <result column="behavior_type" property="behaviorType"/>
+    <result column="resource_id" property="resourceId"/>
+    <result column="query_text" property="queryText"/>
+    <result column="behavior_time" property="behaviorTime"/>
+    <result column="session_id" property="sessionId"/>
+  </resultMap>
+
+  <insert id="insert" parameterType="com.aetheris.rag.model.UserBehavior"
+      useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO user_behaviors (
+      user_id, behavior_type, resource_id, query_text, behavior_time, session_id
+    )
+    VALUES (
+      #{userId}, #{behaviorType}, #{resourceId}, #{queryText}, #{behaviorTime}, #{sessionId}
+    )
+  </insert>
+
+  <select id="findRecentQueries" resultMap="UserBehaviorResultMap">
+    SELECT * FROM user_behaviors
+    WHERE user_id = #{userId} AND behavior_type = 'QUERY'
+    ORDER BY behavior_time DESC
+    LIMIT #{limit}
+  </select>
+
+  <select id="findByUserIdAndTimeRange" resultMap="UserBehaviorResultMap">
+    SELECT * FROM user_behaviors
+    WHERE user_id = #{userId}
+      AND behavior_time >= #{startTime}
+    ORDER BY behavior_time DESC
+  </select>
+
+  <select id="countByType" resultType="int">
+    SELECT COUNT(*) FROM user_behaviors
+    WHERE user_id = #{userId} AND behavior_type = #{type}
+  </select>
+
+</mapper>
+```
+
+### UserProfileMapper.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aetheris.rag.mapper.UserProfileMapper">
+
+  <resultMap id="UserProfileResultMap" type="com.aetheris.rag.model.UserProfile">
+    <id column="user_id" property="userId"/>
+    <result column="profile_vector" property="profileVector"
+        typeHandler="com.aetheris.rag.handler.JsonTypeHandler"/>
+    <result column="window_size" property="windowSize"/>
+    <result column="query_count" property="queryCount"/>
+    <result column="click_count" property="clickCount"/>
+    <result column="favorite_count" property="favoriteCount"/>
+    <result column="updated_at" property="updatedAt"/>
+  </resultMap>
+
+  <!-- UPSERT 操作（插入或更新） -->
+  <insert id="upsert" parameterType="com.aetheris.rag.model.UserProfile">
+    INSERT INTO user_profiles (
+      user_id, profile_vector, window_size, query_count,
+      click_count, favorite_count
+    )
+    VALUES (
+      #{userId}, #{profileVector}, #{windowSize}, #{queryCount},
+      #{clickCount}, #{favoriteCount}
+    )
+    ON DUPLICATE KEY UPDATE
+      profile_vector = VALUES(profile_vector),
+      window_size = VALUES(window_size),
+      query_count = VALUES(query_count),
+      click_count = VALUES(click_count),
+      favorite_count = VALUES(favorite_count),
+      updated_at = CURRENT_TIMESTAMP
+  </insert>
+
+  <select id="findByUserId" resultMap="UserProfileResultMap">
+    SELECT * FROM user_profiles
+    WHERE user_id = #{userId}
+  </select>
+
+  <update id="incrementQueryCount">
+    UPDATE user_profiles
+    SET query_count = query_count + 1
+    WHERE user_id = #{userId}
+  </update>
+
+  <update id="incrementClickCount">
+    UPDATE user_profiles
+    SET click_count = click_count + 1
+    WHERE user_id = #{userId}
+  </update>
+
+</mapper>
+```
+
+### EvalMapper.xml
+
+```xml
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aetheris.rag.mapper.EvalMapper">
+
+  <resultMap id="EvalQueryResultMap" type="com.aetheris.rag.model.EvalQuery">
+    <id column="id" property="id"/>
+    <result column="query_id" property="queryId"/>
+    <result column="query_text" property="queryText"/>
+    <result column="relevant_resources" property="relevantResources"
+        typeHandler="com.aetheris.rag.handler.JsonTypeHandler"/>
+    <result column="created_by" property="createdBy"/>
+    <result column="created_at" property="createdAt"/>
+  </resultMap>
+
+  <resultMap id="EvalRunResultMap" type="com.aetheris.rag.model.EvalRun">
+    <id column="id" property="id"/>
+    <result column="run_name" property="runName"/>
+    <result column="config" property="config"
+        typeHandler="com.aetheris.rag.handler.JsonTypeHandler"/>
+    <result column="use_profile" property="useProfile"/>
+    <result column="metrics" property="metrics"
+        typeHandler="com.aetheris.rag.handler.JsonTypeHandler"/>
+    <result column="run_time" property="runTime"/>
+  </resultMap>
+
+  <insert id="insertQuery" parameterType="com.aetheris.rag.model.EvalQuery"
+      useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO eval_queries (query_id, query_text, relevant_resources, created_by)
+    VALUES (#{queryId}, #{queryText}, #{relevantResources}, #{createdBy})
+  </insert>
+
+  <select id="findAllQueries" resultMap="EvalQueryResultMap">
+    SELECT * FROM eval_queries ORDER BY id
+  </select>
+
+  <insert id="insertRun" parameterType="com.aetheris.rag.model.EvalRun"
+      useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO eval_runs (run_name, config, use_profile, metrics)
+    VALUES (#{runName}, #{config}, #{useProfile}, #{metrics})
+  </insert>
+
+</mapper>
+```
+
+### XML 配置说明
+
+1. **ResultMap 映射**：每个 Mapper XML 定义 ResultMap，映射数据库列到实体类属性
+2. **类型处理器**：
+   - `JsonTypeHandler` 用于处理 JSON 类型字段（profile_vector、relevant_resources、config、metrics）
+   - 需要自定义实现 `org.apache.ibatis.type.TypeHandler` 接口
+3. **SQL 语句分离**：所有 SQL 定义在 XML 中，便于维护和优化
+4. **符合 Google Java Style**：XML 使用 2 空格缩进，标签属性对齐
 
 ## 总结
 
