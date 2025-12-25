@@ -1,50 +1,169 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+  同步影响报告
+  ================
+  版本：无 → 1.0.0
+  修改原则：不适用（首次创建）
+  新增章节：
+    - 性能优先原则
+    - 存储与检索原则
+    - 缓存与幂等原则
+    - 模型接入原则
+    - 可追溯原则
+    - MVP 迭代原则
+    - 测试与验收原则
+    - 治理规则
+  删除章节：不适用
+  模板状态：
+    ✅ plan-template.md - 已审查，Constitution Check 章节兼容
+    ✅ spec-template.md - 已审查，需求结构兼容
+    ✅ tasks-template.md - 已审查，任务组织兼容
+  待办事项：无
+-->
 
-## Core Principles
+# Aetheris 项目宪章
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+## 核心原则
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### 一、性能优先原则
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+**强制要求**：系统设计与实现必须以降低端到端时延和推理成本为首要目标。
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+**具体要求**：
+- 核心链路的各个阶段必须可度量，并记录关键阶段耗时：解析、Embedding、向量检索、LLM 生成
+- 每个请求的性能指标必须记录在日志中，明确标识各阶段边界
+- 所有架构决策必须说明对性能的影响（吞吐量、p95 时延、成本）
+- 必须定义并强制执行关键路径的性能预算
+- 任何新增功能若未进行明确优化，不得显著恶化 p95 时延
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+**理由**：RAG 系统本质上对时延敏感。用户体验和运营成本直接依赖于管道执行效率。缺乏性能优先思维，系统将积累难以修复的技术债务。
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+### 二、存储与检索原则
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+**强制要求**：Redis Stack 必须统一承担向量检索与缓存职责。MySQL 仅用于结构化数据与文本/元数据存储。
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+**具体要求**：
+- 向量相似度检索必须使用 Redis Stack 的 RediSearch 模块
+- 原则上不得引入第二套向量数据库或等价中间件，除非对本宪章进行明确修订
+- MySQL 存储：用户、资源元数据、chunk 文本与位置信息（页码/段落/片段序号）、行为日志、推荐记录、评测数据集与评测结果
+- Redis 存储：chunk 向量索引及必要的检索元数据（resourceId、chunkId、chunkIndex、docType、tags 等），以及缓存（embedding、TopK 结果等）
+- 缓存策略必须充分利用 Redis Stack 的能力
+- 数据访问层必须抽象底层存储实现，以维持此分离
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+**理由**：统一存储架构可降低运维复杂度，最小化数据传输开销，并简化性能优化。引入多套向量存储会因跨系统同步增加时延，并产生一致性问题。
 
-## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
+### 三、缓存与幂等原则
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+**强制要求**：Embedding 结果必须按文本哈希进行缓存以消除重复计算。向量化入库必须幂等，防止重复计费。
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**具体要求**：
+- Embedding 缓存 key 必须基于“规范化文本（去冗余空白/统一换行等）+ 确定性哈希”生成
+- 在调用任何 Embedding API 之前必须先查缓存；命中则禁止重复调用外部模型
+- 向量入库必须幂等：重复入库同一 chunk 内容不得产生重复向量与重复索引（以 contentHash/唯一约束/幂等写入保证）
+- TopK 检索结果可采用短 TTL 缓存（可配置开关与 TTL），缓存 key 需包含 queryHash + filters + topK + 检索版本号（避免参数变更导致脏结果）
+- 必须文档化缓存失效策略（例如：资源删除/重建索引时清理相关缓存）
+
+**理由**：Embedding API 按使用量计费，且代表显著的运营成本。重复计算浪费资金并增加时延。幂等性可防止重试风暴或重复处理导致费用失控。
+
+### 四、模型接入原则
+
+**强制要求**：必须设置统一模型适配层（ModelGateway）作为唯一模型调用出口，确保一致的可靠性、成本控制与安全策略。
+
+**具体要求**：
+- ModelGateway 必须是唯一直接调用智谱 AI API 的组件；业务代码不得直连模型
+- Embedding 与 Chat 模型配置必须分离，且可独立配置：modelName、timeout、重试、并发上限、最大输入长度等
+- 请求参数必须集中管理：temperature、top_p、max_tokens、stop、超时、重试、限流等不得散落硬编码在业务层
+- ModelGateway 必须统一实现：
+  - 超时（timeout）
+  - 重试（对 429/5xx/网络错误分策略）
+  - 限流/并发控制（防止打爆 API 与系统线程）
+  - 降级：LLM 不可用或超时时，允许返回“检索结果 + 引用摘要/候选资源列表”，不得空白失败
+- 日志必须按安全要求脱敏：
+  - 不得记录 API key、Authorization 等凭证
+  - 用户输入、上下文片段入日志必须截断/脱敏
+- 必须保留模型调用的最小审计信息：模型名、耗时、是否重试、返回状态（不含敏感内容）
+
+**理由**：集中式模型接入可实现一致的错误处理、可观测性、成本控制和安全策略执行。分散的 API 调用会导致难以管理的复杂性和安全漏洞。
+
+### 五、可追溯原则
+
+**强制要求**：所有问答与推荐结果必须提供引用来源与证据片段。
+
+**具体要求**：
+- 每个 AI 生成的响应必须包含 citations（机器可解析且人类可读），至少包含：
+  - resourceId（文档标识）
+  - chunkId（片段标识）
+  - chunkIndex（片段序号/位置）
+  - 页码/范围（PDF）或等价定位信息（MD：标题/段落/行号或 chunkIndex）
+  - snippet（支持该结论的文本摘录）
+- 引用格式必须稳定（推荐 JSON 或固定 Markdown 模板），便于前端展示与自动化测试
+- 不得输出无法指向证据的结论性内容；当检索不足时必须：
+  - 明确提示“证据不足/未找到相关资料”
+  - 返回可供用户继续检索的候选资源/改写建议（允许短建议，但仍需引用）
+- 系统 Prompt 与上下文组织必须以“基于证据回答”为第一约束，降低幻觉
+
+**理由**：RAG 系统需要可验证的归因以建立用户信任并调试检索质量。无法溯源的声明无法被验证、调试或信任。
+
+### 六、MVP 迭代原则
+
+**强制要求**：优先交付最小可用闭环，并逐步扩展用户画像与个性化推荐，形成“检索—生成—推荐—反馈”的闭环。
+
+**具体要求**：
+- 初始 MVP 必须包含：Markdown 入库→切片/向量化→语义检索→带引用问答→行为记录
+- 后续迭代可添加：PDF 支持、用户画像、个性化推荐、推荐理由生成、评测面板（可分阶段）
+- 用户画像必须采用“轻量可落地”策略：最近 N 次 query（可加 click/fav 权重）embedding 后做滑动平均形成兴趣向量
+- 推荐必须输出 Top‑N 列表，并给出理由与学习建议；推荐理由必须引用证据 chunk
+- 每个迭代必须独立可部署、可测试、可演示；不得一次性堆砌不可验收的功能集合
+
+**理由**：迭代开发可在复杂性累积之前验证核心假设；在不稳定的基础上构建高级功能会产生技术债务并浪费精力；毕业设计周期有限，闭环优先可确保可交付；轻量画像可在数据稀疏条件下实现可见个性化收益。
+
+### 七、测试与验收原则
+
+**强制要求**：核心链路具备自动化测试；检索与推荐具备离线评测与可复现实验。
+
+**具体要求**：
+- 单元测试：核心组件（切片、清洗、Embedding 缓存、向量检索封装、引用拼装、画像更新、资源聚合排序）必须覆盖关键逻辑
+- 集成测试：至少 1 条端到端测试验证“入库→检索→问答返回”，并断言返回包含 citations 且字段完整
+- 关键参数必须可配置并可复现：
+  - chunk 大小（字符/Token 近似）
+  - chunk 重叠
+  - TopK
+  - Embedding 模型与 Chat 模型选择
+  - 生成参数（temperature 等）
+- 离线评测必须支持：
+  - 语义检索：Precision@K、Recall@K（至少两项）
+  - 推荐对比：无画像 vs 有画像的指标差异（至少输出对比结果）
+  - 性能：记录平均时延与 p95（或近似 p95）
+- 评测数据集允许小规模人工标注，但必须可版本化保存并可重复运行
+
+**理由**：RAG 推荐系统效果受参数与数据影响显著；需要可复现评测支撑调参与论文撰写。
+
+## 治理规则
+
+### 修订流程
+
+1. 提出修订建议，包含理由和影响分析
+2. 记录版本变更（按语义化版本规则进行 MAJOR/MINOR 变更）
+3. 更新相关模板（plan、spec、tasks）以反映新原则
+4. 在本宪章的变更日志中记录修订
+
+### 版本策略
+
+- **MAJOR（主版本）**：向后不兼容的变更（原则移除、重新定义或新增强制要求）
+- **MINOR（次版本）**：新增原则或对现有原则的实质性扩展
+- **PATCH（补丁版本）**：澄清、文字改进、错别字修正（非语义变更）
+
+### 合规性审查
+
+- 所有功能规格说明必须引用适用的宪章原则
+- 所有实施计划必须包含"宪章检查"关卡以验证合规性
+- 不合规情况必须明确论证，并说明为何拒绝更简单的替代方案
+- 安全、性能和可追溯原则为不可协商项
+
+### 实施指南
+
+补充本宪章的实施细节指南，请参考：
+- `.specify/templates/plan-template.md` - 技术规划结构
+- `.specify/templates/spec-template.md` - 功能规格说明要求
+- `.specify/templates/tasks-template.md` - 任务分解和执行指南
+
+**版本**：1.0.0 | **批准日期**：2025-12-25 | **最后修订**：2025-12-25
