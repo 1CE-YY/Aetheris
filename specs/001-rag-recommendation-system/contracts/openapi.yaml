@@ -1,0 +1,782 @@
+openapi: 3.0.3
+info:
+  title: Aetheris RAG 系统 API
+  description: |
+    面向高校学习场景的学习资源检索与推荐 RAG 系统接口文档。
+
+    **核心功能**：
+    - 用户认证（注册、登录）
+    - 学习资源管理（上传、列表、详情）
+    - RAG 智能问答（带引用来源）
+    - 个性化推荐（基于用户画像）
+    - 用户行为记录（查询、点击、收藏）
+    - 离线评测（Precision@K、Recall@K）
+
+  version: 1.0.0
+  contact:
+    name: Aetheris RAG Team
+    email: support@aetheris.dev
+
+servers:
+  - url: http://localhost:8080/api
+    description: 本地开发环境
+  - url: https://api.aetheris.dev/api
+    description: 生产环境
+
+tags:
+  - name: auth
+    description: 用户认证
+  - name: resources
+    description: 学习资源管理
+  - name: chat
+    description: RAG 问答
+  - name: recommendations
+    description: 个性化推荐
+  - name: behaviors
+    description: 用户行为记录
+  - name: eval
+    description: 离线评测
+
+paths:
+  /auth/register:
+    post:
+      tags: [auth]
+      summary: 用户注册
+      description: 创建新用户账户
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: 注册成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '400':
+          description: 请求参数错误（邮箱或用户名已存在）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/login:
+    post:
+      tags: [auth]
+      summary: 用户登录
+      description: 使用邮箱/用户名和密码登录
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResponse'
+        '401':
+          description: 认证失败（邮箱/用户名或密码错误）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /resources:
+    post:
+      tags: [resources]
+      summary: 上传学习资源
+      description: |
+        上传 PDF 或 Markdown 文档，系统自动提取文本、切片、向量化入库。
+
+        **幂等性保证**：基于文件内容哈希（SHA-256）去重，重复上传返回已存在的资源。
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UploadResourceRequest'
+      responses:
+        '201':
+          description: 上传成功，资源已入库
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceResponse'
+        '400':
+          description: 请求错误（文件格式不支持、文件过大、重复上传）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: 未认证
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    get:
+      tags: [resources]
+      summary: 获取资源列表
+      description: 分页获取资源列表，支持按标签过滤
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: 页码（从 0 开始）
+          required: false
+          schema:
+            type: integer
+            default: 0
+        - name: size
+          in: query
+          description: 每页大小
+          required: false
+          schema:
+            type: integer
+            default: 20
+        - name: tags
+          in: query
+          description: 标签过滤（逗号分隔，如：机器学习,深度学习）
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceListResponse'
+
+  /resources/{id}:
+    get:
+      tags: [resources]
+      summary: 获取资源详情
+      description: 获取资源详细信息，包含切片列表
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 资源ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceDetailResponse'
+        '404':
+          description: 资源不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /chat/ask:
+    post:
+      tags: [chat]
+      summary: RAG 智能问答
+      description: |
+        基于用户问题进行语义检索，召回 Top-K 相关切片，生成带引用来源的答案。
+
+        **性能**：P95 < 3 秒，平均 < 5 秒
+        **可追溯性**：所有答案必须包含 citations（引用来源）
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AskRequest'
+      responses:
+        '200':
+          description: 成功返回答案
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerResponse'
+        '400':
+          description: 请求错误（问题过长、参数错误）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '503':
+          description: LLM 服务不可用（降级返回检索结果+引用摘要）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AnswerResponse'
+
+  /recommendations:
+    get:
+      tags: [recommendations]
+      summary: 获取个性化推荐
+      description: |
+        基于用户画像（最近 N 次查询）生成 Top-N 推荐列表。
+
+        **无画像情况**：新用户返回热门资源或默认推荐
+        **有画像情况**：返回个性化推荐，包含推荐理由和学习建议
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: topN
+          in: query
+          description: 推荐数量
+          required: false
+          schema:
+            type: integer
+            default: 10
+            minimum: 1
+            maximum: 50
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecommendationResponse'
+
+  /behaviors:
+    post:
+      tags: [behaviors]
+      summary: 记录用户行为
+      description: 记录用户的查询、点击、收藏行为（自动触发，通常由后端服务调用）
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecordBehaviorRequest'
+      responses:
+        '201':
+          description: 记录成功
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /behaviors/recent:
+    get:
+      tags: [behaviors]
+      summary: 获取最近行为历史
+      description: 获取当前用户的最近行为记录（用于个人中心展示）
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          description: 返回数量
+          required: false
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+      responses:
+        '200':
+          description: 成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BehaviorListResponse'
+
+  /eval/run:
+    post:
+      tags: [eval]
+      summary: 运行离线评测
+      description: |
+        加载测试数据集，计算 Precision@K、Recall@K、平均时延、P95 时延等指标。
+
+        对比两种策略：无画像（仅查询）vs 有画像（基于用户画像）
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvalRunRequest'
+      responses:
+        '200':
+          description: 评测完成
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvalRunResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    RegisterRequest:
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 50
+          example: zhang_san
+        email:
+          type: string
+          format: email
+          example: zhangsan@example.com
+        password:
+          type: string
+          minLength: 6
+          maxLength: 100
+          example: password123
+
+    LoginRequest:
+      type: object
+      required:
+        - identifier
+        - password
+      properties:
+        identifier:
+          type: string
+          description: 邮箱或用户名
+          example: zhangsan@example.com
+        password:
+          type: string
+          example: password123
+
+    UserResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        username:
+          type: string
+          example: zhang_san
+        email:
+          type: string
+          example: zhangsan@example.com
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-12-25T00:00:00Z'
+
+    LoginResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          description: JWT 访问令牌
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        user:
+          $ref: '#/components/schemas/UserResponse'
+
+    UploadResourceRequest:
+      type: object
+      required:
+        - file
+        - title
+        - fileType
+      properties:
+        file:
+          type: string
+          format: binary
+          description: 文档文件（PDF 或 Markdown）
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+          example: 深度学习基础教程
+        tags:
+          type: string
+          description: 标签（逗号分隔）
+          example: 机器学习,深度学习,神经网络
+        description:
+          type: string
+          example: 本书介绍深度学习的基础概念和常用算法
+
+    ResourceResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: 深度学习基础教程
+        tags:
+          type: string
+          example: 机器学习,深度学习
+        fileType:
+          type: string
+          enum: [PDF, MARKDOWN]
+          example: PDF
+        fileSize:
+          type: integer
+          description: 文件大小（字节）
+          example: 5242880
+        description:
+          type: string
+          example: 本书介绍深度学习的基础概念
+        uploadTime:
+          type: string
+          format: date-time
+          example: '2025-12-25T10:30:00Z'
+        chunkCount:
+          type: integer
+          description: 切片数量
+          example: 150
+        vectorized:
+          type: boolean
+          description: 是否已向量化
+          example: true
+
+    ResourceListResponse:
+      type: object
+      properties:
+        resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResourceResponse'
+        total:
+          type: integer
+          description: 总数量
+          example: 50
+        page:
+          type: integer
+          example: 0
+        size:
+          type: integer
+          example: 20
+
+    Chunk:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        chunkIndex:
+          type: integer
+          description: 切片序号
+          example: 5
+        locationInfo:
+          type: string
+          description: 定位信息
+          example: PDF 第 12-14 页
+        snippet:
+          type: string
+          description: 文本摘录（前 200 字符）
+          example: 深度学习是机器学习的一个子领域，它基于人工神经网络...
+
+    ResourceDetailResponse:
+      type: object
+      properties:
+        resource:
+          $ref: '#/components/schemas/ResourceResponse'
+        chunks:
+          type: array
+          description: 切片列表
+          items:
+            $ref: '#/components/schemas/Chunk'
+
+    AskRequest:
+      type: object
+      required:
+        - question
+      properties:
+        question:
+          type: string
+          minLength: 1
+          maxLength: 500
+          example: 什么是 RAG？
+        topK:
+          type: integer
+          description: 召回切片数量
+          minimum: 1
+          maximum: 20
+          default: 5
+          example: 5
+
+    Citation:
+      type: object
+      description: 引用来源（符合宪章五原则）
+      required:
+        - resourceId
+        - resourceTitle
+        - chunkId
+        - chunkIndex
+        - location
+        - snippet
+        - score
+      properties:
+        resourceId:
+          type: integer
+          example: 1
+        resourceTitle:
+          type: string
+          example: 深度学习基础教程
+        chunkId:
+          type: integer
+          example: 45
+        chunkIndex:
+          type: integer
+          example: 5
+        location:
+          type: string
+          description: 定位信息
+          example: PDF 第 12-14 页
+        snippet:
+          type: string
+          description: 文本摘录（100-200 字符）
+          example: RAG（Retrieval-Augmented Generation）是一种结合信息检索和生成式AI的技术...
+        score:
+          type: number
+          format: float
+          description: 相似度分数
+          example: 0.85
+
+    AnswerResponse:
+      type: object
+      properties:
+        answer:
+          type: string
+          description: AI 生成的答案
+          example: RAG（Retrieval-Augmented Generation）是一种结合信息检索和生成式AI的技术...
+        citations:
+          type: array
+          description: 引用来源列表
+          items:
+            $ref: '#/components/schemas/Citation'
+        evidenceInsufficient:
+          type: boolean
+          description: 证据是否不足
+          example: false
+        fallbackResources:
+          type: array
+          description: 降级时返回的候选资源列表
+          items:
+            $ref: '#/components/schemas/ResourceResponse'
+        latencyMs:
+          type: integer
+          description: 响应时延（毫秒）
+          example: 2340
+
+    RecommendationItem:
+      type: object
+      properties:
+        resource:
+          $ref: '#/components/schemas/ResourceResponse'
+        reason:
+          type: string
+          description: 推荐理由
+          example: 基于您最近的查询兴趣"深度学习"
+        suggestion:
+          type: string
+          description: 学习建议
+          example: 建议先学习第 3 章"神经网络基础"，再进入第 5 章"卷积神经网络"
+        citations:
+          type: array
+          description: 推荐理由的证据引用
+          items:
+            $ref: '#/components/schemas/Citation'
+
+    RecommendationResponse:
+      type: object
+      properties:
+        recommendations:
+          type: array
+          items:
+            $ref: '#/components/schemas/RecommendationItem'
+        hasProfile:
+          type: boolean
+          description: 是否有用户画像
+          example: true
+        profileUpdatedAt:
+          type: string
+          format: date-time
+          description: 画像更新时间
+          example: '2025-12-25T12:00:00Z'
+
+    BehaviorType:
+      type: string
+      enum: [QUERY, CLICK, FAVORITE]
+
+    RecordBehaviorRequest:
+      type: object
+      required:
+        - behaviorType
+      properties:
+        behaviorType:
+          $ref: '#/components/schemas/BehaviorType'
+        resourceId:
+          type: integer
+          description: 资源ID（CLICK 或 FAVORITE 行为必填）
+          example: 1
+        queryText:
+          type: string
+          description: 查询文本（QUERY 行为必填）
+          example: 什么是 Transformer？
+        sessionId:
+          type: string
+          description: 会话ID（可选）
+          example: session-abc-123
+
+    Behavior:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        behaviorType:
+          $ref: '#/components/schemas/BehaviorType'
+        resourceId:
+          type: integer
+          nullable: true
+          example: 1
+        queryText:
+          type: string
+          nullable: true
+          example: 什么是 Transformer？
+        behaviorTime:
+          type: string
+          format: date-time
+          example: '2025-12-25T14:30:00Z'
+
+    BehaviorListResponse:
+      type: object
+      properties:
+        behaviors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Behavior'
+        total:
+          type: integer
+          example: 50
+
+    EvalRunRequest:
+      type: object
+      required:
+        - config
+      properties:
+        config:
+          type: object
+          description: 评测参数配置
+          properties:
+            chunkSize:
+              type: integer
+              example: 1000
+            overlap:
+              type: integer
+              example: 200
+            topK:
+              type: integer
+              example: 5
+            embeddingModel:
+              type: string
+              example: embedding-v2
+            chatModel:
+              type: string
+              example: glm-4-flash
+        compareStrategies:
+          type: boolean
+          description: 是否对比无画像 vs 有画像
+          default: true
+
+    EvalMetrics:
+      type: object
+      properties:
+        precisionAtK:
+          type: number
+          format: float
+          example: 0.65
+        recallAtK:
+          type: number
+          format: float
+          example: 0.72
+        avgLatencyMs:
+          type: number
+          format: float
+          example: 2300
+        p95LatencyMs:
+          type: number
+          format: float
+          example: 3800
+
+    StrategyComparison:
+      type: object
+      properties:
+        withoutProfile:
+          $ref: '#/components/schemas/EvalMetrics'
+        withProfile:
+          $ref: '#/components/schemas/EvalMetrics'
+        precisionImprovement:
+          type: number
+          format: float
+          description: Precision 提升百分比
+          example: 16.0
+
+    EvalRunResponse:
+      type: object
+      properties:
+        runId:
+          type: integer
+          example: 1
+        runName:
+          type: string
+          example: 评测运行 001
+        config:
+          type: object
+          example: { "chunkSize": 1000, "topK": 5 }
+        metrics:
+          $ref: '#/components/schemas/EvalMetrics'
+        comparison:
+          $ref: '#/components/schemas/StrategyComparison'
+        runTime:
+          type: string
+          format: date-time
+          example: '2025-12-25T15:00:00Z'
+
+    ErrorResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          example: '2025-12-25T10:30:00Z'
+        status:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: BAD_REQUEST
+        message:
+          type: string
+          example: 邮箱已存在
+        path:
+          type: string
+          example: /api/auth/register
