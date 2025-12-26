@@ -2,12 +2,12 @@
 
 **功能**：学习资源检索与推荐 RAG 系统
 **分支**：`001-rag-recommendation-system`
-**最后更新**：2025-12-25
+**最后更新**：2025-12-26
 
 ## 概述
 
 本指南将帮助您在本地快速搭建和运行 Aetheris RAG 系统的开发环境。系统采用前后端分离架构：
-- **后端**：Spring Boot 3.2+ + MyBatis + Redis Stack + MySQL 8
+- **后端**：Spring Boot 3.5 + Java 21 + MyBatis + Redis Stack + MySQL 8
 - **前端**：Vue 3 + TypeScript + Ant Design Vue 4.x + Vite 5.x
 - **基础设施**：Docker Compose（MySQL + Redis Stack）
 
@@ -15,9 +15,9 @@
 
 ### 必需软件
 
-1. **Java 17+**
+1. **Java 21+**
    ```bash
-   java -version  # openjdk 17.0.1 或更高版本
+   java -version  # openjdk 21.0.1 或更高版本
    ```
 
 2. **Maven 3.8+**
@@ -45,7 +45,7 @@
 
 ### 可选软件
 
-- **IntelliJ IDEA**：推荐用于 Java 开发（社区版即可）
+- **IntelliJ IDEA 2024.1+**：推荐用于 Java 开发（社区版即可，完整支持 Java 21）
 - **Visual Studio Code**：推荐用于前端开发（Vue 3 支持好）
 - **Postman** 或 **curl**：用于 API 测试
 - **RedisInsight**：Redis Stack 可视化工具（可选）
@@ -214,7 +214,160 @@ server:
     context-path: /api
 ```
 
-### 2.2 智谱 AI API Key 申请
+### 2.2 创建 pom.xml
+
+**backend/pom.xml** 核心配置：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-parent</artifactId>
+    <version>3.5.9</version>
+    <relativePath/>
+  </parent>
+
+  <groupId>com.aetheris</groupId>
+  <artifactId>aetheris-rag</artifactId>
+  <version>1.0.0</version>
+  <name>Aetheris RAG System</name>
+  <description>学习资源检索与推荐 RAG 系统</description>
+
+  <properties>
+    <java.version>21</java.version>
+    <maven.compiler.source>21</maven.compiler.source>
+    <maven.compiler.target>21</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <mybatis.version>3.5.16</mybatis.version>
+    <mybatis-spring-boot.version>3.0.4</mybatis-spring-boot.version>
+    <lombok.version>1.18.36</lombok.version>
+    <guava.version>33.4.0</guava.version>
+    <commons-lang3.version>3.17.0</commons-lang3.version>
+    <langchain4j.version>0.37.2</langchain4j.version>
+  </properties>
+
+  <dependencies>
+    <!-- Spring Boot Starters -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-validation</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+
+    <!-- MyBatis -->
+    <dependency>
+      <groupId>org.mybatis</groupId>
+      <artifactId>mybatis-spring-boot-starter</artifactId>
+      <version>${mybatis-spring-boot.version}</version>
+    </dependency>
+
+    <!-- Lombok -->
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>${lombok.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Redis Stack (Lettuce) -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-redis</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.lettuce</groupId>
+      <artifactId>lettuce-core</artifactId>
+      <version>6.5.2.RELEASE</version>
+    </dependency>
+
+    <!-- MySQL -->
+    <dependency>
+      <groupId>com.mysql</groupId>
+      <artifactId>mysql-connector-j</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!-- Flyway -->
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-mysql</artifactId>
+    </dependency>
+
+    <!-- LangChain4j -->
+    <dependency>
+      <groupId>dev.langchain4j</groupId>
+      <artifactId>langchain4j-spring-boot-starter</artifactId>
+      <version>${langchain4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>dev.langchain4j</groupId>
+      <artifactId>langchain4j-zhipu-ai</artifactId>
+      <version>${langchain4j.version}</version>
+    </dependency>
+
+    <!-- 工具类 -->
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>${guava.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>${commons-lang3.version}</version>
+    </dependency>
+
+    <!-- 测试 -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>mysql</artifactId>
+      <version>1.20.4</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>21</source>
+          <target>21</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
+```
+
+### 2.3 智谱 AI API Key 申请
 
 1. 访问 [智谱 AI 开放平台](https://open.bigmodel.cn/)
 2. 注册并登录
@@ -224,7 +377,7 @@ server:
    export ZHIPU_AI_API_KEY=your-actual-api-key
    ```
 
-### 2.3 初始化数据库
+### 2.4 初始化数据库
 
 Flyway 会自动执行迁移脚本 `backend/src/main/resources/db/migration/V1__init_schema.sql`。
 
@@ -233,7 +386,7 @@ Flyway 会自动执行迁移脚本 `backend/src/main/resources/db/migration/V1__
 mvn flyway:migrate
 ```
 
-### 2.4 启动后端
+### 2.5 启动后端
 
 **方式一：使用 Maven**
 ```bash
@@ -244,6 +397,7 @@ mvn spring-boot:run
 
 **方式二：使用 IDE**
 - 在 IntelliJ IDEA 中打开 `backend` 目录
+- 确保项目使用 Java 21 SDK
 - 运行 `AetherisRagApplication.java`
 
 **验证启动**：
@@ -254,6 +408,16 @@ curl http://localhost:8080/api/actuator/health
 应返回：
 ```json
 {"status": "UP"}
+```
+
+**Java 21 虚拟线程配置（必须）**：
+
+在 `application.yml` 中添加：
+```yaml
+spring:
+  threads:
+    virtual:
+      enabled: true  # 必须启用虚拟线程以提升并发性能
 ```
 
 ## 3. 配置前端（Vue 3 + Ant Design Vue）

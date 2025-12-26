@@ -20,19 +20,21 @@
 
 ## 技术上下文
 
-**语言/版本**：Java 17
+**语言/版本**：Java 21
 **主要依赖**：
-- **核心框架**：Spring Boot 3.2+ (Spring MVC、Spring Transaction)
-- **持久层**：MyBatis 3.5+（标准 MyBatis，企业级 ORM 框架）、MyBatis Spring Boot Starter
+- **核心框架**：Spring Boot 3.5+ (Spring MVC、Spring Transaction)
+  - Spring Boot 3.5.0 GA 发布于 2025年5月22日，基于 Spring Framework 6.2.x
+  - **必须启用虚拟线程**（Virtual Threads）以提升并发性能（在 application.yml 中配置 `spring.threads.virtual.enabled=true`）
+- **持久层**：MyBatis 3.5+（标准 MyBatis，企业级 ORM 框架）、MyBatis Spring Boot Starter 3.0.3+
   - SQL 语句统一定义在 XML 文件中（非注解方式），便于维护和优化
   - Mapper 接口与 XML 分离，符合企业级最佳实践
-- **代码简化**：Lombok（减少样板代码：@Data、@Slf4j、@Builder 等）
+- **代码简化**：Lombok 1.18.30+（减少样板代码：@Data、@Slf4j、@Builder 等）
 - **日志**：Slf4j + Logback（Spring Boot 默认日志）
-- **RAG 编排**：LangChain4j 0.29+
+- **RAG 编排**：LangChain4j 0.35+（支持 Spring Boot 3.5 和 Java 21）
 - **文档处理**：Apache PDFBox 3.0+、CommonMark Java
-- **数据存储**：Redis Stack (Lettuce 客户端)、MySQL Connector/J、HikariCP（连接池）
+- **数据存储**：Redis Stack (Lettuce 6.3+ 客户端)、MySQL Connector/J 8.4+、HikariCP（连接池）
 - **参数校验**：Jakarta Validation (Spring Boot 内置)
-- **工具类**：Guava（Google 核心库，提供集合、缓存、并发等工具）、Apache Commons Lang3
+- **工具类**：Guava 33.0+（Google 核心库，提供集合、缓存、并发等工具）、Apache Commons Lang3 3.17+
 **存储**：
 - MySQL 8：结构化数据（用户、资源元数据、chunk 文本与定位信息、行为记录、评测数据）
 - Redis Stack：向量索引（RediSearch Vector KNN）+ 缓存（Embedding 缓存、TopK 结果、热点元数据）

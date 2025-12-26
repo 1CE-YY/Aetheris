@@ -2,8 +2,8 @@
 
 **功能**：学习资源检索与推荐 RAG 系统
 **分支**：`001-rag-recommendation-system`
-**日期**：2025-12-25
-**技术栈**：MySQL 8 + Redis Stack + MyBatis + Lombok
+**日期**：2025-12-26
+**技术栈**：Spring Boot 3.5 + Java 21 + MySQL 8 + Redis Stack + MyBatis + Lombok
 
 ## 概述
 

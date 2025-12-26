@@ -274,7 +274,13 @@ public class PdfDocumentProcessor {
     return chunks;
   }
 
-  private record PageContent(int pageNum, String text) {}
+  // 使用 Lombok @Data 而非 Java 21 Record
+  @Data
+  @AllArgsConstructor
+  private static class PageContent {
+    private int pageNum;
+    private String text;
+  }
 }
 ```
 
@@ -395,7 +401,13 @@ private void updateHeadingStack(int level, String title) {
 }
     }
 
-  private record Section(String path, String text) {}
+  // 使用 Lombok @Data 而非 Java 21 Record
+  @Data
+  @AllArgsConstructor
+  private static class Section {
+    private String path;
+    private String text;
+  }
 }
 ```
 
