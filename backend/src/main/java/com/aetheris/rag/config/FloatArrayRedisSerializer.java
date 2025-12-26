@@ -1,10 +1,13 @@
 package com.aetheris.rag.config;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.core.serializer.support.DeserializingConverter;
-import org.springframework.core.serializer.support.SerializingConverter;
 import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.SerializationException;
+import org.springframework.stereotype.Component;
 
 /**
  * Custom Redis serializer for float arrays.
@@ -18,36 +21,35 @@ import org.springframework.data.redis.serializer.SerializationException;
  */
 public class FloatArrayRedisSerializer implements RedisSerializer<float[]> {
 
-  private final Converter<float[], byte[]> serializer;
-  private final Converter<byte[], float[]> deserializer;
-
-  /** Creates a new FloatArrayRedisSerializer. */
-  public FloatArrayRedisSerializer() {
-    this.serializer = new SerializingConverter();
-    this.deserializer = new DeserializingConverter();
-  }
-
   @Override
-  public byte[] serialize(float[] floats) throws SerializationException {
+  public byte[] serialize(float[] floats) {
     if (floats == null) {
       return new byte[0];
     }
-    try {
-      return serializer.convert(floats);
-    } catch (Exception e) {
-      throw new SerializationException("Failed to serialize float array", e);
+    try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(bos)) {
+      oos.writeObject(floats);
+      oos.flush();
+      return bos.toByteArray();
+    } catch (IOException e) {
+      throw new RuntimeException("Failed to serialize float array", e);
     }
   }
 
   @Override
-  public float[] deserialize(byte[] bytes) throws SerializationException {
+  public float[] deserialize(byte[] bytes) {
     if (bytes == null || bytes.length == 0) {
       return null;
     }
-    try {
-      return deserializer.convert(bytes);
-    } catch (Exception e) {
-      throw new SerializationException("Failed to deserialize float array", e);
+    try (ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+        ObjectInputStream ois = new ObjectInputStream(bis)) {
+      Object obj = ois.readObject();
+      if (obj instanceof float[]) {
+        return (float[]) obj;
+      }
+      throw new RuntimeException("Deserialized object is not a float array");
+    } catch (IOException | ClassNotFoundException e) {
+      throw new RuntimeException("Failed to deserialize float array", e);
     }
   }
 }

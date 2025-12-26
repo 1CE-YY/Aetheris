@@ -1,7 +1,7 @@
 package com.aetheris.rag.gateway.retry;
 
-import dev.langchain4j.exception.ModelException;
-import dev.langchain4j.exception.ModelUnauthorizedException;
+import com.aetheris.rag.gateway.ModelException;
+import java.io.IOException;
 import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -154,16 +154,14 @@ public final class ModelRetryStrategy {
    * @return true if the exception is retryable, false otherwise
    */
   private boolean shouldRetry(Exception e) {
-    // Check for specific status codes
-    if (e instanceof ModelUnauthorizedException) {
-      // 401 Unauthorized - don't retry (invalid API key)
-      return false;
-    }
-
     // Extract status code from exception message if available
     String message = e.getMessage();
     if (message != null) {
       // Check for HTTP status codes in message
+      if (message.contains("401")) {
+        // 401 Unauthorized - don't retry (invalid API key)
+        return false;
+      }
       if (message.contains("429")) {
         // 429 Too Many Requests - retry
         return true;

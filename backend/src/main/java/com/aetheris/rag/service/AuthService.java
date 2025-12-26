@@ -1,4 +1,4 @@
-package com.aetheris.rag.service.auth;
+package com.aetheris.rag.service;
 
 import com.aetheris.rag.dto.request.LoginRequest;
 import com.aetheris.rag.dto.request.RegisterRequest;

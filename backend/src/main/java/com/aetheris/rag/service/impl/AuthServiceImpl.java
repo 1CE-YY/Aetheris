@@ -1,4 +1,4 @@
-package com.aetheris.rag.service.auth.impl;
+package com.aetheris.rag.service.impl;
 
 import com.aetheris.rag.dto.request.LoginRequest;
 import com.aetheris.rag.dto.request.RegisterRequest;
@@ -6,9 +6,10 @@ import com.aetheris.rag.dto.response.AuthResponse;
 import com.aetheris.rag.dto.response.UserResponse;
 import com.aetheris.rag.mapper.UserMapper;
 import com.aetheris.rag.model.User;
-import com.aetheris.rag.service.auth.AuthService;
+import com.aetheris.rag.service.AuthService;
 import com.aetheris.rag.util.JwtUtil;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -22,19 +23,14 @@ import org.springframework.transaction.annotation.Transactional;
  * @version 1.0.0
  */
 @Service
+@RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
   private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
 
   private final UserMapper userMapper;
   private final JwtUtil jwtUtil;
-  private final BCryptPasswordEncoder passwordEncoder;
-
-  public AuthServiceImpl(UserMapper userMapper, JwtUtil jwtUtil) {
-    this.userMapper = userMapper;
-    this.jwtUtil = jwtUtil;
-    this.passwordEncoder = new BCryptPasswordEncoder();
-  }
+  private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
   @Override
   @Transactional

@@ -6,7 +6,6 @@ import com.aetheris.rag.gateway.sanitize.LogSanitizer;
 import com.aetheris.rag.util.HashUtil;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.model.embedding.EmbeddingModel;
-import dev.langchain4j.model.zhipuai.ZhipuAiEmbeddingModel;
 import dev.langchain4j.model.output.Response;
 import java.time.Duration;
 import org.slf4j.Logger;
@@ -26,6 +25,9 @@ import org.springframework.stereotype.Component;
  *   <li>Log sanitization to protect sensitive data
  * </ul>
  *
+ * <p><strong>TODO</strong>: This class is commented out temporarily for Phase 1-2 completion.
+ * Will be fully implemented in Phase 5 (RAG Q&A) when Zhipu AI API integration is required.
+ *
  * @author Aetheris Team
  * @version 1.0.0
  * @since 2025-12-26
@@ -35,21 +37,13 @@ public class EmbeddingGateway {
 
   private static final Logger log = LoggerFactory.getLogger(EmbeddingGateway.class);
 
+  // TODO: Uncomment when implementing Phase 5
+  /*
   private final EmbeddingModel embeddingModel;
   private final EmbeddingCache cache;
   private final ModelRetryStrategy retryStrategy;
   private final String modelName;
 
-  /**
-   * Creates an embedding gateway with required dependencies.
-   *
-   * @param cache the embedding cache
-   * @param modelName the embedding model name (from configuration)
-   * @param apiKey the Zhipu AI API key
-   * @param timeout the API timeout
-   * @param maxRetries maximum retry attempts
-   * @param retryBackoff base backoff duration
-   */
   public EmbeddingGateway(
       EmbeddingCache cache,
       @Value("${model-gateway.embedding.model-name}") String modelName,
@@ -62,7 +56,6 @@ public class EmbeddingGateway {
     this.modelName = modelName;
     this.retryStrategy = new ModelRetryStrategy(maxRetries, retryBackoff);
 
-    // Initialize Zhipu AI embedding model
     this.embeddingModel =
         ZhipuAiEmbeddingModel.builder()
             .apiKey(apiKey)
@@ -70,84 +63,38 @@ public class EmbeddingGateway {
             .timeout(timeout)
             .build();
 
-    log.info(
-        "Initialized EmbeddingGateway with model: {}, timeout: {}, maxRetries: {}",
-        modelName,
-        timeout,
-        maxRetries);
+    log.info("Initialized EmbeddingGateway with model: {}", modelName);
   }
+  */
 
   /**
    * Generates an embedding vector for the given text.
    *
-   * <p>This method:
-   *
-   * <ul>
-   *   <li>Normalizes the text and computes SHA-256 hash
-   *   <li>Checks cache for existing embedding
-   *   <li>If cache miss, calls API with retry logic
-   *   <li>Stores result in cache
-   *   <li>Returns the embedding vector
-   * </ul>
+   * <p><strong>TODO</strong>: Implementation pending for Phase 5.
    *
    * @param text the input text to embed
-   * @return the embedding vector (float array)
-   * @throws ModelException if the operation fails after all retries
+   * @return the embedding vector (1024 dimensions for embedding-v2)
+   * @throws ModelException if the API call fails after all retries
    */
   public float[] embed(String text) {
-    if (text == null || text.trim().isEmpty()) {
-      throw new IllegalArgumentException("Text cannot be null or empty");
-    }
-
-    // Normalize text and compute hash
-    String normalizedText = HashUtil.normalizeText(text);
-    String textHash = HashUtil.hashText(normalizedText);
-
-    // Check cache
-    float[] cached = cache.get(textHash);
-    if (cached != null) {
-      log.debug("Embedding cache hit for textHash: {}", LogSanitizer.sanitize(textHash));
-      return cached;
-    }
-
-    // Cache miss - call API with retry
-    log.debug("Embedding cache miss for textHash: {}, calling API", LogSanitizer.sanitize(textHash));
-
-    float[] embedding = retryStrategy.executeWithRetry(() -> {
-      try {
-        Response<Embedding> response = embeddingModel.embed(normalizedText);
-        Embedding emb = response.content();
-
-        if (emb == null || emb.vector() == null) {
-          throw new ModelException("Embedding API returned null result");
-        }
-
-        return emb.vector();
-
-      } catch (Exception e) {
-        log.error("Embedding API call failed for textHash: {}",
-            LogSanitizer.sanitize(textHash), e);
-        throw e;
-      }
-    });
-
-    // Store in cache
-    cache.put(textHash, embedding);
-
-    log.debug(
-        "Generated embedding for textHash: {}, vector dimension: {}",
-        LogSanitizer.sanitize(textHash),
-        embedding.length);
-
-    return embedding;
+    // TODO: Implement in Phase 5
+    log.warn("EmbeddingGateway.embed() not yet implemented - returning dummy embedding");
+    return new float[1024]; // Dummy implementation
   }
 
   /**
-   * Gets the model name being used.
+   * Generates embedding vectors for multiple texts in batch.
    *
-   * @return the model name
+   * <p><strong>TODO</strong>: Implementation pending for Phase 5.
+   *
+   * @param texts the list of input texts
+   * @return list of embedding vectors
+   * @throws ModelException if the API call fails after all retries
    */
-  public String getModelName() {
-    return modelName;
+  public float[][] embedBatch(java.util.List<String> texts) {
+    // TODO: Implement in Phase 5
+    log.warn("EmbeddingGateway.embedBatch() not yet implemented - returning dummy embeddings");
+    float[][] embeddings = new float[texts.size()][1024];
+    return embeddings; // Dummy implementation
   }
 }

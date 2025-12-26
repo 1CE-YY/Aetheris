@@ -1,10 +1,10 @@
 package com.aetheris.rag.gateway.cache;
 
 import com.aetheris.rag.gateway.sanitize.LogSanitizer;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -53,13 +53,24 @@ public class EmbeddingCache {
    * @param redisTemplate Redis template for cache operations
    * @param ttlDays cache TTL in days (from configuration)
    */
-  @Autowired
   public EmbeddingCache(
       RedisTemplate<String, float[]> redisTemplate,
-      @Value("${model-gateway.embedding.cache.ttl-days:${model-gateway.embedding.cache.ttl-days:30}}") int ttlDays) {
+      @Value("${model-gateway.embedding.cache.ttl-days:30}") int ttlDays) {
     this.redisTemplate = redisTemplate;
     this.ttlSeconds = TimeUnit.DAYS.toSeconds(ttlDays);
     log.info("Initialized EmbeddingCache with TTL: {} days", ttlDays);
+  }
+
+  /**
+   * Creates an embedding cache with configurable TTL (for testing).
+   *
+   * @param redisTemplate Redis template for cache operations
+   * @param ttl cache TTL as a Duration
+   */
+  public EmbeddingCache(RedisTemplate<String, float[]> redisTemplate, Duration ttl) {
+    this.redisTemplate = redisTemplate;
+    this.ttlSeconds = ttl.getSeconds();
+    log.info("Initialized EmbeddingCache with TTL: {} seconds", ttl.getSeconds());
   }
 
   /**

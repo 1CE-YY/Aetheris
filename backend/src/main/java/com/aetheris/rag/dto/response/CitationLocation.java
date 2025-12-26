@@ -24,10 +24,14 @@ import java.util.Objects;
  * @version 1.0.0
  * @since 2025-12-26
  */
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonTypeInfo(
+    use = JsonTypeInfo.Id.NAME,
+    include = JsonTypeInfo.As.PROPERTY,
+    property = "type"
+)
 @JsonSubTypes({
-  @JsonSubTypes.Type(value = PdfLocation.class, name = "pdf"),
-  @JsonSubTypes.Type(value = MarkdownLocation.class, name = "markdown")
+  @JsonSubTypes.Type(value = CitationLocation.PdfLocation.class, name = "pdf"),
+  @JsonSubTypes.Type(value = CitationLocation.MarkdownLocation.class, name = "markdown")
 })
 public abstract class CitationLocation {
 

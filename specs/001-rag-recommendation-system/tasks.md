@@ -45,7 +45,9 @@
 ### 2.1 ModelGateway 统一模型调用入口
 
 - [x] T011 创建 `backend/src/main/java/com/aetheris/rag/gateway/ModelGateway.java` 接口，定义 embed() 和 chat() 方法签名
-- [x] T012 创建 `backend/src/main/java/com/aetheris/rag/gateway/EmbeddingGateway.java`，实现智谱 AI Embedding API 调用
+- [~] T012 创建 `backend/src/main/java/com/aetheris/rag/gateway/EmbeddingGateway.java`，实现智谱 AI Embedding API 调用
+  - **状态**: ⚠️ **Stub 实现** - 仅创建框架，返回 dummy embedding，完整实现推迟到 Phase 5
+  - **原因**: langchain4j-zhipu-ai 包依赖问题，需要在 Phase 5 (RAG Q&A) 时完整实现
   - **目标**：封装 Embedding 调用，实现文本哈希缓存、超时/重试/限流、日志脱敏
   - **涉及表**：无（调用外部 API）
   - **Redis**：`embedding:cache:{textHash}` 存储 embedding 向量，TTL 30 天
@@ -53,12 +55,16 @@
   - **API 端点**：无（内部服务）
   - **测试要点**：单测验证缓存命中、重试策略、超时处理、日志脱敏
   - **验收标准**：FR-007（Embedding 缓存）、FR-009（入库幂等）、宪章三（缓存与幂等）
-- [x] T013 创建 `backend/src/main/java/com/aetheris/rag/gateway/ChatGateway.java`，实现智谱 AI Chat API 调用
+  - **Phase 5 任务**: 完整实现 Zhipu AI Embedding API 调用、缓存逻辑、重试策略
+- [~] T013 创建 `backend/src/main/java/com/aetheris/rag/gateway/ChatGateway.java`，实现智谱 AI Chat API 调用
+  - **状态**: ⚠️ **Stub 实现** - 仅创建框架，返回 dummy response，完整实现推迟到 Phase 5
+  - **原因**: langchain4j-zhipu-ai 包依赖问题，需要在 Phase 5 (RAG Q&A) 时完整实现
   - **目标**：封装 LLM 调用，实现 Prompt 构建、超时/重试/限流、降级处理、日志脱敏
   - **涉及表**：无（调用外部 API）
   - **配置项**：`chat.modelName`（glm-4-flash）、`chat.temperature`（0.7）、`chat.topP`（0.9）、`chat.maxTokens`（2000）、`chat.timeout`（60s）
   - **测试要点**：单测验证降级策略（LLM 不可用时返回检索结果+引用摘要）
   - **验收标准**：FR-015（证据不足时的降级返回）
+  - **Phase 5 任务**: 完整实现 Zhipu AI Chat API 调用、Prompt 构建、降级策略
 - [x] T014 [P] 创建 `backend/src/main/java/com/aetheris/rag/gateway/cache/EmbeddingCache.java`，实现基于文本哈希的 Redis 缓存
 - [x] T015 [P] 创建 `backend/src/main/java/com/aetheris/rag/gateway/retry/ModelRetryStrategy.java`，实现 429/5xx 重试策略（指数退避）
 - [x] T016 [P] 创建 `backend/src/main/java/com/aetheris/rag/gateway/sanitize/LogSanitizer.java`，实现日志脱敏（截断 200 字符，不记录 API key）
@@ -194,6 +200,32 @@
 **目标**：用户输入自然语言问题，系统返回带引用来源的答案
 
 **独立测试**：输入问题"什么是 RAG？"，验证返回答案包含 citations（resourceId、chunkId、chunkIndex、页码/范围、snippet）
+
+### Phase 5.0: 完成 ModelGateway Stub 实现 (阻塞前置条件)
+
+- [ ] **T012-FULL** 完整实现 `EmbeddingGateway.java`（当前为 stub）
+  - **当前状态**: Stub 实现，返回 dummy embedding
+  - **需要完成**:
+    - 修复 langchain4j-zhipu-ai 依赖配置
+    - 实现 Zhipu AI Embedding API 调用
+    - 集成 EmbeddingCache 缓存逻辑
+    - 集成 ModelRetryStrategy 重试策略
+    - 添加日志脱敏
+  - **测试要点**：单测验证缓存命中、重试策略、超时处理、日志脱敏
+  - **验收标准**：FR-007（Embedding 缓存）、FR-009（入库幂等）
+
+- [ ] **T013-FULL** 完整实现 `ChatGateway.java`（当前为 stub）
+  - **当前状态**: Stub 实现，返回 dummy response
+  - **需要完成**:
+    - 修复 langchain4j-zhipu-ai 依赖配置
+    - 实现 Zhipu AI Chat API 调用
+    - 集成 ModelRetryStrategy 重试策略
+    - 实现降级策略（LLM 不可用时的处理）
+    - 添加日志脱敏
+  - **测试要点**：单测验证降级策略、Prompt 构建
+  - **验收标准**：FR-015（证据不足时的降级返回）
+
+### Phase 5.1: 语义检索服务
 
 - [ ] T092 创建 `backend/src/main/java/com/aetheris/rag/service/SearchService.java` 接口和实现 `SearchServiceImpl.java`
   - **目标**：实现语义检索，查询 Redis 向量索引，返回 Top-K 切片（FR-010），按资源聚合（FR-011）

@@ -271,25 +271,25 @@ backend/                 # Spring Boot 后端
 │   │   │   │   ├── BehaviorController.java      # /api/behaviors/*
 │   │   │   │   └── EvalController.java          # /api/eval/*
 │   │   │   ├── service/                         # 业务服务层
-│   │   │   │   ├── auth/                         # 认证服务
-│   │   │   │   │   ├── AuthService.java           # 认证服务接口
-│   │   │   │   │   ├── ResourceService.java       # 资源服务接口
-│   │   │   │   │   ├── SearchService.java         # 检索服务接口
-│   │   │   │   │   ├── RagService.java            # RAG 服务接口
-│   │   │   │   │   ├── UserProfileService.java   # 画像服务接口
-│   │   │   │   │   ├── RecommendationService.java # 推荐服务接口
-│   │   │   │   │   └── EvalService.java           # 评测服务接口
-│   │   │   │   ├── impl/                         # 服务实现类（统一放置）
-│   │   │   │   │   ├── AuthServiceImpl.java       # 认证服务实现
-│   │   │   │   │   ├── ResourceServiceImpl.java   # 资源服务实现
-│   │   │   │   │   ├── PdfProcessor.java          # PDF 处理器
-│   │   │   │   │   ├── MarkdownProcessor.java    # Markdown 处理器
-│   │   │   │   │   ├── VectorServiceImpl.java     # 向量化服务实现
-│   │   │   │   │   ├── SearchServiceImpl.java     # 检索服务实现
-│   │   │   │   │   ├── RagServiceImpl.java        # RAG 服务实现
-│   │   │   │   │   ├── UserProfileServiceImpl.java # 画像服务实现
-│   │   │   │   │   ├── RecommendationServiceImpl.java # 推荐服务实现
-│   │   │   │   │   └── EvalServiceImpl.java       # 评测服务实现
+│   │   │   │   ├── AuthService.java              # 认证服务接口
+│   │   │   │   ├── ResourceService.java          # 资源服务接口
+│   │   │   │   ├── SearchService.java            # 检索服务接口
+│   │   │   │   ├── RagService.java               # RAG 服务接口
+│   │   │   │   ├── UserProfileService.java       # 画像服务接口
+│   │   │   │   ├── RecommendationService.java    # 推荐服务接口
+│   │   │   │   ├── VectorService.java            # 向量化服务接口
+│   │   │   │   ├── EvalService.java              # 评测服务接口
+│   │   │   │   └── impl/                         # 服务实现类（统一放置）
+│   │   │   │       ├── AuthServiceImpl.java      # 认证服务实现
+│   │   │   │       ├── ResourceServiceImpl.java  # 资源服务实现
+│   │   │   │       ├── PdfProcessor.java         # PDF 处理器
+│   │   │   │       ├── MarkdownProcessor.java    # Markdown 处理器
+│   │   │   │       ├── VectorServiceImpl.java    # 向量化服务实现
+│   │   │   │       ├── SearchServiceImpl.java    # 检索服务实现
+│   │   │   │       ├── RagServiceImpl.java       # RAG 服务实现
+│   │   │   │       ├── UserProfileServiceImpl.java # 画像服务实现
+│   │   │   │       ├── RecommendationServiceImpl.java # 推荐服务实现
+│   │   │   │       └── EvalServiceImpl.java      # 评测服务实现
 │   │   │   ├── gateway/                         # 模型网关（核心）
 │   │   │   │   ├── ModelGateway.java            # ModelGateway 接口
 │   │   │   │   ├── EmbeddingGateway.java        # Embedding 网关实现

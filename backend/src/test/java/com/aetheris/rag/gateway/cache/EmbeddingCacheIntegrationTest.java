@@ -96,15 +96,15 @@ class EmbeddingCacheIntegrationTest {
   }
 
   @Test
-  @DisplayName("delete should remove existing embedding")
-  void testDelete() {
+  @DisplayName("invalidate should remove existing embedding")
+  void testInvalidate() {
     // Given
     String textHash = "test-hash-456";
     float[] embedding = {0.6f, 0.7f, 0.8f};
     embeddingCache.put(textHash, embedding);
 
     // When
-    embeddingCache.delete(textHash);
+    embeddingCache.invalidate(textHash);
     float[] retrieved = embeddingCache.get(textHash);
 
     // Then

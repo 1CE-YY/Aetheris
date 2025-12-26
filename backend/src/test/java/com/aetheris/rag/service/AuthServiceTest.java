@@ -1,4 +1,4 @@
-package com.aetheris.rag.service.auth;
+package com.aetheris.rag.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -11,7 +11,7 @@ import com.aetheris.rag.dto.request.RegisterRequest;
 import com.aetheris.rag.dto.response.AuthResponse;
 import com.aetheris.rag.mapper.UserMapper;
 import com.aetheris.rag.model.User;
-import com.aetheris.rag.service.auth.impl.AuthServiceImpl;
+import com.aetheris.rag.service.impl.AuthServiceImpl;
 import com.aetheris.rag.util.JwtUtil;
 import java.time.Instant;
 import org.junit.jupiter.api.BeforeEach;

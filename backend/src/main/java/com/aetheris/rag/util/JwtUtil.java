@@ -65,7 +65,7 @@ public class JwtUtil {
    * @return the user ID
    */
   public Long getUserIdFromToken(String token) {
-    Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
+    Claims claims = Jwts.parser().setSigningKey(key).build().parseClaimsJws(token).getBody();
     return Long.parseLong(claims.getSubject());
   }
 
@@ -77,7 +77,7 @@ public class JwtUtil {
    */
   public boolean validateToken(String token) {
     try {
-      Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+      Jwts.parser().setSigningKey(key).build().parseClaimsJws(token);
       return true;
     } catch (Exception e) {
       log.debug("Invalid JWT token: {}", e.getMessage());

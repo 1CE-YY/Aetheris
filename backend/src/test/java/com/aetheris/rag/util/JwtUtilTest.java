@@ -30,7 +30,8 @@ class JwtUtilTest {
     SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     testSecret = Base64.getEncoder().encodeToString(key.getEncoded());
 
-    jwtUtil = new JwtUtil(testSecret);
+    // JwtUtil requires (secret, expiration) - use 1 hour (3600000 ms) for tests
+    jwtUtil = new JwtUtil(testSecret, 3600000L);
   }
 
   @Test

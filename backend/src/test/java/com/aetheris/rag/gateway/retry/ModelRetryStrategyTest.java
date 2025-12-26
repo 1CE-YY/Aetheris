@@ -2,7 +2,7 @@ package com.aetheris.rag.gateway.retry;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import dev.langchain4j.exception.ModelException;
+import com.aetheris.rag.gateway.ModelException;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;

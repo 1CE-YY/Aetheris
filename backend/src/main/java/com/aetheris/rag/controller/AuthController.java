@@ -3,11 +3,11 @@ package com.aetheris.rag.controller;
 import com.aetheris.rag.dto.request.LoginRequest;
 import com.aetheris.rag.dto.request.RegisterRequest;
 import com.aetheris.rag.dto.response.AuthResponse;
-import com.aetheris.rag.service.auth.AuthService;
+import com.aetheris.rag.service.AuthService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,16 +23,12 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/auth")
+@RequiredArgsConstructor
 public class AuthController {
 
   private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
   private final AuthService authService;
-
-  @Autowired
-  public AuthController(AuthService authService) {
-    this.authService = authService;
-  }
 
   /**
    * Registers a new user.
