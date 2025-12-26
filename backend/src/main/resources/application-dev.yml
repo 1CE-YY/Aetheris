@@ -1,0 +1,34 @@
+# Development Environment Configuration
+
+spring:
+  profiles:
+    active: dev
+
+  # Dev tools for hot reload
+  devtools:
+    restart:
+      enabled: true
+
+# Logging for development
+logging:
+  level:
+    root: INFO
+    com.aetheris.rag: DEBUG
+    com.aetheris.rag.gateway: TRACE
+    com.aetheris.rag.mapper: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    org.mybatis: DEBUG
+    org.apache.ibatis: DEBUG
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr([%thread]){magenta} %clr(%-5level){highlight} %clr(%logger{36}){cyan} - %msg%n"
+
+# Actuator for development
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always

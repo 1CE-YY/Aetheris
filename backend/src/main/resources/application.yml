@@ -1,0 +1,192 @@
+# Aetheris RAG System - Main Configuration
+# Environment variables are used for sensitive data (API keys, passwords)
+
+spring:
+  application:
+    name: aetheris-rag
+
+  # MUST enable virtual threads for improved concurrency performance
+  threads:
+    virtual:
+      enabled: true
+
+  # Database configuration (MySQL)
+  datasource:
+    url: ${MYSQL_URL:jdbc:mysql://localhost:3306/aetheris_rag?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true}
+    username: ${MYSQL_USERNAME:aetheris}
+    password: ${MYSQL_PASSWORD:aetheris123}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: ${DB_MAX_POOL_SIZE:10}
+      minimum-idle: ${DB_MIN_IDLE:5}
+      connection-timeout: ${DB_CONNECTION_TIMEOUT:30000}
+      idle-timeout: ${DB_IDLE_TIMEOUT:600000}
+      max-lifetime: ${DB_MAX_LIFETIME:1800000}
+
+  # Flyway database migration
+  flyway:
+    enabled: ${FLYWAY_ENABLED:true}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+
+  # Redis configuration
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DB:0}
+      lettuce:
+        pool:
+          max-active: ${REDIS_MAX_ACTIVE:8}
+          max-idle: ${REDIS_MAX_IDLE:8}
+          min-idle: ${REDIS_MIN_IDLE:2}
+          max-wait: ${REDIS_MAX_WAIT:-1ms}
+      timeout: ${REDIS_TIMEOUT:5000ms}
+
+  # File upload configuration
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: ${MAX_FILE_SIZE:50MB}
+      max-request-size: ${MAX_REQUEST_SIZE:50MB}
+
+# File storage configuration
+file:
+  upload:
+    base-path: ${FILE_UPLOAD_PATH:./uploads} # Base directory for uploaded files
+    temp-path: ${FILE_TEMP_PATH:./uploads/temp} # Temporary directory for processing
+    max-size: ${MAX_FILE_SIZE:50MB}
+
+  # Jackson configuration
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+      indent-output: false
+    deserialization:
+      fail-on-unknown-properties: false
+
+# Server configuration
+server:
+  port: ${SERVER_PORT:8080}
+  servlet:
+    context-path: /
+  compression:
+    enabled: true
+  tomcat:
+    threads:
+      max: ${TOMCAT_MAX_THREADS:200}
+      min-spare: ${TOMCAT_MIN_THREADS:10}
+
+# MyBatis configuration
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.aetheris.rag.model
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: true
+    lazy-loading-enabled: true
+    log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
+
+# Model Gateway Configuration
+model-gateway:
+  # Embedding model configuration
+  embedding:
+    model-name: ${EMBEDDING_MODEL:embedding-v2}
+    base-url: ${EMBEDDING_BASE_URL:https://open.bigmodel.cn/api/paas/v4/}
+    timeout: ${EMBEDDING_TIMEOUT:30s}
+    max-tokens: ${EMBEDDING_MAX_TOKENS:8192}
+    retry:
+      max-attempts: ${EMBEDDING_MAX_RETRIES:3}
+      backoff: ${EMBEDDING_RETRY_BACKOFF:1s}
+    rate-limit:
+      permits-per-second: ${EMBEDDING_RATE_LIMIT:10}
+    cache:
+      enabled: ${EMBEDDING_CACHE_ENABLED:true}
+      ttl-days: ${EMBEDDING_CACHE_TTL_DAYS:30}
+
+  # Chat model configuration
+  chat:
+    model-name: ${CHAT_MODEL:glm-4-flash}
+    base-url: ${CHAT_BASE_URL:https://open.bigmodel.cn/api/paas/v4/}
+    api-key: ${ZHIPU_API_KEY:}
+    temperature: ${CHAT_TEMPERATURE:0.7}
+    top-p: ${CHAT_TOP_P:0.9}
+    max-tokens: ${CHAT_MAX_TOKENS:2000}
+    timeout: ${CHAT_TIMEOUT:60s}
+    retry:
+      max-attempts: ${CHAT_MAX_RETRIES:2}
+      backoff: ${CHAT_RETRY_BACKOFF:2s}
+    rate-limit:
+      permits-per-second: ${CHAT_RATE_LIMIT:5}
+
+# RAG configuration
+rag:
+  # Chunk configuration for document splitting
+  chunk:
+    size: ${CHUNK_SIZE:1000}
+    overlap: ${CHUNK_OVERLAP:200}
+
+  # Retrieval configuration
+  retrieval:
+    top-k: ${RETRIEVAL_TOP_K:5}
+    score-threshold: ${RETRIEVAL_SCORE_THRESHOLD:0.5}
+
+  # Vector index configuration
+  vector:
+    index-name: ${VECTOR_INDEX_NAME:chunk_vector_index}
+    dimension: ${VECTOR_DIMENSION:1024}
+    distance-metric: ${VECTOR_DISTANCE_METRIC:COSINE}
+    hnsw:
+      m: ${VECTOR_HNSW_M:16}
+      ef-construction: ${VECTOR_HNSW_EF_CONSTRUCTION:128}
+
+# User profile configuration
+profile:
+  enabled: ${PROFILE_ENABLED:true}
+  window-size: ${PROFILE_WINDOW_SIZE:10}
+  update-trigger: ${PROFILE_UPDATE_TRIGGER:query}
+  query-weight: ${PROFILE_QUERY_WEIGHT:1.0}
+  click-weight: ${PROFILE_CLICK_WEIGHT:2.0}
+  favorite-weight: ${PROFILE_FAVORITE_WEIGHT:3.0}
+
+# Recommendation configuration
+recommendation:
+  top-n: ${RECOMMENDATION_TOP_N:10}
+  enabled: ${RECOMMENDATION_ENABLED:true}
+
+# JWT configuration
+jwt:
+  secret: ${JWT_SECRET:your-256-bit-secret-key-change-in-production-minimum-32-bytes}
+  expiration: ${JWT_EXPIRATION:86400} # 24 hours in seconds
+
+# Logging configuration
+logging:
+  level:
+    root: ${LOG_LEVEL_ROOT:INFO}
+    com.aetheris.rag: ${LOG_LEVEL_APP:DEBUG}
+    org.springframework: ${LOG_LEVEL_SPRING:INFO}
+    org.mybatis: ${LOG_LEVEL_MYBATIS:DEBUG}
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: ${LOG_FILE:logs/application.log}
+    max-size: ${LOG_MAX_SIZE:100MB}
+    max-history: ${LOG_MAX_HISTORY:30}
+
+# Actuator configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true

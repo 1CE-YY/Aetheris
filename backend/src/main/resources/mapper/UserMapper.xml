@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+  MyBatis Mapper for User entity
+  See: com.aetheris.rag.mapper.UserMapper
+-->
+<mapper namespace="com.aetheris.rag.mapper.UserMapper">
+
+  <!-- Result Map -->
+  <resultMap id="UserResultMap" type="com.aetheris.rag.model.User">
+    <id property="id" column="id"/>
+    <result property="username" column="username"/>
+    <result property="email" column="email"/>
+    <result property="passwordHash" column="password_hash"/>
+    <result property="createdAt" column="created_at"/>
+    <result property="updatedAt" column="updated_at"/>
+    <result property="lastActiveAt" column="last_active_at"/>
+  </resultMap>
+
+  <!-- Insert User -->
+  <insert id="insert" parameterType="com.aetheris.rag.model.User" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO users (username, email, password_hash, created_at, updated_at, last_active_at)
+    VALUES (#{username}, #{email}, #{passwordHash}, #{createdAt}, #{updatedAt}, #{lastActiveAt})
+  </insert>
+
+  <!-- Find by ID -->
+  <select id="findById" resultMap="UserResultMap">
+    SELECT id, username, email, password_hash, created_at, updated_at, last_active_at
+    FROM users
+    WHERE id = #{id}
+  </select>
+
+  <!-- Find by Email -->
+  <select id="findByEmail" resultMap="UserResultMap">
+    SELECT id, username, email, password_hash, created_at, updated_at, last_active_at
+    FROM users
+    WHERE email = #{email}
+  </select>
+
+  <!-- Find by Username -->
+  <select id="findByUsername" resultMap="UserResultMap">
+    SELECT id, username, email, password_hash, created_at, updated_at, last_active_at
+    FROM users
+    WHERE username = #{username}
+  </select>
+
+  <!-- Update Last Active -->
+  <update id="updateLastActive">
+    UPDATE users
+    SET last_active_at = #{lastActiveAt},
+        updated_at = CURRENT_TIMESTAMP
+    WHERE id = #{id}
+  </update>
+
+  <!-- Check Email Exists -->
+  <select id="emailExists" resultType="boolean">
+    SELECT COUNT(*) > 0
+    FROM users
+    WHERE email = #{email}
+  </select>
+
+  <!-- Check Username Exists -->
+  <select id="usernameExists" resultType="boolean">
+    SELECT COUNT(*) > 0
+    FROM users
+    WHERE username = #{username}
+  </select>
+
+</mapper>

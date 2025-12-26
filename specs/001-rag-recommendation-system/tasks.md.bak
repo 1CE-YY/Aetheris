@@ -17,19 +17,19 @@
 
 **目标**：搭建 Spring Boot 单体应用项目结构，配置数据库和 Redis 连接
 
-- [x] T001 创建后端项目结构 `backend/`，包含 `src/main/java/com/aetheris/rag/`、`src/main/resources/`、`src/test/` 目录
-- [x] T002 创建前端项目结构 `frontend/`，初始化 Vue3 + Vite + TypeScript 项目
-- [x] T003 [P] 配置 `.editorconfig` 文件，统一 Java/TypeScript/XML 编码规范（2 空格缩进）
-- [x] T004 [P] 配置 `backend/pom.xml`，添加 Spring Boot 3.5+、MyBatis、Lombok、LangChain4j、Redis Lettuce、MySQL Connector、Guava、Commons Lang3 依赖
-- [x] T005 [P] 配置 `frontend/package.json`，添加 Vue 3.3+、Ant Design Vue 4.x、Pinia、Vue Router、Axios、Day.js、Lodash-es 依赖
-- [x] T006 创建 Docker Compose 配置文件 `docker-compose.yml`，定义 MySQL 8 和 Redis Stack 服务
-- [x] T007 [P] 创建 `backend/src/main/resources/application.yml`，配置 MySQL 数据源（HikariCP）、Redis Stack 连接（Lettuce）、Flyway 迁移
-- [x] T008 [P] **配置虚拟线程（必须）**：在 `application.yml` 中添加 `spring.threads.virtual.enabled=true` 以提升并发性能
+- [ ] T001 创建后端项目结构 `backend/`，包含 `src/main/java/com/aetheris/rag/`、`src/main/resources/`、`src/test/` 目录
+- [ ] T002 创建前端项目结构 `frontend/`，初始化 Vue3 + Vite + TypeScript 项目
+- [ ] T003 [P] 配置 `.editorconfig` 文件，统一 Java/TypeScript/XML 编码规范（2 空格缩进）
+- [ ] T004 [P] 配置 `backend/pom.xml`，添加 Spring Boot 3.5+、MyBatis、Lombok、LangChain4j、Redis Lettuce、MySQL Connector、Guava、Commons Lang3 依赖
+- [ ] T005 [P] 配置 `frontend/package.json`，添加 Vue 3.3+、Ant Design Vue 4.x、Pinia、Vue Router、Axios、Day.js、Lodash-es 依赖
+- [ ] T006 创建 Docker Compose 配置文件 `docker-compose.yml`，定义 MySQL 8 和 Redis Stack 服务
+- [ ] T007 [P] 创建 `backend/src/main/resources/application.yml`，配置 MySQL 数据源（HikariCP）、Redis Stack 连接（Lettuce）、Flyway 迁移
+- [ ] T008 [P] **配置虚拟线程（必须）**：在 `application.yml` 中添加 `spring.threads.virtual.enabled=true` 以提升并发性能
   - **目标**：启用 Java 21 虚拟线程，满足系统并发性能要求（支持 10-20 并发用户）
   - **配置项**：`spring.threads.virtual.enabled=true`
   - **验收标准**：系统启动时日志显示虚拟线程已启用，并发测试验证吞吐量提升
-- [x] T009 [P] 创建 `backend/src/main/resources/application-dev.yml`，配置开发环境日志级别（SLF4j + Logback）
-- [x] T010 [P] 创建 `backend/src/main/resources/db/migration/V1__init_schema.sql`，定义 users、resources、resource_chunks、user_behaviors、user_profiles、eval_queries、eval_runs 表结构
+- [ ] T092 [P] 创建 `backend/src/main/resources/application-dev.yml`，配置开发环境日志级别（SLF4j + Logback）
+- [ ] T092 [P] 创建 `backend/src/main/resources/db/migration/V1__init_schema.sql`，定义 users、resources、resource_chunks、user_behaviors、user_profiles、eval_queries、eval_runs 表结构
 
 **验收标准**：
 - [ ] `docker-compose up -d` 成功启动 MySQL 和 Redis Stack
@@ -44,8 +44,8 @@
 
 ### 2.1 ModelGateway 统一模型调用入口
 
-- [x] T011 创建 `backend/src/main/java/com/aetheris/rag/gateway/ModelGateway.java` 接口，定义 embed() 和 chat() 方法签名
-- [x] T012 创建 `backend/src/main/java/com/aetheris/rag/gateway/EmbeddingGateway.java`，实现智谱 AI Embedding API 调用
+- [ ] T092 创建 `backend/src/main/java/com/aetheris/rag/gateway/ModelGateway.java` 接口，定义 embed() 和 chat() 方法签名
+- [ ] T092 创建 `backend/src/main/java/com/aetheris/rag/gateway/EmbeddingGateway.java`，实现智谱 AI Embedding API 调用
   - **目标**：封装 Embedding 调用，实现文本哈希缓存、超时/重试/限流、日志脱敏
   - **涉及表**：无（调用外部 API）
   - **Redis**：`embedding:cache:{textHash}` 存储 embedding 向量，TTL 30 天
@@ -53,19 +53,19 @@
   - **API 端点**：无（内部服务）
   - **测试要点**：单测验证缓存命中、重试策略、超时处理、日志脱敏
   - **验收标准**：FR-007（Embedding 缓存）、FR-009（入库幂等）、宪章三（缓存与幂等）
-- [x] T013 创建 `backend/src/main/java/com/aetheris/rag/gateway/ChatGateway.java`，实现智谱 AI Chat API 调用
+- [ ] T092 创建 `backend/src/main/java/com/aetheris/rag/gateway/ChatGateway.java`，实现智谱 AI Chat API 调用
   - **目标**：封装 LLM 调用，实现 Prompt 构建、超时/重试/限流、降级处理、日志脱敏
   - **涉及表**：无（调用外部 API）
   - **配置项**：`chat.modelName`（glm-4-flash）、`chat.temperature`（0.7）、`chat.topP`（0.9）、`chat.maxTokens`（2000）、`chat.timeout`（60s）
   - **测试要点**：单测验证降级策略（LLM 不可用时返回检索结果+引用摘要）
   - **验收标准**：FR-015（证据不足时的降级返回）
-- [x] T014 [P] 创建 `backend/src/main/java/com/aetheris/rag/gateway/cache/EmbeddingCache.java`，实现基于文本哈希的 Redis 缓存
-- [x] T015 [P] 创建 `backend/src/main/java/com/aetheris/rag/gateway/retry/ModelRetryStrategy.java`，实现 429/5xx 重试策略（指数退避）
-- [x] T016 [P] 创建 `backend/src/main/java/com/aetheris/rag/gateway/sanitize/LogSanitizer.java`，实现日志脱敏（截断 200 字符，不记录 API key）
+- [ ] T092 [P] 创建 `backend/src/main/java/com/aetheris/rag/gateway/cache/EmbeddingCache.java`，实现基于文本哈希的 Redis 缓存
+- [ ] T092 [P] 创建 `backend/src/main/java/com/aetheris/rag/gateway/retry/ModelRetryStrategy.java`，实现 429/5xx 重试策略（指数退避）
+- [ ] T092 [P] 创建 `backend/src/main/java/com/aetheris/rag/gateway/sanitize/LogSanitizer.java`，实现日志脱敏（截断 200 字符，不记录 API key）
 
 ### 2.2 Citations 统一结构规范
 
-- [x] T017 创建 `backend/src/main/java/com/aetheris/rag/dto/response/Citation.java`，定义引用结构
+- [ ] T092 创建 `backend/src/main/java/com/aetheris/rag/dto/response/Citation.java`，定义引用结构
   - **目标**：定义统一的 Citations JSON 结构，支持 /api/chat/ask 和 /api/recommendations 复用
   - **涉及表**：关联 resources（resource_id, title）、resource_chunks（chunk_id, chunk_index, location_info）
   - **字段**：resourceId、resourceTitle、chunkId、chunkIndex、location（PDF pageStart/pageEnd，MD chapterPath）、snippet（100-200 字符）、score（相似度分数）
@@ -74,24 +74,24 @@
 
 ### 2.3 用户认证与授权
 
-- [x] T018 创建 `backend/src/main/java/com/aetheris/rag/model/User.java`，使用 Lombok @Data、@Builder 注解
+- [ ] T092 创建 `backend/src/main/java/com/aetheris/rag/model/User.java`，使用 Lombok @Data、@Builder 注解
   - **涉及表**：users（id, username, email, password_hash, created_at, updated_at, last_active_at）
-- [x] T019 [P] 创建 `backend/src/main/java/com/aetheris/rag/mapper/UserMapper.java` 接口和 `UserMapper.xml`
+- [ ] T092 [P] 创建 `backend/src/main/java/com/aetheris/rag/mapper/UserMapper.java` 接口和 `UserMapper.xml`
   - **SQL**：INSERT、SELECT by email/username/id、UPDATE last_active_at
-- [x] T020 创建 `backend/src/main/java/com/aetheris/rag/service/auth/AuthService.java` 接口和实现 `AuthServiceImpl.java`
+- [ ] T092 创建 `backend/src/main/java/com/aetheris/rag/service/auth/AuthService.java` 接口和实现 `AuthServiceImpl.java`
   - **目标**：实现注册（邮箱唯一性检查、密码 BCrypt 哈希）、登录（JWT token 生成）、密码校验
   - **涉及表**：users
   - **API 端点**：POST /api/auth/register、POST /api/auth/login
   - **测试要点**：单测验证 BCrypt 哈希、JWT 生成、邮箱重复检查
   - **验收标准**：FR-001（注册登录）、FR-002（用户信息维护）
-- [x] T021 [P] 创建 `backend/src/main/java/com/aetheris/rag/controller/AuthController.java`，实现注册和登录端点
-- [x] T022 [P] 创建 `backend/src/main/java/com/aetheris/rag/config/SecurityConfig.java`，配置 JWT 过滤器（验证 Authorization 头）
+- [ ] T092 [P] 创建 `backend/src/main/java/com/aetheris/rag/controller/AuthController.java`，实现注册和登录端点
+- [ ] T092 [P] 创建 `backend/src/main/java/com/aetheris/rag/config/SecurityConfig.java`，配置 JWT 过滤器（验证 Authorization 头）
 
 ### 2.4 基础工具类
 
-- [x] T023 [P] 创建 `backend/src/main/java/com/aetheris/rag/util/HashUtil.java`，实现 SHA-256 文本哈希计算
-- [x] T024 [P] 创建 `backend/src/main/java/com/aetheris/rag/util/TextNormalizer.java`，实现文本规范化（去除冗余空白、统一换行）
-- [x] T025 [P] 创建 `backend/src/main/java/com/aetheris/rag/util/PerformanceTimer.java`，实现分阶段耗时记录（解析、Embedding、检索、生成）
+- [ ] T092 [P] 创建 `backend/src/main/java/com/aetheris/rag/util/HashUtil.java`，实现 SHA-256 文本哈希计算
+- [ ] T092 [P] 创建 `backend/src/main/java/com/aetheris/rag/util/TextNormalizer.java`，实现文本规范化（去除冗余空白、统一换行）
+- [ ] T092 [P] 创建 `backend/src/main/java/com/aetheris/rag/util/PerformanceTimer.java`，实现分阶段耗时记录（解析、Embedding、检索、生成）
 
 **验收标准**：
 - [ ] ModelGateway 单测通过，缓存命中率达 80%+

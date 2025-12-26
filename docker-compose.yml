@@ -1,0 +1,65 @@
+# Aetheris RAG System - Docker Compose Configuration
+# Description: MySQL 8 and Redis Stack services for development
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: aetheris-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USERNAME}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: Asia/Shanghai
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/src/main/resources/db/migration:/docker-entrypoint-initdb.d:ro
+    networks:
+      - aetheris-network
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --max_connections=1000
+      - --max_allowed_packet=256M
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis-stack:
+    image: redis/redis-stack-server:latest
+    container_name: aetheris-redis
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data/redis
+    networks:
+      - aetheris-network
+    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  aetheris-network:
+    driver: bridge
+    name: aetheris-network
+
+volumes:
+  mysql_data:
+    driver: local
+    name: aetheris-mysql-data
+  redis_data:
+    driver: local
+    name: aetheris-redis-data
