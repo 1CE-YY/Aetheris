@@ -38,7 +38,6 @@
     <langchain4j.version>0.35.0</langchain4j.version>
     <guava.version>33.0.0-jre</guava.version>
     <commons-lang3.version>3.17.0</commons-lang3.version>
-    <lettuce.version>6.3.2.RELEASE</lettuce.version>
 
     <!-- Test dependencies -->
     <testcontainers.version>1.19.3</testcontainers.version>
@@ -99,13 +98,6 @@
       <groupId>dev.langchain4j</groupId>
       <artifactId>langchain4j-zhipu-ai</artifactId>
       <version>${langchain4j.version}</version>
-    </dependency>
-
-    <!-- Redis (Lettuce) -->
-    <dependency>
-      <groupId>io.lettuce</groupId>
-      <artifactId>lettuce-core</artifactId>
-      <version>${lettuce.version}</version>
     </dependency>
 
     <!-- MySQL Connector -->
@@ -261,8 +253,6 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.11.0</version>
         <configuration>
-          <source>21</source>
-          <target>21</target>
           <release>21</release>
           <compilerArgs>
             <arg>-parameters</arg>

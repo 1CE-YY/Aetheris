@@ -26,17 +26,28 @@ echo ""
 # ========================================
 echo -e "${YELLOW}[1/3] 停止后端服务...${NC}"
 
-if [ -f ".backend.pid" ]; then
-    BACKEND_PID=$(cat .backend.pid)
-    if ps -p $BACKEND_PID > /dev/null 2>&1; then
+if [ -f ".pids.json" ]; then
+    # 使用jq或grep提取PID
+    if command -v jq &> /dev/null; then
+        BACKEND_PID=$(jq -r '.backend.pid' .pids.json)
+    else
+        BACKEND_PID=$(grep -A 5 '"backend"' .pids.json | grep '"pid"' | grep -o '[0-9]*')
+    fi
+
+    if [ -n "$BACKEND_PID" ] && [ "$BACKEND_PID" != "null" ] && ps -p $BACKEND_PID > /dev/null 2>&1; then
         kill $BACKEND_PID
         echo -e "${GREEN}✅ 后端已停止 (PID: $BACKEND_PID)${NC}"
+
+        # 更新状态
+        if command -v jq &> /dev/null; then
+            jq '.backend.pid = null | .backend.status = "stopped" | .backend.started_at = null' .pids.json > .pids.json.tmp
+            mv .pids.json.tmp .pids.json
+        fi
     else
         echo -e "${YELLOW}⚠️  后端进程未运行${NC}"
     fi
-    rm .backend.pid
 else
-    echo -e "${YELLOW}⚠️  未找到后端 PID 文件${NC}"
+    echo -e "${YELLOW}⚠️  未找到 PID 文件${NC}"
 
     # 尝试查找并杀死 Spring Boot 进程
     SPRING_PID=$(ps aux | grep 'spring-boot:run' | grep -v grep | awk '{print $2}')
@@ -53,17 +64,28 @@ echo ""
 # ========================================
 echo -e "${YELLOW}[2/3] 停止前端服务...${NC}"
 
-if [ -f ".frontend.pid" ]; then
-    FRONTEND_PID=$(cat .frontend.pid)
-    if ps -p $FRONTEND_PID > /dev/null 2>&1; then
+if [ -f ".pids.json" ]; then
+    # 使用jq或grep提取PID
+    if command -v jq &> /dev/null; then
+        FRONTEND_PID=$(jq -r '.frontend.pid' .pids.json)
+    else
+        FRONTEND_PID=$(grep -A 5 '"frontend"' .pids.json | grep '"pid"' | grep -o '[0-9]*')
+    fi
+
+    if [ -n "$FRONTEND_PID" ] && [ "$FRONTEND_PID" != "null" ] && ps -p $FRONTEND_PID > /dev/null 2>&1; then
         kill $FRONTEND_PID
         echo -e "${GREEN}✅ 前端已停止 (PID: $FRONTEND_PID)${NC}"
+
+        # 更新状态
+        if command -v jq &> /dev/null; then
+            jq '.frontend.pid = null | .frontend.status = "stopped" | .frontend.started_at = null' .pids.json > .pids.json.tmp
+            mv .pids.json.tmp .pids.json
+        fi
     else
         echo -e "${YELLOW}⚠️  前端进程未运行${NC}"
     fi
-    rm .frontend.pid
 else
-    echo -e "${YELLOW}⚠️  未找到前端 PID 文件${NC}"
+    echo -e "${YELLOW}⚠️  未找到 PID 文件${NC}"
 
     # 尝试查找并杀死 Vite 进程
     VITE_PID=$(ps aux | grep 'vite' | grep -v grep | awk '{print $2}')

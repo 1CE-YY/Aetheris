@@ -3,6 +3,7 @@ package com.aetheris.rag.gateway.cache;
 import com.aetheris.rag.gateway.sanitize.LogSanitizer;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +38,7 @@ import org.springframework.stereotype.Component;
  * @since 2025-12-26
  */
 @Component
+@RequiredArgsConstructor
 public class EmbeddingCache {
 
   private static final Logger log = LoggerFactory.getLogger(EmbeddingCache.class);
@@ -45,32 +47,25 @@ public class EmbeddingCache {
   private static final int DEFAULT_TTL_DAYS = 30;
 
   private final RedisTemplate<String, float[]> redisTemplate;
-  private final long ttlSeconds;
+
+  @Value("${model-gateway.embedding.cache.ttl-days:30}")
+  private int ttlDays;
 
   /**
-   * Creates an embedding cache with configurable TTL.
-   *
-   * @param redisTemplate Redis template for cache operations
-   * @param ttlDays cache TTL in days (from configuration)
+   * Post-construct callback to log initialization.
    */
-  public EmbeddingCache(
-      RedisTemplate<String, float[]> redisTemplate,
-      @Value("${model-gateway.embedding.cache.ttl-days:30}") int ttlDays) {
-    this.redisTemplate = redisTemplate;
-    this.ttlSeconds = TimeUnit.DAYS.toSeconds(ttlDays);
+  @jakarta.annotation.PostConstruct
+  public void init() {
     log.info("Initialized EmbeddingCache with TTL: {} days", ttlDays);
   }
 
   /**
-   * Creates an embedding cache with configurable TTL (for testing).
+   * Gets the TTL in seconds for cache operations.
    *
-   * @param redisTemplate Redis template for cache operations
-   * @param ttl cache TTL as a Duration
+   * @return TTL in seconds
    */
-  public EmbeddingCache(RedisTemplate<String, float[]> redisTemplate, Duration ttl) {
-    this.redisTemplate = redisTemplate;
-    this.ttlSeconds = ttl.getSeconds();
-    log.info("Initialized EmbeddingCache with TTL: {} seconds", ttl.getSeconds());
+  private long getTtlSeconds() {
+    return TimeUnit.DAYS.toSeconds(ttlDays);
   }
 
   /**
@@ -126,7 +121,7 @@ public class EmbeddingCache {
     String key = buildCacheKey(textHash);
 
     try {
-      redisTemplate.opsForValue().set(key, embedding, ttlSeconds, TimeUnit.SECONDS);
+      redisTemplate.opsForValue().set(key, embedding, getTtlSeconds(), TimeUnit.SECONDS);
       log.debug("Cached embedding for textHash: {}, vector dimension: {}",
           LogSanitizer.sanitize(textHash), embedding.length);
 

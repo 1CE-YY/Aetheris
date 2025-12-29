@@ -3,7 +3,6 @@ package com.aetheris.rag.gateway.cache;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.aetheris.rag.config.RedisConfig;
-import java.time.Duration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -56,8 +55,8 @@ class EmbeddingCacheIntegrationTest {
         new com.aetheris.rag.config.FloatArrayRedisSerializer());
     redisTemplate.afterPropertiesSet();
 
-    // Create EmbeddingCache with 30 day TTL
-    embeddingCache = new EmbeddingCache(redisTemplate, Duration.ofDays(30));
+    // Create EmbeddingCache
+    embeddingCache = new EmbeddingCache(redisTemplate);
   }
 
   @AfterEach

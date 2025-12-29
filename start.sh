@@ -138,10 +138,17 @@ fi
 echo -e "${BLUE}启动 Spring Boot 应用...${NC}"
 nohup mvn spring-boot:run > "$PROJECT_ROOT/logs/backend.log" 2>&1 &
 BACKEND_PID=$!
-echo $BACKEND_PID > "$PROJECT_ROOT/.backend.pid"
+STARTED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+# 更新PID文件
+sed -i '' "s/\"backend\": {/"\"backend\": {\n    \"pid\": $BACKEND_PID,\n    \"status\": \"running\",\n    \"started_at\": \"$STARTED_AT\"/" "$PROJECT_ROOT/.pids.json"
+sed -i '' '/"backend": {/,/}/s/"pid": [0-9]*/"pid": '$BACKEND_PID'/' "$PROJECT_ROOT/.pids.json"
+sed -i '' '/"backend": {/,/}/s/"status": "stopped"/"status": "running"/' "$PROJECT_ROOT/.pids.json"
+sed -i '' '/"backend": {/,/}/s/"started_at": null/"started_at": "'$STARTED_AT'"/' "$PROJECT_ROOT/.pids.json"
 
 echo -e "${GREEN}✅ 后端启动中... (PID: $BACKEND_PID)${NC}"
 echo -e "${YELLOW}📄 查看日志: tail -f $PROJECT_ROOT/logs/backend.log${NC}"
+echo -e "${YELLOW}📄 查看进程状态: cat $PROJECT_ROOT/.pids.json | jq${NC}"
 
 # 等待后端启动
 echo -e "${BLUE}等待后端启动 (30秒)...${NC}"
@@ -173,10 +180,16 @@ fi
 echo -e "${BLUE}启动 Vite 开发服务器...${NC}"
 nohup npm run dev > "$PROJECT_ROOT/logs/frontend.log" 2>&1 &
 FRONTEND_PID=$!
-echo $FRONTEND_PID > "$PROJECT_ROOT/.frontend.pid"
+STARTED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+
+# 更新PID文件
+sed -i '' '/"frontend": {/,/}/s/"pid": [0-9]*/"pid": '$FRONTEND_PID'/' "$PROJECT_ROOT/.pids.json"
+sed -i '' '/"frontend": {/,/}/s/"status": "stopped"/"status": "running"/' "$PROJECT_ROOT/.pids.json"
+sed -i '' '/"frontend": {/,/}/s/"started_at": null/"started_at": "'$STARTED_AT'"/' "$PROJECT_ROOT/.pids.json"
 
 echo -e "${GREEN}✅ 前端启动中... (PID: $FRONTEND_PID)${NC}"
 echo -e "${YELLOW}📄 查看日志: tail -f $PROJECT_ROOT/logs/frontend.log${NC}"
+echo -e "${YELLOW}📄 查看进程状态: cat $PROJECT_ROOT/.pids.json | jq${NC}"
 
 # 等待前端启动
 echo -e "${BLUE}等待前端启动 (10秒)...${NC}"
@@ -201,8 +214,7 @@ echo -e "  - Docker: docker-compose logs -f"
 echo ""
 echo -e "${YELLOW}🛑 停止服务:${NC}"
 echo -e "  - 停止所有: ./stop.sh"
-echo -e "  - 停止后端: kill \$(cat .backend.pid)"
-echo -e "  - 停止前端: kill \$(cat .frontend.pid)"
+echo -e "  - 查看进程状态: cat .pids.json | jq"
 echo ""
 echo -e "${BLUE}📚 完整启动指南: docs/STARTUP_GUIDE.md${NC}"
 echo ""
