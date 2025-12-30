@@ -4,8 +4,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 用于跟踪性能指标的工具类，支持阶段级别的计时。
@@ -33,9 +32,8 @@ import org.slf4j.LoggerFactory;
  * @author Aetheris Team
  * @version 1.0.0
  */
+@Slf4j
 public class PerformanceTimer {
-
-  private static final Logger log = LoggerFactory.getLogger(PerformanceTimer.class);
 
   private final Instant startTime;
   private final Map<String, Long> stages;

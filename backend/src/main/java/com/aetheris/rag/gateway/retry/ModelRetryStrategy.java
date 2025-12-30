@@ -3,8 +3,7 @@ package com.aetheris.rag.gateway.retry;
 import com.aetheris.rag.gateway.ModelException;
 import java.io.IOException;
 import java.time.Duration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 模型 API 调用的重试策略，使用指数退避。
@@ -41,9 +40,8 @@ import org.slf4j.LoggerFactory;
  * @version 1.0.0
  * @since 2025-12-26
  */
+@Slf4j
 public final class ModelRetryStrategy {
-
-  private static final Logger log = LoggerFactory.getLogger(ModelRetryStrategy.class);
 
   private final int maxAttempts;
   private final Duration baseBackoff;

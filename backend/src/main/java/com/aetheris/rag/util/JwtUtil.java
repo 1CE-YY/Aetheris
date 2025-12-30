@@ -7,8 +7,7 @@ import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -18,10 +17,9 @@ import org.springframework.stereotype.Component;
  * @author Aetheris Team
  * @version 1.0.0
  */
+@Slf4j
 @Component
 public class JwtUtil {
-
-  private static final Logger log = LoggerFactory.getLogger(JwtUtil.class);
 
   private final Key key;
   private final long jwtExpiration;

@@ -4,8 +4,7 @@ import com.aetheris.rag.gateway.sanitize.LogSanitizer;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -36,11 +35,10 @@ import org.springframework.stereotype.Component;
  * @version 1.0.0
  * @since 2025-12-26
  */
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class EmbeddingCache {
-
-  private static final Logger log = LoggerFactory.getLogger(EmbeddingCache.class);
 
   private static final String CACHE_KEY_PREFIX = "embedding:cache:";
   private static final int DEFAULT_TTL_DAYS = 30;

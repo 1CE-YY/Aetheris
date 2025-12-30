@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aetheris.rag.mapper.UserBehaviorMapper">
+
+  <!-- ResultMap 定义 -->
+  <resultMap id="UserBehaviorResultMap" type="com.aetheris.rag.model.UserBehavior">
+    <id column="id" property="id"/>
+    <result column="user_id" property="userId"/>
+    <result column="behavior_type" property="behaviorType"/>
+    <result column="resource_id" property="resourceId"/>
+    <result column="query_text" property="queryText"/>
+    <result column="behavior_time" property="behaviorTime"/>
+    <result column="session_id" property="sessionId"/>
+    <result column="weight" property="weight"/>
+  </resultMap>
+
+  <!-- 插入用户行为记录 -->
+  <insert id="insert" parameterType="com.aetheris.rag.model.UserBehavior"
+      useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO user_behaviors (
+      user_id, behavior_type, resource_id, query_text, behavior_time, session_id, weight
+    )
+    VALUES (
+      #{userId}, #{behaviorType}, #{resourceId}, #{queryText}, #{behaviorTime}, #{sessionId}, #{weight}
+    )
+  </insert>
+
+  <!-- 查询用户最近的查询行为（按时间倒序） -->
+  <select id="findRecentQueries" resultMap="UserBehaviorResultMap">
+    SELECT * FROM user_behaviors
+    WHERE user_id = #{userId} AND behavior_type = 'QUERY'
+    ORDER BY behavior_time DESC
+    LIMIT #{limit}
+  </select>
+
+  <!-- 查询用户在指定时间之后的所有行为 -->
+  <select id="findByUserIdAndTimeRange" resultMap="UserBehaviorResultMap">
+    SELECT * FROM user_behaviors
+    WHERE user_id = #{userId}
+      AND behavior_time &gt;= #{startTime}
+    ORDER BY behavior_time DESC
+  </select>
+
+  <!-- 统计用户指定类型的的行为数量 -->
+  <select id="countByType" resultType="int">
+    SELECT COUNT(*) FROM user_behaviors
+    WHERE user_id = #{userId} AND behavior_type = #{type}
+  </select>
+
+  <!-- 查询用户最近的所有行为（按时间倒序） -->
+  <select id="findRecentBehaviors" resultMap="UserBehaviorResultMap">
+    SELECT * FROM user_behaviors
+    WHERE user_id = #{userId}
+    ORDER BY behavior_time DESC
+    LIMIT #{limit}
+  </select>
+
+</mapper>

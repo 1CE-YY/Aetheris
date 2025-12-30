@@ -43,4 +43,13 @@ public interface AuthService {
    * @return 用户 ID
    */
   Long getUserIdFromToken(String token);
+
+  /**
+   * 获取当前登录用户的信息。
+   *
+   * @param userId 用户 ID
+   * @return 用户信息
+   * @throws RuntimeException 如果用户不存在
+   */
+  com.aetheris.rag.dto.response.UserResponse getCurrentUser(Long userId);
 }

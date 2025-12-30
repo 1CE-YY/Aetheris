@@ -2,12 +2,12 @@ package com.aetheris.rag.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
+import lombok.Value;
 
 /**
  * 用于引用 RAG 答案和推荐中的证据来源的引用对象。
  *
- * <p>此类表示将 AI 生成的响应链接到其源材料的引用。
- * 每个引用提供完整的可追溯性，允许用户验证信息并导航到原始文档中的确切位置。
+ * <p>此类表示将 AI 生成的响应链接到其源材料的引用。每个引用提供完整的可追溯性，允许用户验证信息并导航到原始文档中的确切位置。
  *
  * <p>引用结构遵循 FR-014 和 FR-020 中定义的规范：
  *
@@ -22,31 +22,34 @@ import java.util.Objects;
  * @version 1.0.0
  * @since 2025-12-26
  */
+@Value
 public class Citation {
 
   @JsonProperty("resourceId")
-  private final String resourceId;
+  String resourceId;
 
   @JsonProperty("resourceTitle")
-  private final String resourceTitle;
+  String resourceTitle;
 
   @JsonProperty("chunkId")
-  private final String chunkId;
+  String chunkId;
 
   @JsonProperty("chunkIndex")
-  private final int chunkIndex;
+  int chunkIndex;
 
   @JsonProperty("location")
-  private final CitationLocation location;
+  CitationLocation location;
 
   @JsonProperty("snippet")
-  private final String snippet;
+  String snippet;
 
   @JsonProperty("score")
-  private final double score;
+  double score;
 
   /**
    * 创建完整的引用。
+   *
+   * <p>构造函数中包含完整的参数校验逻辑，确保数据完整性
    *
    * @param resourceId 资源 ID（UUID）
    * @param resourceTitle 资源标题
@@ -97,68 +100,13 @@ public class Citation {
   }
 
   /**
-   * 获取资源 ID。
+   * 判断两个引用是否相等。
    *
-   * @return 资源 UUID
-   */
-  public String getResourceId() {
-    return resourceId;
-  }
-
-  /**
-   * 获取资源标题。
+   * <p>只比较核心字段：resourceId、chunkId、chunkIndex、score
    *
-   * @return 资源标题
+   * @param o 其他对象
+   * @return 如果核心字段相等则返回 true
    */
-  public String getResourceTitle() {
-    return resourceTitle;
-  }
-
-  /**
-   * 获取分块 ID。
-   *
-   * @return 分块 UUID
-   */
-  public String getChunkId() {
-    return chunkId;
-  }
-
-  /**
-   * 获取分块索引。
-   *
-   * @return 分块索引（从 0 开始）
-   */
-  public int getChunkIndex() {
-    return chunkIndex;
-  }
-
-  /**
-   * 获取位置信息。
-   *
-   * @return 位置（PDF 页码范围或 Markdown 章节路径）
-   */
-  public CitationLocation getLocation() {
-    return location;
-  }
-
-  /**
-   * 获取文本摘录。
-   *
-   * @return 支持性文本摘录
-   */
-  public String getSnippet() {
-    return snippet;
-  }
-
-  /**
-   * 获取相似度分数。
-   *
-   * @return 分数（0.0 到 1.0）
-   */
-  public double getScore() {
-    return score;
-  }
-
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -174,32 +122,15 @@ public class Citation {
         && Objects.equals(chunkId, citation.chunkId);
   }
 
+  /**
+   * 生成哈希码。
+   *
+   * <p>只使用核心字段：resourceId、chunkId、chunkIndex、score
+   *
+   * @return 哈希码
+   */
   @Override
   public int hashCode() {
     return Objects.hash(resourceId, chunkId, chunkIndex, score);
-  }
-
-  @Override
-  public String toString() {
-    return "Citation{"
-        + "resourceId='"
-        + resourceId
-        + '\''
-        + ", resourceTitle='"
-        + resourceTitle
-        + '\''
-        + ", chunkId='"
-        + chunkId
-        + '\''
-        + ", chunkIndex="
-        + chunkIndex
-        + ", location="
-        + location
-        + ", snippet='"
-        + snippet
-        + '\''
-        + ", score="
-        + score
-        + '}';
   }
 }

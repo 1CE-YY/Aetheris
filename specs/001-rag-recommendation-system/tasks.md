@@ -132,27 +132,30 @@
 
 **目标**：用户可以注册登录，系统记录查询和点击/收藏行为
 
+**验收日期**: 2025-12-30
+**验收评分**: 待验收
+
 **独立测试**：用户注册登录后，在问答界面输入问题，检查 `user_behaviors` 表有记录
 
-- [ ] T026 创建 `backend/src/main/java/com/aetheris/rag/model/UserBehavior.java`，使用 Lombok 注解
+- [x] T026 创建 `backend/src/main/java/com/aetheris/rag/model/UserBehavior.java`，使用 Lombok 注解
   - **涉及表**：user_behaviors（id, user_id, behavior_type, resource_id, query_text, behavior_time, session_id）
-- [ ] T027 [P] 创建 `backend/src/main/java/com/aetheris/rag/mapper/UserBehaviorMapper.java` 接口和 `UserBehaviorMapper.xml`
+- [x] T027 [P] 创建 `backend/src/main/java/com/aetheris/rag/mapper/UserBehaviorMapper.java` 接口和 `UserBehaviorMapper.xml`
   - **SQL**：INSERT、SELECT recent queries、SELECT by time range
-- [ ] T028 创建 `backend/src/main/java/com/aetheris/rag/service/BehaviorService.java`（无接口，简单实现）
+- [x] T028 创建 `backend/src/main/java/com/aetheris/rag/service/BehaviorService.java`（无接口，简单实现）
   - **目标**：记录查询行为（FR-003）、记录点击/收藏行为（FR-004）
   - **涉及表**：user_behaviors
   - **API 端点**：POST /api/behaviors（内部调用，无需暴露）
   - **测试要点**：单测验证行为记录、时间戳自动填充
   - **验收标准**：FR-003、FR-004、US4 验收场景 2/3
-- [ ] T029 [P] 创建 `backend/src/main/java/com/aetheris/rag/controller/BehaviorController.java`，提供 GET /api/behaviors/recent 查询最近行为（用于个人中心）
+- [x] T029 [P] 创建 `backend/src/main/java/com/aetheris/rag/controller/BehaviorController.java`，提供 GET /api/behaviors/recent 查询最近行为（用于个人中心）
 
 **前端任务（可并行）**：
 
-- [ ] T030 [P] 创建 `frontend/src/views/auth/LoginView.vue`，使用 Ant Design Vue 表单组件
-- [ ] T031 [P] 创建 `frontend/src/views/auth/RegisterView.vue`，实现注册表单验证（邮箱格式、密码长度）
-- [ ] T032 [P] 创建 `frontend/src/services/auth.service.ts`，封装注册和登录 API 调用（Axios + JWT token 存储）
-- [ ] T033 创建 `frontend/src/stores/user.ts`，使用 Pinia 管理用户登录状态
-- [ ] T034 [P] 创建 `frontend/src/router/index.ts`，定义路由（登录、注册、主页），添加路由守卫（未登录跳转登录页）
+- [x] T030 [P] 创建 `frontend/src/views/auth/LoginView.vue`，使用 Ant Design Vue 表单组件
+- [x] T031 [P] 创建 `frontend/src/views/auth/RegisterView.vue`，实现注册表单验证（邮箱格式、密码长度）
+- [x] T032 [P] 创建 `frontend/src/services/auth.service.ts`，封装注册和登录 API 调用（Axios + JWT token 存储）
+- [x] T033 创建 `frontend/src/stores/user.ts`，使用 Pinia 管理用户登录状态
+- [x] T034 [P] 创建 `frontend/src/router/index.ts`，定义路由（登录、注册、主页），添加路由守卫（未登录跳转登录页）
 
 **验收标准**：
 - [ ] 用户注册功能正常，可创建新账号
@@ -164,7 +167,21 @@
 - [ ] 行为记录包含正确的 user_id、behavior_type、query_text、behavior_time
 - [ ] GET /api/behaviors/recent 可查询最近行为记录
 
-**Checkpoint**：用户可注册登录，行为记录正常写入数据库
+**Checkpoint**：用户可注册登录，行为记录正常写入数据库（待用户验收）
+
+**验收备注**：
+- ✅ UserBehavior 实体类实现完成（包含 BehaviorType 枚举）
+- ✅ UserBehaviorMapper 接口和 XML 实现（包含 5 个 SQL 方法）
+- ✅ BehaviorService 服务实现完成（包含 6 个业务方法）
+- ✅ BehaviorController 控制器实现完成（包含 4 个 API 端点）
+- ✅ 前端 LoginView.vue 登录页面实现（Ant Design Vue 表单）
+- ✅ 前端 RegisterView.vue 注册页面实现（包含表单验证）
+- ✅ auth.service.ts 认证服务实现（Axios + JWT token 管理）
+- ✅ user.ts Pinia store 实现（用户状态管理）
+- ✅ router/index.ts 路由配置实现（包含路由守卫）
+- ✅ 单元测试 BehaviorServiceTest（8 个测试方法）
+- ✅ 集成测试 UserBehaviorIntegrationTest（4 个测试方法）
+- ⚠️ 待用户验收前端功能和 API 测试
 
 ---
 

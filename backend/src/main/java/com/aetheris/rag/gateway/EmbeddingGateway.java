@@ -8,8 +8,7 @@ import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.output.Response;
 import java.time.Duration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -32,10 +31,9 @@ import org.springframework.stereotype.Component;
  * @version 1.0.0
  * @since 2025-12-26
  */
+@Slf4j
 @Component
 public class EmbeddingGateway {
-
-  private static final Logger log = LoggerFactory.getLogger(EmbeddingGateway.class);
 
   // TODO: Uncomment when implementing Phase 5
   /*

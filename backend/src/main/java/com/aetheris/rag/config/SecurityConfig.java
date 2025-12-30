@@ -8,8 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -32,12 +31,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * @author Aetheris Team
  * @version 1.0.0
  */
+@Slf4j
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
-  private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
 
   private final JwtUtil jwtUtil;
 
@@ -78,10 +76,9 @@ public class SecurityConfig {
   /**
    * JWT 认证过滤器。
    */
+  @Slf4j
   @RequiredArgsConstructor
   public static class JwtAuthenticationFilter extends OncePerRequestFilter {
-
-    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     private final JwtUtil jwtUtil;
 
