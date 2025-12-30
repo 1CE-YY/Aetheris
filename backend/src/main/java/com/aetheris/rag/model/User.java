@@ -7,10 +7,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * User entity representing a user account in the system.
+ * 表示系统中用户帐户的用户实体。
  *
- * <p>This class maps to the {@code users} table and contains user authentication and profile
- * information.
+ * <p>此类映射到 {@code users} 表，包含用户认证和个人资料信息。
  *
  * @author Aetheris Team
  * @version 1.0.0
@@ -22,24 +21,24 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class User {
 
-  /** User ID (primary key, auto-generated) */
+  /** 用户 ID（主键，自动生成） */
   private Long id;
 
-  /** Username (unique, not null) */
+  /** 用户名（唯一，非空） */
   private String username;
 
-  /** Email address (unique, not null) */
+  /** 电子邮件地址（唯一，非空） */
   private String email;
 
-  /** Password hash (BCrypt, not null) */
+  /** 密码哈希（BCrypt，非空） */
   private String passwordHash;
 
-  /** Account creation timestamp */
+  /** 帐户创建时间戳 */
   private Instant createdAt;
 
-  /** Last update timestamp */
+  /** 最后更新时间戳 */
   private Instant updatedAt;
 
-  /** Last activity timestamp (nullable) */
+  /** 最后活动时间戳（可空） */
   private Instant lastActiveAt;
 }

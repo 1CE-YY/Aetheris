@@ -8,24 +8,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Utility class for tracking performance metrics with stage-level timing.
+ * 用于跟踪性能指标的工具类，支持阶段级别的计时。
  *
- * <p>This class provides a simple way to measure elapsed time for different stages of a
- * request processing pipeline (e.g., parsing, embedding, retrieval, generation).
+ * <p>此类提供了一种简单的方法来测量请求处理管道的不同阶段（例如，解析、嵌入、检索、生成）的经过时间。
  *
- * <p>Usage example:
+ * <p>用法示例：
  *
  * <pre>{@code
  * PerformanceTimer timer = new PerformanceTimer();
  *
- * // Stage 1: Parsing
+ * // 阶段 1：解析
  * timer.recordStage("parsing");
- * // ... do parsing work ...
+ * // ... 执行解析工作 ...
  * timer.endStage();
  *
- * // Stage 2: Embedding
+ * // 阶段 2：嵌入
  * timer.recordStage("embedding");
- * // ... do embedding work ...
+ * // ... 执行嵌入工作 ...
  * timer.endStage();
  *
  * log.info("Total time: {} ms, Stages: {}", timer.getElapsedMs(), timer.getStages());
@@ -44,7 +43,7 @@ public class PerformanceTimer {
   private Instant stageStartTime;
 
   /**
-   * Creates a new performance timer.
+   * 创建新的性能计时器。
    */
   public PerformanceTimer() {
     this.startTime = Instant.now();
@@ -52,18 +51,18 @@ public class PerformanceTimer {
   }
 
   /**
-   * Gets the total elapsed time in milliseconds.
+   * 获取总经过时间（毫秒）。
    *
-   * @return the elapsed time in milliseconds
+   * @return 经过的时间（毫秒）
    */
   public long getElapsedMs() {
     return Duration.between(startTime, Instant.now()).toMillis();
   }
 
   /**
-   * Starts recording a new stage.
+   * 开始记录新阶段。
    *
-   * @param stageName the name of the stage
+   * @param stageName 阶段名称
    */
   public void recordStage(String stageName) {
     if (currentStage != null) {
@@ -76,7 +75,7 @@ public class PerformanceTimer {
   }
 
   /**
-   * Ends the current stage and records its duration.
+   * 结束当前阶段并记录其持续时间。
    */
   public void endStage() {
     if (currentStage == null) {
@@ -95,19 +94,19 @@ public class PerformanceTimer {
   }
 
   /**
-   * Gets the recorded stages and their durations.
+   * 获取记录的阶段及其持续时间。
    *
-   * @return a map of stage names to durations in milliseconds
+   * @return 阶段名称到持续时间的映射（毫秒）
    */
   public Map<String, Long> getStages() {
     return new LinkedHashMap<>(stages);
   }
 
   /**
-   * Gets the duration of a specific stage.
+   * 获取特定阶段的持续时间。
    *
-   * @param stageName the stage name
-   * @return the duration in milliseconds, or null if stage not found
+   * @param stageName 阶段名称
+   * @return 持续时间（毫秒），如果未找到阶段则返回 null
    */
   public Long getStageDuration(String stageName) {
     return stages.get(stageName);

@@ -1,40 +1,83 @@
 # Aetheris RAG 系统启动指南
 
-**阶段性验收准备文档**
+**最后更新**: 2025-12-30
 
 ---
 
-## 📋 验收前准备清单
+## 📑 目录
 
-### Phase 1-2 已完成功能验收
-
-根据 tasks.md，Phase 1-2 已完成以下任务：
-
-✅ **Phase 1: 项目初始化** (T001-T010)
-- 项目结构搭建（Spring Boot 3.5 + Vue 3）
-- Docker Compose 配置（MySQL 8 + Redis Stack）
-- 数据库表结构定义（Flyway migrations）
-
-✅ **Phase 2: 基础设施层** (T011-T025)
-- ModelGateway 框架（EmbeddingGateway、ChatGateway stub）
-- Citations 统一结构
-- 用户认证系统（JWT + BCrypt）
-- 工具类（HashUtil、TextNormalizer、PerformanceTimer）
+- [快速启动](#快速启动推荐) - 一键启动脚本
+- [完整启动步骤](#完整启动步骤) - 详细分步指南
+- [验收测试](#验收测试) - Phase 1-2 功能验证
+- [故障排查](#故障排查) - 常见问题解决
+- [相关文档](#相关文档) - 更多资源
 
 ---
 
-## 🚀 启动步骤
+## 🚀 快速启动（推荐）
+
+### 一键启动
+
+```bash
+cd /Users/hubin5/app/Aetheris
+./start.sh
+```
+
+启动脚本会自动：
+1. ✅ 检查环境（Java 21、Maven、Node.js、Docker）
+2. ✅ 创建 .env 配置文件（如不存在）
+3. ✅ 启动 MySQL + Redis（Docker）
+4. ✅ 启动后端（Spring Boot）
+5. ✅ 启动前端（Vite）
+
+### 访问地址
+
+启动成功后，访问以下地址：
+
+| 服务 | 地址 | 说明 |
+|------|------|------|
+| 🌐 **前端** | http://localhost:5173 | Vue 3 开发服务器 |
+| 🔧 **后端 API** | http://localhost:8080 | Spring Boot 应用 |
+| 📊 **健康检查** | http://localhost:8080/actuator/health | Actuator 端点 |
+| 🗄️ **MySQL** | localhost:3306 | 数据库 |
+| 🔴 **Redis** | localhost:6379 | Redis Stack |
+
+### 停止服务
+
+```bash
+./stop.sh
+```
+
+### 快速验证
+
+```bash
+# 测试用户注册
+curl -X POST http://localhost:8080/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","email":"test@example.com","password":"Password123!"}'
+
+# 测试用户登录
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"test@example.com","password":"Password123!"}'
+```
+
+---
+
+## 📋 完整启动步骤
+
+如果一键启动脚本遇到问题，可以按照以下步骤手动启动。
 
 ### 步骤 1: 环境准备
 
 #### 1.1 设置 Java 21（必须！）
 
 ```bash
-# 当前 Java 版本检查
+# 检查当前 Java 版本
 java -version  # 需要是 Java 21
 
 # 如果不是 Java 21，设置环境变量
-export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.8/Contents/Home
+export JAVA_HOME=/Users/hubin5/app/Aetheris/Library/Java/JavaVirtualMachines/corretto-21.0.8/Contents/Home
 export PATH=$JAVA_HOME/bin:$PATH
 
 # 验证
@@ -80,7 +123,8 @@ node -v
 npm -v
 
 # 安装依赖（如果未安装）
-npm install
+pnpm install
+# 或使用 npm install
 ```
 
 ---
@@ -115,8 +159,12 @@ aetheris-redis      redis/redis-stack-server  Up (healthy)
 docker exec -it aetheris-mysql mysql -u aetheris -paetheris123 -e "SHOW DATABASES;"
 
 # 测试 Redis 连接
-docker exec -it aetheris-redis redis-cli -a "" ping
+docker exec -it aetheris-redis redis-cli -a aetheris123 ping
 # 输出: PONG
+
+# 验证 Redis Stack 模块加载
+docker exec -it aetheris-redis redis-cli -a aetheris123 FT._LIST
+# 应显示向量索引模块已加载
 ```
 
 ---
@@ -127,9 +175,11 @@ docker exec -it aetheris-redis redis-cli -a "" ping
 # 在 backend 目录执行
 cd /Users/hubin5/app/Aetheris/backend
 
-# 清理并编译
-export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.8/Contents/Home
+# 设置 Java 21（如果尚未设置）
+export JAVA_HOME=/Users/hubin5/app/Aetheris/Library/Java/JavaVirtualMachines/corretto-21.0.8/Contents/Home
 export PATH=$JAVA_HOME/bin:$PATH
+
+# 清理并编译
 mvn clean compile
 
 # 启动 Spring Boot 应用
@@ -139,7 +189,7 @@ mvn spring-boot:run
 **预期输出**：
 ```
 ...
-Started RagApplication in X.XXX seconds (JVM running for X.XXX)
+Started AetherisRagApplication in X.XXX seconds (JVM running for X.XXX)
 ```
 
 **关键日志检查**：
@@ -176,7 +226,8 @@ curl -X POST http://localhost:8080/api/auth/register \
 cd /Users/hubin5/app/Aetheris/frontend
 
 # 启动开发服务器
-npm run dev
+pnpm dev
+# 或使用 npm run dev
 ```
 
 **预期输出**：
@@ -194,7 +245,22 @@ npm run dev
 
 ---
 
-## ✅ Phase 1-2 验收测试
+## ✅ 验收测试
+
+### Phase 1-2 功能验收
+
+根据 `tasks.md`，Phase 1-2 已完成以下任务：
+
+✅ **Phase 1: 项目初始化** (T001-T010)
+- 项目结构搭建（Spring Boot 3.5 + Vue 3）
+- Docker Compose 配置（MySQL 8 + Redis Stack）
+- 数据库表结构定义（Flyway migrations）
+
+✅ **Phase 2: 基础设施层** (T011-T025)
+- ModelGateway 框架（EmbeddingGateway、ChatGateway stub）
+- Citations 统一结构
+- 用户认证系统（JWT + BCrypt）
+- 工具类（HashUtil、TextNormalizer、PerformanceTimer）
 
 ### 测试 1: 项目结构验证
 
@@ -256,12 +322,13 @@ curl -X POST http://localhost:8080/api/auth/register \
 **预期输出**：
 ```json
 {
-  "code": 200,
-  "message": "注册成功",
-  "data": {
-    "token": "eyJhbGciOiJIUzI1NiJ9...",
+  "token": "eyJhbGciOiJIUzI1NiJ9...",
+  "user": {
+    "id": 1,
     "username": "testuser",
-    "email": "test@example.com"
+    "email": "test@example.com",
+    "createdAt": "2025-12-30T...",
+    "lastActiveAt": "2025-12-30T..."
   }
 }
 ```
@@ -279,12 +346,13 @@ curl -X POST http://localhost:8080/api/auth/login \
 **预期输出**：
 ```json
 {
-  "code": 200,
-  "message": "登录成功",
-  "data": {
-    "token": "eyJhbGciOiJIUzI1NiJ9...",
+  "token": "eyJhbGciOiJIUzI1NiJ9...",
+  "user": {
+    "id": 1,
     "username": "testuser",
-    "email": "test@example.com"
+    "email": "test@example.com",
+    "createdAt": "2025-12-30T...",
+    "lastActiveAt": "2025-12-30T..."
   }
 }
 ```
@@ -337,7 +405,7 @@ cat backend/src/main/java/com/aetheris/rag/dto/response/Citation.java
 
 **解决方案**:
 ```bash
-export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.8/Contents/Home
+export JAVA_HOME=/Users/hubin5/app/Aetheris/Library/Java/JavaVirtualMachines/corretto-21.0.8/Contents/Home
 export PATH=$JAVA_HOME/bin:$PATH
 java -version  # 确认是 Java 21
 ```
@@ -360,15 +428,18 @@ docker-compose logs mysql
 
 ### 问题 3: Redis 连接失败
 
-**症状**: `Unable to connect to Redis`
+**症状**: `Unable to connect to Redis` 或 `DENIED Redis is running in protected mode`
 
 **检查**:
 ```bash
 # 确认 Redis 运行中
 docker-compose ps redis-stack
 
-# 测试连接
-docker exec -it aetheris-redis redis-cli -a "" ping
+# 测试连接（使用密码）
+docker exec -it aetheris-redis redis-cli -a aetheris123 ping
+
+# 检查 Redis Stack 模块
+docker exec -it aetheris-redis redis-cli -a aetheris123 FT._LIST
 ```
 
 ### 问题 4: Flyway 迁移失败
@@ -399,26 +470,56 @@ curl http://localhost:8080/actuator/health
 cat frontend/vite.config.ts | grep proxy
 ```
 
+### 问题 6: 端口被占用
+
+**症状**: `Address already in use`
+
+**解决方案**:
+```bash
+# 查看占用端口的进程
+lsof -i :8080  # 后端
+lsof -i :5173  # 前端
+lsof -i :3306  # MySQL
+lsof -i :6379  # Redis
+
+# 杀死进程
+kill -9 <PID>
+```
+
+### 查看日志
+
+```bash
+# 后端日志
+tail -f logs/backend.log
+
+# 前端日志
+tail -f logs/frontend.log
+
+# Docker 日志
+docker-compose logs -f mysql
+docker-compose logs -f redis
+```
+
 ---
 
 ## 📊 验收检查清单
 
 ### Phase 1: 项目初始化 ✅
 
-- [ ] Docker Compose 成功启动 MySQL 和 Redis
-- [ ] 数据库表结构正确创建（7张表）
-- [ ] 后端项目可编译成功
-- [ ] 前端项目可启动
+- [x] Docker Compose 成功启动 MySQL 和 Redis
+- [x] 数据库表结构正确创建（8 张表）
+- [x] 后端项目可编译成功
+- [x] 前端项目可启动
 
 ### Phase 2: 基础设施层 ✅
 
-- [ ] ModelGateway 接口和实现类存在（stub）
-- [ ] Citations 结构定义正确
-- [ ] 用户注册 API 测试通过
-- [ ] 用户登录 API 测试通过
-- [ ] JWT token 生成和验证正常
-- [ ] 工具类实现正确（HashUtil、TextNormalizer、PerformanceTimer）
-- [ ] 虚拟线程已启用（查看启动日志）
+- [x] ModelGateway 接口和实现类存在（stub）
+- [x] Citations 结构定义正确
+- [x] 用户注册 API 测试通过
+- [x] 用户登录 API 测试通过
+- [x] JWT token 生成和验证正常
+- [x] 工具类实现正确（HashUtil、TextNormalizer、PerformanceTimer）
+- [x] 虚拟线程已启用（查看启动日志）
 
 ---
 
@@ -426,15 +527,27 @@ cat frontend/vite.config.ts | grep proxy
 
 完成 Phase 1-2 验收后，可以继续：
 
-**Phase 3: 用户账户与行为记录** (T026-T034)
-- 实现用户行为记录功能
-- 完善前端登录注册页面
-- 实现路由守卫
+**Phase 3: 资源入库与向量化** (T026-T038)
+- ModelGateway 完整实现（调用智谱 AI API）
+- PDF 文档解析（Apache PDFBox）
+- Markdown 文档解析（CommonMark）
+- 文本分段与向量化
+- Redis Stack 向量索引创建
+- Embedding 缓存机制
 
-**Phase 4: 资源入库** (T035-T048)
-- 实现 PDF/Markdown 文档上传
-- 实现文本切片和向量化
-- 实现资源列表和详情页
+**Phase 4: RAG 问答系统** (T039-T050)
+- 向量检索（RediSearch）
+- Prompt 模板设计
+- LLM 调用与响应解析
+- 引用来源生成
+- 问答 API 实现
+
+**Phase 5: 推荐系统与评测** (T051-T060)
+- 用户行为记录
+- 用户画像更新
+- 个性化推荐算法
+- 离线评测系统
+- 性能优化
 
 ---
 
@@ -444,6 +557,8 @@ cat frontend/vite.config.ts | grep proxy
 - **任务清单**: `specs/001-rag-recommendation-system/tasks.md`
 - **技术规范**: `specs/001-rag-recommendation-system/spec.md`
 - **架构设计**: `specs/001-rag-recommendation-system/plan.md`
+- **验收报告**: `docs/PHASE1_2_ACCEPTANCE_REPORT.md`
+- **开发日志**: `docs/dev-logs/development-log.md`
 
 ---
 
@@ -451,8 +566,9 @@ cat frontend/vite.config.ts | grep proxy
 
 如遇问题：
 1. 查看本文档的"故障排查"部分
-2. 检查 `logs/application.log` 日志文件
+2. 检查 `logs/backend.log` 日志文件
 3. 查看 Docker 容器日志: `docker-compose logs [service-name]`
 4. 查看开发日志: `docs/dev-logs/development-log.md`
+5. 查看验收报告: `docs/PHASE1_2_ACCEPTANCE_REPORT.md`
 
-**祝验收顺利！** 🎉
+**祝使用顺利！** 🎉

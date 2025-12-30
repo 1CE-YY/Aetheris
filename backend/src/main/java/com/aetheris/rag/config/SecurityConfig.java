@@ -27,7 +27,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 /**
- * Security configuration for JWT authentication.
+ * JWT 认证的安全配置。
  *
  * @author Aetheris Team
  * @version 1.0.0
@@ -76,7 +76,7 @@ public class SecurityConfig {
   }
 
   /**
-   * JWT authentication filter.
+   * JWT 认证过滤器。
    */
   @RequiredArgsConstructor
   public static class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -99,14 +99,14 @@ public class SecurityConfig {
           if (jwtUtil.validateToken(token)) {
             Long userId = jwtUtil.getUserIdFromToken(token);
 
-            // Create authentication object with user ID and authorities
+            // 使用用户 ID 和权限创建认证对象
             UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(
                     userId,
                     null,
                     List.of(new SimpleGrantedAuthority("ROLE_USER")));
 
-            // Set authentication in security context
+            // 在安全上下文中设置认证
             SecurityContextHolder.getContext().setAuthentication(authentication);
             log.debug("Authenticated user: {}", userId);
           }

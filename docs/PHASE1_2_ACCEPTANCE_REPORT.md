@@ -210,8 +210,7 @@ users (3 条记录)
 | 配置文件 | ✅ PASSED | .env.example 142 行，配置完整 |
 
 **文档清单**:
-- `QUICK_START.md` (130 行) - 快速启动
-- `STARTUP_GUIDE.md` (458 行) - 详细启动指南
+- `STARTUP_GUIDE.md` (575 行) - 启动指南（一键启动 + 完整步骤）
 - `PHASE1_2_ACCEPTANCE_CHECKLIST.md` (337 行) - 验收清单
 - `development-log.md` (131 行) - 开发日志
 - `openapi.yaml` (782 行) - API 规范
@@ -521,8 +520,7 @@ frontend/
 ### 4.3 文档交付物
 
 **项目文档**:
-- `QUICK_START.md` (130 行) - 快速启动指南
-- `STARTUP_GUIDE.md` (458 行) - 详细启动指南
+- `STARTUP_GUIDE.md` (575 行) - 启动指南（一键启动 + 完整步骤）
 - `PHASE1_2_ACCEPTANCE_CHECKLIST.md` (337 行) - 验收清单
 - `development-log.md` (131 行) - 开发日志
 

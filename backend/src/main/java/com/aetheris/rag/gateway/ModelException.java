@@ -1,7 +1,7 @@
 package com.aetheris.rag.gateway;
 
 /**
- * Exception thrown when model operations fail.
+ * 模型操作失败时抛出的异常。
  *
  * @author Aetheris Team
  * @version 1.0.0

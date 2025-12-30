@@ -26,35 +26,32 @@ echo ""
 # ========================================
 echo -e "${YELLOW}[1/3] 停止后端服务...${NC}"
 
-if [ -f ".pids.json" ]; then
-    # 使用jq或grep提取PID
-    if command -v jq &> /dev/null; then
-        BACKEND_PID=$(jq -r '.backend.pid' .pids.json)
-    else
-        BACKEND_PID=$(grep -A 5 '"backend"' .pids.json | grep '"pid"' | grep -o '[0-9]*')
+# 方法1: 使用 pkill 查找并杀死所有相关进程
+BACKEND_PIDS=$(pgrep -f "spring-boot:run|AetherisRagApplication" || true)
+
+if [ -n "$BACKEND_PIDS" ]; then
+    echo -e "${BLUE}找到后端进程: $BACKEND_PIDS${NC}"
+    # 先尝试优雅关闭
+    pkill -TERM -f "spring-boot:run|AetherisRagApplication" || true
+    sleep 3
+
+    # 检查进程是否还在，如果还在则强制杀死
+    REMAINING_PIDS=$(pgrep -f "spring-boot:run|AetherisRagApplication" || true)
+    if [ -n "$REMAINING_PIDS" ]; then
+        echo -e "${YELLOW}进程仍在运行，强制关闭...${NC}"
+        pkill -9 -f "spring-boot:run|AetherisRagApplication" || true
+        sleep 1
     fi
 
-    if [ -n "$BACKEND_PID" ] && [ "$BACKEND_PID" != "null" ] && ps -p $BACKEND_PID > /dev/null 2>&1; then
-        kill $BACKEND_PID
-        echo -e "${GREEN}✅ 后端已停止 (PID: $BACKEND_PID)${NC}"
-
-        # 更新状态
-        if command -v jq &> /dev/null; then
-            jq '.backend.pid = null | .backend.status = "stopped" | .backend.started_at = null' .pids.json > .pids.json.tmp
-            mv .pids.json.tmp .pids.json
-        fi
-    else
-        echo -e "${YELLOW}⚠️  后端进程未运行${NC}"
-    fi
+    echo -e "${GREEN}✅ 后端已停止${NC}"
 else
-    echo -e "${YELLOW}⚠️  未找到 PID 文件${NC}"
+    echo -e "${YELLOW}⚠️  未找到运行中的后端进程${NC}"
+fi
 
-    # 尝试查找并杀死 Spring Boot 进程
-    SPRING_PID=$(ps aux | grep 'spring-boot:run' | grep -v grep | awk '{print $2}')
-    if [ -n "$SPRING_PID" ]; then
-        kill $SPRING_PID
-        echo -e "${GREEN}✅ 后端已停止 (PID: $SPRING_PID)${NC}"
-    fi
+# 更新 PID 文件状态
+if [ -f ".pids.json" ] && command -v jq &> /dev/null; then
+    jq '.backend.pid = null | .backend.status = "stopped" | .backend.started_at = null' .pids.json > .pids.json.tmp
+    mv .pids.json.tmp .pids.json
 fi
 
 echo ""
@@ -64,35 +61,32 @@ echo ""
 # ========================================
 echo -e "${YELLOW}[2/3] 停止前端服务...${NC}"
 
-if [ -f ".pids.json" ]; then
-    # 使用jq或grep提取PID
-    if command -v jq &> /dev/null; then
-        FRONTEND_PID=$(jq -r '.frontend.pid' .pids.json)
-    else
-        FRONTEND_PID=$(grep -A 5 '"frontend"' .pids.json | grep '"pid"' | grep -o '[0-9]*')
+# 使用 pkill 查找并杀死所有相关进程
+FRONTEND_PIDS=$(pgrep -f "vite.*frontend|npm.*dev|node.*vite" || true)
+
+if [ -n "$FRONTEND_PIDS" ]; then
+    echo -e "${BLUE}找到前端进程: $FRONTEND_PIDS${NC}"
+    # 优雅关闭
+    pkill -TERM -f "vite.*frontend|npm.*dev|node.*vite" || true
+    sleep 2
+
+    # 检查进程是否还在，如果还在则强制杀死
+    REMAINING_PIDS=$(pgrep -f "vite.*frontend|npm.*dev|node.*vite" || true)
+    if [ -n "$REMAINING_PIDS" ]; then
+        echo -e "${YELLOW}进程仍在运行，强制关闭...${NC}"
+        pkill -9 -f "vite.*frontend|npm.*dev|node.*vite" || true
+        sleep 1
     fi
 
-    if [ -n "$FRONTEND_PID" ] && [ "$FRONTEND_PID" != "null" ] && ps -p $FRONTEND_PID > /dev/null 2>&1; then
-        kill $FRONTEND_PID
-        echo -e "${GREEN}✅ 前端已停止 (PID: $FRONTEND_PID)${NC}"
-
-        # 更新状态
-        if command -v jq &> /dev/null; then
-            jq '.frontend.pid = null | .frontend.status = "stopped" | .frontend.started_at = null' .pids.json > .pids.json.tmp
-            mv .pids.json.tmp .pids.json
-        fi
-    else
-        echo -e "${YELLOW}⚠️  前端进程未运行${NC}"
-    fi
+    echo -e "${GREEN}✅ 前端已停止${NC}"
 else
-    echo -e "${YELLOW}⚠️  未找到 PID 文件${NC}"
+    echo -e "${YELLOW}⚠️  未找到运行中的前端进程${NC}"
+fi
 
-    # 尝试查找并杀死 Vite 进程
-    VITE_PID=$(ps aux | grep 'vite' | grep -v grep | awk '{print $2}')
-    if [ -n "$VITE_PID" ]; then
-        kill $VITE_PID
-        echo -e "${GREEN}✅ 前端已停止 (PID: $VITE_PID)${NC}"
-    fi
+# 更新 PID 文件状态
+if [ -f ".pids.json" ] && command -v jq &> /dev/null; then
+    jq '.frontend.pid = null | .frontend.status = "stopped" | .frontend.started_at = null' .pids.json > .pids.json.tmp
+    mv .pids.json.tmp .pids.json
 fi
 
 echo ""

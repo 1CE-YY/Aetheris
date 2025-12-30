@@ -1,21 +1,21 @@
 package com.aetheris.rag.gateway;
 
 /**
- * Gateway interface for AI model operations.
+ * AI 模型操作的网关接口。
  *
- * <p>This interface defines the contract for all AI model interactions, providing a single
- * exit point for embedding and chat operations. This centralized approach ensures:
+ * <p>此接口定义了所有 AI 模型交互的契约，为嵌入和聊天操作提供单一出口。
+ * 这种集中式方法确保：
  *
  * <ul>
- *   <li>Consistent error handling and retry logic
- *   <li>Unified rate limiting and timeout management
- *   <li>Caching for cost optimization
- *   <li>Security and logging policies
- *   <li>Fallback strategies for service degradation
+ *   <li>一致的错误处理和重试逻辑
+ *   <li>统一的速率限制和超时管理
+ *   <li>用于成本优化的缓存
+ *   <li>安全和日志策略
+ *   <li>服务降级的回退策略
  * </ul>
  *
- * <p><strong>Important:</strong> All business code MUST use this gateway instead of calling
- * model APIs directly. This is enforced by the project constitution (Principle 4: Model Access).
+ * <p><strong>重要：</strong> 所有业务代码必须使用此网关，而不是直接调用模型 API。
+ * 这由项目宪法的原则 4（模型访问）强制执行。
  *
  * @author Aetheris Team
  * @version 1.0.0
@@ -24,52 +24,50 @@ package com.aetheris.rag.gateway;
 public interface ModelGateway {
 
   /**
-   * Generates an embedding vector for the given text.
+   * 为给定文本生成嵌入向量。
    *
-   * <p>This method:
+   * <p>此方法：
    *
    * <ul>
-   *   <li>Checks cache first to avoid redundant API calls
-   *   <li>Implements retry logic for transient failures
-   *   <li>Enforces rate limiting
-   *   <li>Sanitizes logs to protect sensitive data
+   *   <li>首先检查缓存以避免冗余 API 调用
+   *   <li>对瞬态故障实现重试逻辑
+   *   <li>强制执行速率限制
+   *   <li>清理日志以保护敏感数据
    * </ul>
    *
-   * @param text the input text to embed
-   * @return the embedding vector (float array)
-   * @throws ModelException if the embedding operation fails after all retries
+   * @param text 要嵌入的输入文本
+   * @return 嵌入向量（浮点数组）
+   * @throws ModelException 如果嵌入操作在所有重试后失败
    */
   float[] embed(String text);
 
   /**
-   * Generates a chat response using the LLM.
+   * 使用 LLM 生成聊天响应。
    *
-   * <p>This method:
+   * <p>此方法：
    *
    * <ul>
-   *   <li>Implements retry logic for transient failures
-   *   <li>Enforces rate limiting
-   *   <li>Provides fallback strategies for service degradation
-   *   <li>Sanitizes logs to protect sensitive data
+   *   <li>对瞬态故障实现重试逻辑
+   *   <li>强制执行速率限制
+   *   <li>提供服务降级的回退策略
+   *   <li>清理日志以保护敏感数据
    * </ul>
    *
-   * @param prompt the input prompt
-   * @return the generated response text
-   * @throws ModelException if the chat operation fails after all retries (unless fallback is
-   *     enabled)
+   * @param prompt 输入提示
+   * @return 生成的响应文本
+   * @throws ModelException 如果聊天操作在所有重试后失败（除非启用了回退）
    */
   String chat(String prompt);
 
   /**
-   * Generates a chat response with a system message.
+   * 使用系统消息生成聊天响应。
    *
-   * <p>Same as {@link #chat(String)}, but includes a system message to guide the model's
-   * behavior.
+   * <p>与 {@link #chat(String)} 相同，但包含系统消息以指导模型的行为。
    *
-   * @param systemMessage the system message (e.g., instructions)
-   * @param userMessage the user message
-   * @return the generated response text
-   * @throws ModelException if the chat operation fails after all retries
+   * @param systemMessage 系统消息（例如，指令）
+   * @param userMessage 用户消息
+   * @return 生成的响应文本
+   * @throws ModelException 如果聊天操作在所有重试后失败
    */
   String chat(String systemMessage, String userMessage);
 }

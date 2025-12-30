@@ -141,10 +141,18 @@ BACKEND_PID=$!
 STARTED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 # 更新PID文件
-sed -i '' "s/\"backend\": {/"\"backend\": {\n    \"pid\": $BACKEND_PID,\n    \"status\": \"running\",\n    \"started_at\": \"$STARTED_AT\"/" "$PROJECT_ROOT/.pids.json"
-sed -i '' '/"backend": {/,/}/s/"pid": [0-9]*/"pid": '$BACKEND_PID'/' "$PROJECT_ROOT/.pids.json"
-sed -i '' '/"backend": {/,/}/s/"status": "stopped"/"status": "running"/' "$PROJECT_ROOT/.pids.json"
-sed -i '' '/"backend": {/,/}/s/"started_at": null/"started_at": "'$STARTED_AT'"/' "$PROJECT_ROOT/.pids.json"
+if command -v jq &> /dev/null; then
+    # 使用 jq 更新 JSON（推荐）
+    tmp=$(mktemp)
+    jq '.backend.pid = '$BACKEND_PID' | .backend.status = "running" | .backend.started_at = "'$STARTED_AT'"' "$PROJECT_ROOT/.pids.json" > "$tmp"
+    mv "$tmp" "$PROJECT_ROOT/.pids.json"
+else
+    # 回退到 sed（简化版）
+    sed -i '' 's/"pid": null/"pid": '$BACKEND_PID'/' "$PROJECT_ROOT/.pids.json"
+    sed -i '' 's/"pid": [0-9]*/"pid": '$BACKEND_PID'/' "$PROJECT_ROOT/.pids.json"
+    sed -i '' 's/"status": "stopped"/"status": "running"/' "$PROJECT_ROOT/.pids.json"
+    sed -i '' 's/"started_at": null/"started_at": "'$STARTED_AT'"/' "$PROJECT_ROOT/.pids.json"
+fi
 
 echo -e "${GREEN}✅ 后端启动中... (PID: $BACKEND_PID)${NC}"
 echo -e "${YELLOW}📄 查看日志: tail -f $PROJECT_ROOT/logs/backend.log${NC}"
@@ -183,9 +191,18 @@ FRONTEND_PID=$!
 STARTED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 # 更新PID文件
-sed -i '' '/"frontend": {/,/}/s/"pid": [0-9]*/"pid": '$FRONTEND_PID'/' "$PROJECT_ROOT/.pids.json"
-sed -i '' '/"frontend": {/,/}/s/"status": "stopped"/"status": "running"/' "$PROJECT_ROOT/.pids.json"
-sed -i '' '/"frontend": {/,/}/s/"started_at": null/"started_at": "'$STARTED_AT'"/' "$PROJECT_ROOT/.pids.json"
+if command -v jq &> /dev/null; then
+    # 使用 jq 更新 JSON（推荐）
+    tmp=$(mktemp)
+    jq '.frontend.pid = '$FRONTEND_PID' | .frontend.status = "running" | .frontend.started_at = "'$STARTED_AT'"' "$PROJECT_ROOT/.pids.json" > "$tmp"
+    mv "$tmp" "$PROJECT_ROOT/.pids.json"
+else
+    # 回退到 sed（简化版）
+    sed -i '' 's/"pid": null/"pid": '$FRONTEND_PID'/' "$PROJECT_ROOT/.pids.json"
+    sed -i '' 's/"pid": [0-9]*/"pid": '$FRONTEND_PID'/' "$PROJECT_ROOT/.pids.json"
+    sed -i '' 's/"status": "stopped"/"status": "running"/' "$PROJECT_ROOT/.pids.json"
+    sed -i '' 's/"started_at": null/"started_at": "'$STARTED_AT'"/' "$PROJECT_ROOT/.pids.json"
+fi
 
 echo -e "${GREEN}✅ 前端启动中... (PID: $FRONTEND_PID)${NC}"
 echo -e "${YELLOW}📄 查看日志: tail -f $PROJECT_ROOT/logs/frontend.log${NC}"

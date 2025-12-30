@@ -14,19 +14,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Gateway for Zhipu AI embedding API operations.
+ * 智谱 AI 嵌入 API 操作的网关。
  *
- * <p>This class encapsulates all interactions with the Zhipu AI embedding service, providing:
+ * <p>此类封装了与智谱 AI 嵌入服务的所有交互，提供：
  *
  * <ul>
- *   <li>Caching to eliminate redundant API calls (based on text hash)
- *   <li>Retry logic with exponential backoff for transient failures
- *   <li>Rate limiting to prevent API quota exhaustion
- *   <li>Log sanitization to protect sensitive data
+ *   <li>缓存以消除冗余 API 调用（基于文本哈希）
+ *   <li>使用指数退避的重试逻辑以处理瞬态故障
+ *   <li>速率限制以防止 API 配额耗尽
+ *   <li>日志清理以保护敏感数据
  * </ul>
  *
- * <p><strong>TODO</strong>: This class is commented out temporarily for Phase 1-2 completion.
- * Will be fully implemented in Phase 5 (RAG Q&A) when Zhipu AI API integration is required.
+ * <p><strong>TODO</strong>: 此类为 Phase 1-2 完成而临时注释掉。
+ * 将在 Phase 5（RAG 问答）中完全实现，届时需要智谱 AI API 集成。
  *
  * @author Aetheris Team
  * @version 1.0.0
@@ -68,33 +68,33 @@ public class EmbeddingGateway {
   */
 
   /**
-   * Generates an embedding vector for the given text.
+   * 为给定文本生成嵌入向量。
    *
-   * <p><strong>TODO</strong>: Implementation pending for Phase 5.
+   * <p><strong>TODO</strong>: 待 Phase 5 实现。
    *
-   * @param text the input text to embed
-   * @return the embedding vector (1024 dimensions for embedding-v2)
-   * @throws ModelException if the API call fails after all retries
+   * @param text 要嵌入的输入文本
+   * @return 嵌入向量（embedding-v2 为 1024 维）
+   * @throws ModelException 如果 API 调用在所有重试后失败
    */
   public float[] embed(String text) {
-    // TODO: Implement in Phase 5
+    // TODO: 在 Phase 5 中实现
     log.warn("EmbeddingGateway.embed() not yet implemented - returning dummy embedding");
-    return new float[1024]; // Dummy implementation
+    return new float[1024]; // 临时实现
   }
 
   /**
-   * Generates embedding vectors for multiple texts in batch.
+   * 批量为多个文本生成嵌入向量。
    *
-   * <p><strong>TODO</strong>: Implementation pending for Phase 5.
+   * <p><strong>TODO</strong>: 待 Phase 5 实现。
    *
-   * @param texts the list of input texts
-   * @return list of embedding vectors
-   * @throws ModelException if the API call fails after all retries
+   * @param texts 输入文本列表
+   * @return 嵌入向量列表
+   * @throws ModelException 如果 API 调用在所有重试后失败
    */
   public float[][] embedBatch(java.util.List<String> texts) {
-    // TODO: Implement in Phase 5
+    // TODO: 在 Phase 5 中实现
     log.warn("EmbeddingGateway.embedBatch() not yet implemented - returning dummy embeddings");
     float[][] embeddings = new float[texts.size()][1024];
-    return embeddings; // Dummy implementation
+    return embeddings; // 临时实现
   }
 }

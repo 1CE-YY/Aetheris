@@ -7,31 +7,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Retry strategy for model API calls with exponential backoff.
+ * 模型 API 调用的重试策略，使用指数退避。
  *
- * <p>This class implements a retry mechanism for handling transient failures when calling
- * external model APIs (e.g., Zhipu AI). It uses exponential backoff with jitter to avoid
- * overwhelming the API during outages.
+ * <p>此类实现了重试机制，用于处理调用外部模型 API（例如智谱 AI）时的瞬态故障。
+ * 它使用带抖动的指数退避来避免在故障期间压垮 API。
  *
- * <p>Retry conditions:
- *
- * <ul>
- *   <li>HTTP 429 (Too Many Requests) - rate limit exceeded
- *   <li>HTTP 500 (Internal Server Error) - server-side error
- *   <li>HTTP 502 (Bad Gateway) - gateway error
- *   <li>HTTP 503 (Service Unavailable) - service temporarily unavailable
- *   <li>IOException - network connectivity issues
- * </ul>
- *
- * <p>Non-retryable errors (fail immediately):
+ * <p>重试条件：
  *
  * <ul>
- *   <li>HTTP 401 (Unauthorized) - invalid API key
- *   <li>HTTP 400 (Bad Request) - invalid request parameters
- *   <li>Other client errors (4xx except 429)
+ *   <li>HTTP 429（请求过多）- 超过速率限制
+ *   <li>HTTP 500（内部服务器错误）- 服务器端错误
+ *   <li>HTTP 502（网关错误）- 网关错误
+ *   <li>HTTP 503（服务不可用）- 服务暂时不可用
+ *   <li>IOException - 网络连接问题
  * </ul>
  *
- * <p>Usage example:
+ * <p>不可重试的错误（立即失败）：
+ *
+ * <ul>
+ *   <li>HTTP 401（未授权）- 无效的 API 密钥
+ *   <li>HTTP 400（错误请求）- 无效的请求参数
+ *   <li>其他客户端错误（4xx，除了 429）
+ * </ul>
+ *
+ * <p>用法示例：
  *
  * <pre>{@code
  * ModelRetryStrategy retryStrategy = new ModelRetryStrategy(3, Duration.ofSeconds(1));
@@ -51,23 +50,23 @@ public final class ModelRetryStrategy {
   private final double jitterFactor;
 
   /**
-   * Creates a retry strategy with custom parameters.
+   * 使用自定义参数创建重试策略。
    *
-   * @param maxAttempts maximum number of retry attempts (must be >= 1)
-   * @param baseBackoff base backoff duration between retries (must be positive)
-   * @throws IllegalArgumentException if maxAttempts < 1 or baseBackoff is null/negative
+   * @param maxAttempts 最大重试次数（必须 >= 1）
+   * @param baseBackoff 重试之间的基本退避持续时间（必须为正数）
+   * @throws IllegalArgumentException 如果 maxAttempts < 1 或 baseBackoff 为 null/负数
    */
   public ModelRetryStrategy(int maxAttempts, Duration baseBackoff) {
     this(maxAttempts, baseBackoff, 0.1);
   }
 
   /**
-   * Creates a retry strategy with custom parameters and jitter.
+   * 使用自定义参数和抖动创建重试策略。
    *
-   * @param maxAttempts maximum number of retry attempts (must be >= 1)
-   * @param baseBackoff base backoff duration between retries (must be positive)
-   * @param jitterFactor jitter factor to add randomness (0.0 to 1.0, default 0.1)
-   * @throws IllegalArgumentException if parameters are invalid
+   * @param maxAttempts 最大重试次数（必须 >= 1）
+   * @param baseBackoff 重试之间的基本退避持续时间（必须为正数）
+   * @param jitterFactor 抖动因子以添加随机性（0.0 到 1.0，默认 0.1）
+   * @throws IllegalArgumentException 如果参数无效
    */
   public ModelRetryStrategy(int maxAttempts, Duration baseBackoff, double jitterFactor) {
     if (maxAttempts < 1) {
@@ -88,15 +87,15 @@ public final class ModelRetryStrategy {
   }
 
   /**
-   * Executes an operation with retry logic.
+   * 使用重试逻辑执行操作。
    *
-   * <p>This method will retry the operation on transient failures using exponential backoff.
-   * Non-retryable errors will fail immediately without retry.
+   * <p>此方法将使用指数退避在瞬态故障上重试操作。
+   * 不可重试的错误将立即失败而不会重试。
    *
-   * @param operation the operation to execute
-   * @param <T> the return type of the operation
-   * @return the result of the operation
-   * @throws ModelException if all retry attempts fail or a non-retryable error occurs
+   * @param operation 要执行的操作
+   * @param <T> 操作的返回类型
+   * @return 操作的结果
+   * @throws ModelException 如果所有重试尝试失败或发生不可重试的错误
    */
   public <T> T executeWithRetry(RetryableOperation<T> operation) {
     int attempts = 0;
@@ -148,10 +147,10 @@ public final class ModelRetryStrategy {
   }
 
   /**
-   * Determines if an exception is retryable.
+   * 确定异常是否可重试。
    *
-   * @param e the exception to check
-   * @return true if the exception is retryable, false otherwise
+   * @param e 要检查的异常
+   * @return 如果异常可重试返回 true，否则返回 false
    */
   private boolean shouldRetry(Exception e) {
     // Extract status code from exception message if available
@@ -186,10 +185,10 @@ public final class ModelRetryStrategy {
   }
 
   /**
-   * Calculates backoff duration with exponential delay and jitter.
+   * 计算具有指数延迟和抖动的退避持续时间。
    *
-   * @param attempt the current attempt number (1-based)
-   * @return the backoff duration
+   * @param attempt 当前尝试次数（从 1 开始）
+   * @return 退避持续时间
    */
   private Duration calculateBackoff(int attempt) {
     // Exponential backoff: base * 2^(attempt-1)
@@ -209,18 +208,18 @@ public final class ModelRetryStrategy {
   }
 
   /**
-   * Functional interface for retryable operations.
+   * 可重试操作的函数式接口。
    *
-   * @param <T> the return type of the operation
+   * @param <T> 操作的返回类型
    */
   @FunctionalInterface
   public interface RetryableOperation<T> {
 
     /**
-     * Executes the operation.
+     * 执行操作。
      *
-     * @return the result
-     * @throws Exception if the operation fails
+     * @return 结果
+     * @throws Exception 如果操作失败
      */
     T execute() throws Exception;
   }

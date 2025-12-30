@@ -5,28 +5,27 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
- * Aetheris RAG System - Main Application Entry Point
+ * Aetheris RAG 系统 - 主应用程序入口点
  *
- * <p>This application provides a learning resource retrieval and recommendation system using
- * RAG (Retrieval-Augmented Generation) architecture.
+ * <p>此应用程序提供使用 RAG（检索增强生成）架构的学习资源检索和推荐系统。
  *
- * <p>Key features:
+ * <p>主要功能：
  *
  * <ul>
- *   <li>Semantic search using Redis Stack vector embeddings
- *   <li>RAG-based Q&A with citation sources
- *   <li>Personalized recommendations using lightweight user profiling
- *   <li>Support for PDF and Markdown document ingestion
+ *   <li>使用 Redis Stack 向量嵌入进行语义搜索
+ *   <li>基于 RAG 的问答，带有引用来源
+ *   <li>使用轻量级用户画像的个性化推荐
+ *   <li>支持 PDF 和 Markdown 文档入库
  * </ul>
  *
- * <p>Technology Stack:
+ * <p>技术栈：
  *
  * <ul>
- *   <li>Spring Boot 3.5+ with Java 21 virtual threads
- *   <li>MyBatis for database access
- *   <li>LangChain4j for AI model integration (Zhipu AI)
- *   <li>Redis Stack for vector storage and caching
- *   <li>MySQL 8 for structured data
+ *   <li>Spring Boot 3.5+ 和 Java 21 虚拟线程
+ *   <li>MyBatis 用于数据库访问
+ *   <li>LangChain4j 用于 AI 模型集成（智谱 AI）
+ *   <li>Redis Stack 用于向量存储和缓存
+ *   <li>MySQL 8 用于结构化数据
  * </ul>
  *
  * @author Aetheris Team
@@ -38,9 +37,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class AetherisRagApplication {
 
   /**
-   * Main entry point for the Aetheris RAG application.
+   * Aetheris RAG 应用程序的主入口点。
    *
-   * @param args command line arguments
+   * @param args 命令行参数
    */
   public static void main(String[] args) {
     SpringApplication.run(AetherisRagApplication.class, args);

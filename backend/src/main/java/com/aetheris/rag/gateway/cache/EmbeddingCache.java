@@ -11,26 +11,25 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
 /**
- * Cache for embedding vectors to eliminate redundant API calls.
+ * 嵌入向量的缓存，用于消除冗余 API 调用。
  *
- * <p>This class implements a caching layer for text embeddings using Redis. It caches the
- * embedding vectors computed from text to avoid calling the external embedding API repeatedly
- * for the same content.
+ * <p>此类使用 Redis 为文本嵌入实现缓存层。它缓存从文本计算的嵌入向量，
+ * 以避免对相同内容重复调用外部嵌入 API。
  *
- * <p>Cache key design:
+ * <p>缓存键设计：
  *
  * <ul>
- *   <li>Format: {@code embedding:cache:{textHash}}
- *   <li>{@code textHash}: SHA-256 hash of normalized text (to handle whitespace variations)
- *   <li>TTL: 30 days (configurable)
+ *   <li>格式：{@code embedding:cache:{textHash}}
+ *   <li>{@code textHash}：规范化文本的 SHA-256 哈希（用于处理空格变化）
+ *   <li>TTL：30 天（可配置）
  * </ul>
  *
- * <p>This cache is critical for cost control and performance:
+ * <p>此缓存对于成本控制和性能至关重要：
  *
  * <ul>
- *   <li>Reduces embedding API costs by avoiding duplicate calls
- *   <li>Improves response time for repeated queries
- *   <li>Reduces load on external API services
+ *   <li>通过避免重复调用来降低嵌入 API 成本
+ *   <li>提高重复查询的响应时间
+ *   <li>减少外部 API 服务的负载
  * </ul>
  *
  * @author Aetheris Team
@@ -52,7 +51,7 @@ public class EmbeddingCache {
   private int ttlDays;
 
   /**
-   * Post-construct callback to log initialization.
+   * 记录初始化的后置构造回调。
    */
   @jakarta.annotation.PostConstruct
   public void init() {
@@ -60,19 +59,19 @@ public class EmbeddingCache {
   }
 
   /**
-   * Gets the TTL in seconds for cache operations.
+   * 获取缓存操作的 TTL（秒）。
    *
-   * @return TTL in seconds
+   * @return TTL（秒）
    */
   private long getTtlSeconds() {
     return TimeUnit.DAYS.toSeconds(ttlDays);
   }
 
   /**
-   * Retrieves an embedding from cache.
+   * 从缓存中检索嵌入。
    *
-   * @param textHash the SHA-256 hash of normalized text
-   * @return the cached embedding vector, or null if not found
+   * @param textHash 规范化文本的 SHA-256 哈希
+   * @return 缓存的嵌入向量，如果未找到则返回 null
    */
   public float[] get(String textHash) {
     if (textHash == null || textHash.isEmpty()) {
@@ -101,10 +100,10 @@ public class EmbeddingCache {
   }
 
   /**
-   * Stores an embedding in cache with TTL.
+   * 使用 TTL 将嵌入存储在缓存中。
    *
-   * @param textHash the SHA-256 hash of normalized text
-   * @param embedding the embedding vector to cache
+   * @param textHash 规范化文本的 SHA-256 哈希
+   * @param embedding 要缓存的嵌入向量
    */
   public void put(String textHash, float[] embedding) {
     if (textHash == null || textHash.isEmpty()) {
@@ -132,10 +131,10 @@ public class EmbeddingCache {
   }
 
   /**
-   * Checks if an embedding exists in cache.
+   * 检查嵌入是否存在于缓存中。
    *
-   * @param textHash the SHA-256 hash of normalized text
-   * @return true if cached, false otherwise
+   * @param textHash 规范化文本的 SHA-256 哈希
+   * @return 如果已缓存返回 true，否则返回 false
    */
   public boolean exists(String textHash) {
     if (textHash == null || textHash.isEmpty()) {
@@ -156,16 +155,16 @@ public class EmbeddingCache {
   }
 
   /**
-   * Removes an embedding from cache.
+   * 从缓存中删除嵌入。
    *
-   * <p>This method is typically used when:
+   * <p>此方法通常用于：
    *
    * <ul>
-   *   <li>Resource content is updated (invalidates cached embeddings)
-   *   <li>Manual cache invalidation is required
+   *   <li>资源内容更新（使缓存的嵌入失效）
+   *   <li>需要手动缓存失效
    * </ul>
    *
-   * @param textHash the SHA-256 hash of normalized text
+   * @param textHash 规范化文本的 SHA-256 哈希
    */
   public void invalidate(String textHash) {
     if (textHash == null || textHash.isEmpty()) {
@@ -185,10 +184,10 @@ public class EmbeddingCache {
   }
 
   /**
-   * Clears all embedding cache entries.
+   * 清除所有嵌入缓存条目。
    *
-   * <p><strong>Warning:</strong> This is a destructive operation that will clear all cached
-   * embeddings. Use with caution.
+   * <p><strong>警告：</strong> 这是一个破坏性操作，将清除所有缓存的嵌入。
+   * 请谨慎使用。
    */
   public void clear() {
     try {
@@ -204,10 +203,10 @@ public class EmbeddingCache {
   }
 
   /**
-   * Builds the cache key for a given text hash.
+   * 为给定文本哈希构建缓存键。
    *
-   * @param textHash the SHA-256 hash of normalized text
-   * @return the Redis cache key
+   * @param textHash 规范化文本的 SHA-256 哈希
+   * @return Redis 缓存键
    */
   private String buildCacheKey(String textHash) {
     return CACHE_KEY_PREFIX + textHash;

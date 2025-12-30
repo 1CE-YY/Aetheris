@@ -1,23 +1,23 @@
 package com.aetheris.rag.gateway.sanitize;
 
 /**
- * Utility class for sanitizing log messages to prevent sensitive information leakage.
+ * 用于清理日志消息以防止敏感信息泄露的工具类。
  *
- * <p>This class provides methods to mask or truncate sensitive data in logs, ensuring that:
+ * <p>此类提供了在日志中屏蔽或截断敏感数据的方法，确保：
  *
  * <ul>
- *   <li>API keys and tokens are never logged in plain text
- *   <li>User input is truncated to prevent log flooding
- *   <li>Passwords and credentials are completely masked
+ *   <li>API 密钥和 token 永远不会以明文记录
+ *   <li>用户输入被截断以防止日志泛滥
+ *   <li>密码和凭据被完全屏蔽
  * </ul>
  *
- * <p>Usage examples:
+ * <p>用法示例：
  *
  * <pre>{@code
- * // Sanitize user input
- * String sanitized = LogSanitizer.sanitize(userInput); // Truncates to 200 chars
+ * // 清理用户输入
+ * String sanitized = LogSanitizer.sanitize(userInput); // 截断为 200 个字符
  *
- * // Mask API key
+ * // 屏蔽 API 密钥
  * String masked = LogSanitizer.maskApiKey("sk-abc123def456"); // "sk-abc****"
  * }</pre>
  *
@@ -38,13 +38,13 @@ public final class LogSanitizer {
   }
 
   /**
-   * Sanitizes user input by truncating to maximum length.
+   * 通过截断到最大长度来清理用户输入。
    *
-   * <p>This method truncates input text to {@code MAX_INPUT_LENGTH} characters to prevent log
-   * flooding and reduce log storage costs. If truncated, a suffix is appended.
+   * <p>此方法将输入文本截断为 {@code MAX_INPUT_LENGTH} 个字符，以防止日志泛滥并降低日志存储成本。
+   * 如果被截断，则附加后缀。
    *
-   * @param input the user input to sanitize
-   * @return sanitized input, or null if input is null
+   * @param input 要清理的用户输入
+   * @return 清理后的输入，如果输入为 null 则返回 null
    */
   public static String sanitize(String input) {
     if (input == null) {
@@ -59,11 +59,11 @@ public final class LogSanitizer {
   }
 
   /**
-   * Sanitizes user input with custom maximum length.
+   * 使用自定义最大长度清理用户输入。
    *
-   * @param input the user input to sanitize
-   * @param maxLength the maximum length to allow
-   * @return sanitized input, or null if input is null
+   * @param input 要清理的用户输入
+   * @param maxLength 允许的最大长度
+   * @return 清理后的输入，如果输入为 null 则返回 null
    */
   public static String sanitize(String input, int maxLength) {
     if (input == null) {
@@ -78,12 +78,12 @@ public final class LogSanitizer {
   }
 
   /**
-   * Masks an API key by showing only the first few characters.
+   * 通过仅显示前几个字符来屏蔽 API 密钥。
    *
-   * <p>Example: {@code maskApiKey("sk-abc123def456")} returns {@code "sk-abc****"}
+   * <p>示例：{@code maskApiKey("sk-abc123def456")} 返回 {@code "sk-abc****"}
    *
-   * @param apiKey the API key to mask
-   * @return masked API key, or null if apiKey is null
+   * @param apiKey 要屏蔽的 API 密钥
+   * @return 屏蔽后的 API 密钥，如果 apiKey 为 null 则返回 null
    */
   public static String maskApiKey(String apiKey) {
     if (apiKey == null) {
@@ -98,39 +98,36 @@ public final class LogSanitizer {
   }
 
   /**
-   * Masks a JWT token completely.
+   * 完全屏蔽 JWT token。
    *
-   * <p>JWT tokens should never be logged in plain text. This method replaces the entire token
-   * with a masked string.
+   * <p>JWT token 永远不应以明文记录。此方法将整个 token 替换为屏蔽字符串。
    *
-   * @param token the JWT token to mask
-   * @return masked token string, or "[null]" if token is null
+   * @param token 要屏蔽的 JWT token
+   * @return 屏蔽后的 token 字符串，如果 token 为 null 则返回 "[null]"
    */
   public static String maskToken(String token) {
     return token == null ? "[null]" : "[JWT_TOKEN]";
   }
 
   /**
-   * Masks a password completely.
+   * 完全屏蔽密码。
    *
-   * <p>Passwords should never be logged in any form. This method replaces the password with a
-   * masked string.
+   * <p>密码不应以任何形式记录。此方法将密码替换为屏蔽字符串。
    *
-   * @param password the password to mask
-   * @return masked password string, or "[null]" if password is null
+   * @param password 要屏蔽的密码
+   * @return 屏蔽后的密码字符串，如果密码为 null 则返回 "[null]"
    */
   public static String maskPassword(String password) {
     return password == null ? "[null]" : "[PASSWORD]";
   }
 
   /**
-   * Sanitizes an exception message for logging.
+   * 清理异常消息以进行记录。
    *
-   * <p>Some exceptions may contain sensitive information in their messages. This method
-   * truncates the message if necessary.
+   * <p>某些异常可能在消息中包含敏感信息。如有必要，此方法会截断消息。
    *
-   * @param throwable the exception to sanitize
-   * @return sanitized exception message
+   * @param throwable 要清理的异常
+   * @return 清理后的异常消息
    */
   public static String sanitizeException(Throwable throwable) {
     if (throwable == null) {

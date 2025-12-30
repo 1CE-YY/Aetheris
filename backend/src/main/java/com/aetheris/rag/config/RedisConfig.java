@@ -11,7 +11,7 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 /**
- * Redis configuration for caching and vector storage.
+ * 用于缓存和向量存储的 Redis 配置。
  *
  * @author Aetheris Team
  * @version 1.0.0
@@ -37,12 +37,12 @@ public class RedisConfig {
   }
 
   /**
-   * General-purpose RedisTemplate for caching objects.
+   * 用于缓存对象的通用 RedisTemplate。
    *
-   * <p>Uses Jackson JSON serializer for values, suitable for most caching scenarios.
+   * <p>使用 Jackson JSON 序列化器处理值，适用于大多数缓存场景。
    *
-   * @param factory Redis connection factory
-   * @return RedisTemplate configured for general use
+   * @param factory Redis 连接工厂
+   * @return 为通用用途配置的 RedisTemplate
    */
   @Bean
   public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
@@ -56,12 +56,12 @@ public class RedisConfig {
   }
 
   /**
-   * Specialized RedisTemplate for embedding vectors.
+   * 用于嵌入向量的专用 RedisTemplate。
    *
-   * <p>Uses custom serializer for float[] arrays to ensure proper serialization.
+   * <p>使用自定义序列化器处理 float[] 数组，以确保正确的序列化。
    *
-   * @param factory Redis connection factory
-   * @return RedisTemplate configured for embedding vectors
+   * @param factory Redis 连接工厂
+   * @return 为嵌入向量配置的 RedisTemplate
    */
   @Bean
   public RedisTemplate<String, float[]> embeddingRedisTemplate(RedisConnectionFactory factory) {

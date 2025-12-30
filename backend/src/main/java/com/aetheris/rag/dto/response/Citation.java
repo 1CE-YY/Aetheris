@@ -4,19 +4,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.Objects;
 
 /**
- * Citation object for referencing evidence sources in RAG answers and recommendations.
+ * 用于引用 RAG 答案和推荐中的证据来源的引用对象。
  *
- * <p>This class represents a citation that links an AI-generated response to its source
- * material. Each citation provides complete traceability, allowing users to verify the
- * information and navigate to the exact location in the original document.
+ * <p>此类表示将 AI 生成的响应链接到其源材料的引用。
+ * 每个引用提供完整的可追溯性，允许用户验证信息并导航到原始文档中的确切位置。
  *
- * <p>Citation structure follows the specification defined in FR-014 and FR-020:
+ * <p>引用结构遵循 FR-014 和 FR-020 中定义的规范：
  *
  * <ul>
- *   <li>Stable JSON structure for frontend consumption
- *   <li>Supports both PDF (page ranges) and Markdown (chapter paths) location formats
- *   <li>Includes similarity scores for ranking
- *   <li>100% traceable to source documents
+ *   <li>稳定的 JSON 结构供前端使用
+ *   <li>支持 PDF（页码范围）和 Markdown（章节路径）位置格式
+ *   <li>包含相似度分数用于排名
+ *   <li>100% 可追溯到源文档
  * </ul>
  *
  * @author Aetheris Team
@@ -47,15 +46,15 @@ public class Citation {
   private final double score;
 
   /**
-   * Creates a complete citation.
+   * 创建完整的引用。
    *
-   * @param resourceId the resource ID (UUID)
-   * @param resourceTitle the resource title
-   * @param chunkId the chunk ID (UUID)
-   * @param chunkIndex the chunk index (0-based position in document)
-   * @param location the location information (page range or chapter path)
-   * @param snippet the text excerpt supporting the answer (100-200 characters)
-   * @param score the similarity score (0.0 to 1.0)
+   * @param resourceId 资源 ID（UUID）
+   * @param resourceTitle 资源标题
+   * @param chunkId 分块 ID（UUID）
+   * @param chunkIndex 分块索引（在文档中的从 0 开始的位置）
+   * @param location 位置信息（页码范围或章节路径）
+   * @param snippet 支持答案的文本摘录（100-200 个字符）
+   * @param score 相似度分数（0.0 到 1.0）
    */
   public Citation(
       String resourceId,
@@ -98,63 +97,63 @@ public class Citation {
   }
 
   /**
-   * Gets the resource ID.
+   * 获取资源 ID。
    *
-   * @return the resource UUID
+   * @return 资源 UUID
    */
   public String getResourceId() {
     return resourceId;
   }
 
   /**
-   * Gets the resource title.
+   * 获取资源标题。
    *
-   * @return the resource title
+   * @return 资源标题
    */
   public String getResourceTitle() {
     return resourceTitle;
   }
 
   /**
-   * Gets the chunk ID.
+   * 获取分块 ID。
    *
-   * @return the chunk UUID
+   * @return 分块 UUID
    */
   public String getChunkId() {
     return chunkId;
   }
 
   /**
-   * Gets the chunk index.
+   * 获取分块索引。
    *
-   * @return the chunk index (0-based)
+   * @return 分块索引（从 0 开始）
    */
   public int getChunkIndex() {
     return chunkIndex;
   }
 
   /**
-   * Gets the location information.
+   * 获取位置信息。
    *
-   * @return the location (PDF page range or Markdown chapter path)
+   * @return 位置（PDF 页码范围或 Markdown 章节路径）
    */
   public CitationLocation getLocation() {
     return location;
   }
 
   /**
-   * Gets the text snippet.
+   * 获取文本摘录。
    *
-   * @return the supporting text excerpt
+   * @return 支持性文本摘录
    */
   public String getSnippet() {
     return snippet;
   }
 
   /**
-   * Gets the similarity score.
+   * 获取相似度分数。
    *
-   * @return the score (0.0 to 1.0)
+   * @return 分数（0.0 到 1.0）
    */
   public double getScore() {
     return score;

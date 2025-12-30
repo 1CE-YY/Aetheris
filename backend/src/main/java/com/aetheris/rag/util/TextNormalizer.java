@@ -1,7 +1,7 @@
 package com.aetheris.rag.util;
 
 /**
- * Utility class for text normalization.
+ * 文本规范化的工具类。
  *
  * @author Aetheris Team
  * @version 1.0.0
@@ -13,10 +13,10 @@ public final class TextNormalizer {
   }
 
   /**
-   * Normalizes text by removing redundant whitespace and unifying line breaks.
+   * 通过删除冗余空格和统一换行符来规范化文本。
    *
-   * @param text the text to normalize
-   * @return normalized text
+   * @param text 要规范化的文本
+   * @return 规范化的文本
    */
   public static String normalize(String text) {
     if (text == null) {

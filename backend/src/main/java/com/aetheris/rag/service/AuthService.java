@@ -5,7 +5,7 @@ import com.aetheris.rag.dto.request.RegisterRequest;
 import com.aetheris.rag.dto.response.AuthResponse;
 
 /**
- * Service interface for authentication operations.
+ * 认证操作的服务接口。
  *
  * @author Aetheris Team
  * @version 1.0.0
@@ -13,34 +13,34 @@ import com.aetheris.rag.dto.response.AuthResponse;
 public interface AuthService {
 
   /**
-   * Registers a new user.
+   * 注册新用户。
    *
-   * @param request the registration request
-   * @return the authentication response with token
+   * @param request 注册请求
+   * @return 包含 token 的认证响应
    */
   AuthResponse register(RegisterRequest request);
 
   /**
-   * Authenticates a user.
+   * 用户登录认证。
    *
-   * @param request the login request
-   * @return the authentication response with token
+   * @param request 登录请求
+   * @return 包含 token 的认证响应
    */
   AuthResponse login(LoginRequest request);
 
   /**
-   * Validates a JWT token.
+   * 验证 JWT token。
    *
-   * @param token the JWT token
-   * @return true if valid, false otherwise
+   * @param token JWT token
+   * @return 如果有效返回 true，否则返回 false
    */
   boolean validateToken(String token);
 
   /**
-   * Extracts user ID from a JWT token.
+   * 从 JWT token 中提取用户 ID。
    *
-   * @param token the JWT token
-   * @return the user ID
+   * @param token JWT token
+   * @return 用户 ID
    */
   Long getUserIdFromToken(String token);
 }

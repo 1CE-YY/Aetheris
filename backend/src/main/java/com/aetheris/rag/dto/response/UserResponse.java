@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Response DTO for user information.
+ * 用户信息的响应 DTO。
  *
  * @author Aetheris Team
  * @version 1.0.0

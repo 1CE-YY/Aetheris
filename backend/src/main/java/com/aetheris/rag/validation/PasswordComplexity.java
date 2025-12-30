@@ -9,13 +9,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Validates password complexity requirements.
+ * 验证密码复杂性要求。
  *
- * <p>Password must contain:
+ * <p>密码必须包含：
  *
  * <ul>
- *   <li>At least one letter (a-z, A-Z)
- *   <li>At least one digit (0-9)
+ *   <li>至少一个字母（a-z、A-Z）
+ *   <li>至少一个数字（0-9）
  * </ul>
  *
  * @author Aetheris Team

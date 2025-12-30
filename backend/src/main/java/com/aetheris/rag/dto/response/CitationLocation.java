@@ -7,17 +7,16 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import java.util.Objects;
 
 /**
- * Location information for a citation chunk.
+ * 引用分块的位置信息。
  *
- * <p>This class represents the position of a chunk within a document, supporting both PDF
- * and Markdown formats. It provides complete traceability for users to navigate to the exact
- * source location.
+ * <p>此类表示分块在文档中的位置，支持 PDF 和 Markdown 格式。
+ * 它提供完整的可追溯性，供用户导航到确切的源位置。
  *
- * <p>Location formats:
+ * <p>位置格式：
  *
  * <ul>
- *   <li>PDF: Page range (start and end page numbers)
- *   <li>Markdown: Chapter path (e.g., "Chapter 1 > 1.1 Introduction")
+ *   <li>PDF：页码范围（起始和结束页码）
+ *   <li>Markdown：章节路径（例如，"Chapter 1 > 1.1 Introduction"）
  * </ul>
  *
  * @author Aetheris Team
@@ -36,14 +35,14 @@ import java.util.Objects;
 public abstract class CitationLocation {
 
   /**
-   * Gets the formatted location string for display.
+   * 获取用于显示的格式化位置字符串。
    *
-   * @return the human-readable location string
+   * @return 人类可读的位置字符串
    */
   public abstract String getDisplayString();
 
   /**
-   * PDF location with page range.
+   * 带页码范围的 PDF 位置。
    */
   public static class PdfLocation extends CitationLocation {
 
@@ -51,10 +50,10 @@ public abstract class CitationLocation {
     private final int pageEnd;
 
     /**
-     * Creates a PDF location.
+     * 创建 PDF 位置。
      *
-     * @param pageStart the starting page number (1-based)
-     * @param pageEnd the ending page number (1-based, must be >= pageStart)
+     * @param pageStart 起始页码（从 1 开始）
+     * @param pageEnd 结束页码（从 1 开始，必须 >= pageStart）
      */
     @JsonCreator
     public PdfLocation(
@@ -113,16 +112,16 @@ public abstract class CitationLocation {
   }
 
   /**
-   * Markdown location with chapter path.
+   * 带章节路径的 Markdown 位置。
    */
   public static class MarkdownLocation extends CitationLocation {
 
     private final String chapterPath;
 
     /**
-     * Creates a Markdown location.
+     * 创建 Markdown 位置。
      *
-     * @param chapterPath the chapter path (e.g., "Chapter 1 > 1.1 Introduction")
+     * @param chapterPath 章节路径（例如，"Chapter 1 > 1.1 Introduction"）
      */
     @JsonCreator
     public MarkdownLocation(@JsonProperty("chapterPath") String chapterPath) {

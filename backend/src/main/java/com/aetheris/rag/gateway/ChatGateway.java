@@ -11,19 +11,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Gateway for Zhipu AI chat API operations.
+ * 智谱 AI 聊天 API 操作的网关。
  *
- * <p>This class encapsulates all interactions with the Zhipu AI chat service, providing:
+ * <p>此类封装了与智谱 AI 聊天服务的所有交互，提供：
  *
  * <ul>
- *   <li>Prompt construction and formatting
- *   <li>Retry logic with exponential backoff
- *   <li>Graceful degradation when LLM is unavailable
- *   <li>Log sanitization to protect sensitive data
+ *   <li>提示构建和格式化
+ *   <li>使用指数退避的重试逻辑
+ *   <li>LLM 不可用时的优雅降级
+ *   <li>日志清理以保护敏感数据
  * </ul>
  *
- * <p><strong>TODO</strong>: This class is commented out temporarily for Phase 1-2 completion.
- * Will be fully implemented in Phase 5 (RAG Q&A) when Zhipu AI API integration is required.
+ * <p><strong>TODO</strong>: 此类为 Phase 1-2 完成而临时注释掉。
+ * 将在 Phase 5（RAG 问答）中完全实现，届时需要智谱 AI API 集成。
  *
  * @author Aetheris Team
  * @version 1.0.0
@@ -68,32 +68,32 @@ public class ChatGateway {
   */
 
   /**
-   * Generates a chat response.
+   * 生成聊天响应。
    *
-   * <p><strong>TODO</strong>: Implementation pending for Phase 5.
+   * <p><strong>TODO</strong>: 待 Phase 5 实现。
    *
-   * @param prompt the input prompt
-   * @return the generated response text
-   * @throws ModelException if the API call fails after all retries
+   * @param prompt 输入提示
+   * @return 生成的响应文本
+   * @throws ModelException 如果 API 调用在所有重试后失败
    */
   public String chat(String prompt) {
-    // TODO: Implement in Phase 5
+    // TODO: 在 Phase 5 中实现
     log.warn("ChatGateway.chat() not yet implemented - returning dummy response");
     return "This is a dummy response. Chat functionality will be implemented in Phase 5.";
   }
 
   /**
-   * Generates a chat response with system prompt.
+   * 使用系统提示生成聊天响应。
    *
-   * <p><strong>TODO</strong>: Implementation pending for Phase 5.
+   * <p><strong>TODO</strong>: 待 Phase 5 实现。
    *
-   * @param systemPrompt the system prompt
-   * @param userPrompt the user prompt
-   * @return the generated response text
-   * @throws ModelException if the API call fails after all retries
+   * @param systemPrompt 系统提示
+   * @param userPrompt 用户提示
+   * @return 生成的响应文本
+   * @throws ModelException 如果 API 调用在所有重试后失败
    */
   public String chat(String systemPrompt, String userPrompt) {
-    // TODO: Implement in Phase 5
+    // TODO: 在 Phase 5 中实现
     log.warn("ChatGateway.chat(systemPrompt, userPrompt) not yet implemented - returning dummy response");
     return "This is a dummy response. Chat functionality will be implemented in Phase 5.";
   }

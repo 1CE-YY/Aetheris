@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Response DTO for authentication operations.
+ * 认证操作的响应 DTO。
  *
  * @author Aetheris Team
  * @version 1.0.0

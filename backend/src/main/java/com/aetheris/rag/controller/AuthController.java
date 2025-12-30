@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * REST controller for authentication operations.
+ * 认证操作的 REST 控制器。
  *
  * @author Aetheris Team
  * @version 1.0.0
@@ -31,10 +31,10 @@ public class AuthController {
   private final AuthService authService;
 
   /**
-   * Registers a new user.
+   * 注册新用户。
    *
-   * @param request the registration request
-   * @return the authentication response with token
+   * @param request 注册请求
+   * @return 包含 token 的认证响应
    */
   @PostMapping("/register")
   public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
@@ -50,10 +50,10 @@ public class AuthController {
   }
 
   /**
-   * Authenticates a user.
+   * 用户登录认证。
    *
-   * @param request the login request
-   * @return the authentication response with token
+   * @param request 登录请求
+   * @return 包含 token 的认证响应
    */
   @PostMapping("/login")
   public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {

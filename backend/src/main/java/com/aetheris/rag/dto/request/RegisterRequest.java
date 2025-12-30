@@ -10,7 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Request DTO for user registration.
+ * 用户注册的请求 DTO。
  *
  * @author Aetheris Team
  * @version 1.0.0

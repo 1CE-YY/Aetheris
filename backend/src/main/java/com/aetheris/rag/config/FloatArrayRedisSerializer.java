@@ -10,10 +10,10 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Component;
 
 /**
- * Custom Redis serializer for float arrays.
+ * 用于浮点数组的自定义 Redis 序列化器。
  *
- * <p>This serializer handles float[] arrays by converting them to/from byte arrays using Java
- * serialization. This ensures proper serialization and deserialization of embedding vectors.
+ * <p>此序列化器通过使用 Java 序列化将 float[] 数组转换为字节数组来处理它们。
+ * 这确保了嵌入向量的正确序列化和反序列化。
  *
  * @author Aetheris Team
  * @version 1.0.0

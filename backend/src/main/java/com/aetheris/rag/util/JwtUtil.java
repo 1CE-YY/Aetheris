@@ -13,7 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
- * Utility class for JWT token generation and validation.
+ * JWT token 生成和验证的工具类。
  *
  * @author Aetheris Team
  * @version 1.0.0
@@ -41,10 +41,10 @@ public class JwtUtil {
   }
 
   /**
-   * Generates a JWT token for the given user ID.
+   * 为给定的用户 ID 生成 JWT token。
    *
-   * @param userId the user ID
-   * @return the JWT token
+   * @param userId 用户 ID
+   * @return JWT token
    */
   public String generateToken(Long userId) {
     Date now = new Date();
@@ -59,10 +59,10 @@ public class JwtUtil {
   }
 
   /**
-   * Extracts user ID from a JWT token.
+   * 从 JWT token 中提取用户 ID。
    *
-   * @param token the JWT token
-   * @return the user ID
+   * @param token JWT token
+   * @return 用户 ID
    */
   public Long getUserIdFromToken(String token) {
     Claims claims = Jwts.parser().setSigningKey(key).build().parseClaimsJws(token).getBody();
@@ -70,10 +70,10 @@ public class JwtUtil {
   }
 
   /**
-   * Validates a JWT token.
+   * 验证 JWT token。
    *
-   * @param token the JWT token
-   * @return true if valid, false otherwise
+   * @param token JWT token
+   * @return 如果有效返回 true，否则返回 false
    */
   public boolean validateToken(String token) {
     try {

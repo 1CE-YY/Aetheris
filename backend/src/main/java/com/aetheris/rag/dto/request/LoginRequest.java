@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Request DTO for user login.
+ * 用户登录的请求 DTO。
  *
  * @author Aetheris Team
  * @version 1.0.0
