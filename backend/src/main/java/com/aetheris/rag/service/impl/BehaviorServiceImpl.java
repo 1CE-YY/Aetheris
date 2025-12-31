@@ -4,7 +4,7 @@
 package com.aetheris.rag.service.impl;
 
 import com.aetheris.rag.mapper.UserBehaviorMapper;
-import com.aetheris.rag.model.UserBehavior;
+import com.aetheris.rag.entity.UserBehavior;
 import com.aetheris.rag.service.BehaviorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

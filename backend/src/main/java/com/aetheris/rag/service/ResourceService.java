@@ -3,8 +3,8 @@
  */
 package com.aetheris.rag.service;
 
-import com.aetheris.rag.model.Chunk;
-import com.aetheris.rag.model.Resource;
+import com.aetheris.rag.entity.Chunk;
+import com.aetheris.rag.entity.Resource;
 import java.nio.file.Path;
 import java.util.List;
 

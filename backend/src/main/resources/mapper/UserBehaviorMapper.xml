@@ -4,7 +4,7 @@
 <mapper namespace="com.aetheris.rag.mapper.UserBehaviorMapper">
 
   <!-- ResultMap 定义 -->
-  <resultMap id="UserBehaviorResultMap" type="com.aetheris.rag.model.UserBehavior">
+  <resultMap id="UserBehaviorResultMap" type="com.aetheris.rag.entity.UserBehavior">
     <id column="id" property="id"/>
     <result column="user_id" property="userId"/>
     <result column="behavior_type" property="behaviorType"/>
@@ -16,7 +16,7 @@
   </resultMap>
 
   <!-- 插入用户行为记录 -->
-  <insert id="insert" parameterType="com.aetheris.rag.model.UserBehavior"
+  <insert id="insert" parameterType="com.aetheris.rag.entity.UserBehavior"
       useGeneratedKeys="true" keyProperty="id">
     INSERT INTO user_behaviors (
       user_id, behavior_type, resource_id, query_text, behavior_time, session_id, weight

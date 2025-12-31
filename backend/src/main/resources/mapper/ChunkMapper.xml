@@ -7,7 +7,7 @@
 <mapper namespace="com.aetheris.rag.mapper.ChunkMapper">
 
   <!-- 结果映射 -->
-  <resultMap id="ChunkResultMap" type="com.aetheris.rag.model.Chunk">
+  <resultMap id="ChunkResultMap" type="com.aetheris.rag.entity.Chunk">
     <id column="id" property="id" jdbcType="BIGINT"/>
     <result column="resource_id" property="resourceId" jdbcType="BIGINT"/>
     <result column="chunk_index" property="chunkIndex" jdbcType="INTEGER"/>

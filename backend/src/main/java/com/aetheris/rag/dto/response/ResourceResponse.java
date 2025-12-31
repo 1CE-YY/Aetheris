@@ -3,7 +3,7 @@
  */
 package com.aetheris.rag.dto.response;
 
-import com.aetheris.rag.model.Resource;
+import com.aetheris.rag.entity.Resource;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

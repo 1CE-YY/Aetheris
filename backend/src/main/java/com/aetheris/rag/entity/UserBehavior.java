@@ -1,7 +1,7 @@
 /*
  * Copyright 2025 Aetheris RAG Team. All rights reserved.
  */
-package com.aetheris.rag.model;
+package com.aetheris.rag.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

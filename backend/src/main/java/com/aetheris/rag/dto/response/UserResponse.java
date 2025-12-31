@@ -1,6 +1,6 @@
 package com.aetheris.rag.dto.response;
 
-import com.aetheris.rag.model.User;
+import com.aetheris.rag.entity.User;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

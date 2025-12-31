@@ -7,7 +7,7 @@ import com.aetheris.rag.common.response.ApiResponse;
 import com.aetheris.rag.dto.response.BehaviorCountResponse;
 import com.aetheris.rag.dto.response.BehaviorResponse;
 import com.aetheris.rag.exception.BadRequestException;
-import com.aetheris.rag.model.UserBehavior;
+import com.aetheris.rag.entity.UserBehavior;
 import com.aetheris.rag.service.BehaviorService;
 import java.util.List;
 import java.util.stream.Collectors;

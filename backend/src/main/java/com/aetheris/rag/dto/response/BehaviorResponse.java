@@ -3,7 +3,7 @@
  */
 package com.aetheris.rag.dto.response;
 
-import com.aetheris.rag.model.UserBehavior;
+import com.aetheris.rag.entity.UserBehavior;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

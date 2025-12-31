@@ -5,8 +5,8 @@ package com.aetheris.rag.service.impl;
 
 import com.aetheris.rag.mapper.ChunkMapper;
 import com.aetheris.rag.mapper.ResourceMapper;
-import com.aetheris.rag.model.Chunk;
-import com.aetheris.rag.model.Resource;
+import com.aetheris.rag.entity.Chunk;
+import com.aetheris.rag.entity.Resource;
 import com.aetheris.rag.service.ResourceService;
 import com.aetheris.rag.service.VectorService;
 import com.aetheris.rag.util.HashUtil;

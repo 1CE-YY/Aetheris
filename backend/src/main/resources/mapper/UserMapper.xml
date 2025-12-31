@@ -9,7 +9,7 @@
 <mapper namespace="com.aetheris.rag.mapper.UserMapper">
 
   <!-- Result Map -->
-  <resultMap id="UserResultMap" type="com.aetheris.rag.model.User">
+  <resultMap id="UserResultMap" type="com.aetheris.rag.entity.User">
     <id property="id" column="id"/>
     <result property="username" column="username"/>
     <result property="email" column="email"/>
@@ -20,7 +20,7 @@
   </resultMap>
 
   <!-- Insert User -->
-  <insert id="insert" parameterType="com.aetheris.rag.model.User" useGeneratedKeys="true" keyProperty="id">
+  <insert id="insert" parameterType="com.aetheris.rag.entity.User" useGeneratedKeys="true" keyProperty="id">
     INSERT INTO users (username, email, password_hash, created_at, updated_at, last_active_at)
     VALUES (#{username}, #{email}, #{passwordHash}, #{createdAt}, #{updatedAt}, #{lastActiveAt})
   </insert>

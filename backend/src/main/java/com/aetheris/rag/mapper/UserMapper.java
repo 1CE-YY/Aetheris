@@ -1,6 +1,6 @@
 package com.aetheris.rag.mapper;
 
-import com.aetheris.rag.model.User;
+import com.aetheris.rag.entity.User;
 import java.time.Instant;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

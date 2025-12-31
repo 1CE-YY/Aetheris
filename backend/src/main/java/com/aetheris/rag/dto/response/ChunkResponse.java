@@ -3,7 +3,7 @@
  */
 package com.aetheris.rag.dto.response;
 
-import com.aetheris.rag.model.Chunk;
+import com.aetheris.rag.entity.Chunk;
 import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

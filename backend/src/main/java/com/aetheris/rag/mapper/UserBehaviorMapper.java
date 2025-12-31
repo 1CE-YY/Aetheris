@@ -3,7 +3,7 @@
  */
 package com.aetheris.rag.mapper;
 
-import com.aetheris.rag.model.UserBehavior;
+import com.aetheris.rag.entity.UserBehavior;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

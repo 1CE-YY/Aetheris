@@ -3,7 +3,7 @@
  */
 package com.aetheris.rag.mapper;
 
-import com.aetheris.rag.model.Resource;
+import com.aetheris.rag.entity.Resource;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;

@@ -3,7 +3,7 @@
  */
 package com.aetheris.rag.util;
 
-import com.aetheris.rag.model.Chunk;
+import com.aetheris.rag.entity.Chunk;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

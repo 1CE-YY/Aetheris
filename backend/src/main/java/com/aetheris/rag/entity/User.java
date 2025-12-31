@@ -1,4 +1,4 @@
-package com.aetheris.rag.model;
+package com.aetheris.rag.entity;
 
 import java.time.Instant;
 import lombok.AllArgsConstructor;

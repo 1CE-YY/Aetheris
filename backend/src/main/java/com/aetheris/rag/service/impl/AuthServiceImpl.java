@@ -7,7 +7,7 @@ import com.aetheris.rag.dto.response.UserResponse;
 import com.aetheris.rag.exception.ConflictException;
 import com.aetheris.rag.exception.UnauthorizedException;
 import com.aetheris.rag.mapper.UserMapper;
-import com.aetheris.rag.model.User;
+import com.aetheris.rag.entity.User;
 import com.aetheris.rag.service.AuthService;
 import com.aetheris.rag.util.JwtUtil;
 import lombok.RequiredArgsConstructor;

@@ -3,7 +3,7 @@
  */
 package com.aetheris.rag.service;
 
-import com.aetheris.rag.model.UserBehavior;
+import com.aetheris.rag.entity.UserBehavior;
 
 import java.util.List;
 

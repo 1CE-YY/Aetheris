@@ -5,7 +5,7 @@ package com.aetheris.rag.service.impl;
 
 import com.aetheris.rag.gateway.ModelGateway;
 import com.aetheris.rag.mapper.ChunkMapper;
-import com.aetheris.rag.model.Chunk;
+import com.aetheris.rag.entity.Chunk;
 import com.aetheris.rag.service.VectorService;
 import jakarta.annotation.PostConstruct;
 import java.time.Duration;
