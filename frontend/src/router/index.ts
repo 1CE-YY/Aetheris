@@ -41,13 +41,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/resource/ResourceListView.vue'),
     meta: { requiresAuth: true }
   },
-  // TODO: 以下路由待实现页面组件后取消注释
-  // {
-  //   path: '/resources/upload',
-  //   name: 'ResourceUpload',
-  //   component: () => import('@/views/resource/UploadView.vue'),
-  //   meta: { requiresAuth: true }
-  // },
+  {
+    path: '/resources/upload',
+    name: 'ResourceUpload',
+    component: () => import('@/views/resource/UploadView.vue'),
+    meta: { requiresAuth: true }
+  },
   {
     path: '/resources/:id',
     name: 'ResourceDetail',
@@ -102,13 +101,21 @@ const router = createRouter({
 router.beforeEach((to, _from, next) => {
   const userStore = useUserStore()
 
+  console.log('[Router] 导航到:', to.path)
+  console.log('[Router] validatingToken:', userStore.validatingToken)
+  console.log('[Router] tokenValidated:', userStore.tokenValidated)
+  console.log('[Router] isLoggedIn:', userStore.isLoggedIn)
+  console.log('[Router] token:', userStore.token?.substring(0, 20))
+
   // 如果正在验证 token，等待验证完成
   if (userStore.validatingToken) {
+    console.log('[Router] 正在验证 token，等待...')
     // 使用 watch 等待验证完成，然后重新触发路由守卫
     const unwatch = userStore.$subscribe((_mutation, state) => {
       if (!state.validatingToken) {
         unwatch()
         // 验证完成，重新触发路由守卫
+        console.log('[Router] Token 验证完成，重新导航')
         next(to)
       }
     })
@@ -117,8 +124,10 @@ router.beforeEach((to, _from, next) => {
 
   // 如果 token 尚未验证，启动验证并等待
   if (!userStore.tokenValidated) {
+    console.log('[Router] Token 尚未验证，开始验证...')
     userStore.initialize().then(() => {
       // 验证完成，重新触发路由守卫
+      console.log('[Router] Token 验证完成，重新导航')
       next(to)
     })
     return
@@ -127,17 +136,22 @@ router.beforeEach((to, _from, next) => {
   // 检查路由是否需要认证
   const requiresAuth = to.meta.requiresAuth !== false
 
+  console.log('[Router] requiresAuth:', requiresAuth)
+
   if (requiresAuth && !userStore.isLoggedIn) {
     // 需要认证但用户未登录，重定向到登录页
+    console.log('[Router] 需要认证但未登录，重定向到登录页')
     next({
       name: 'Login',
       query: { redirect: to.fullPath }
     })
   } else if (!requiresAuth && userStore.isLoggedIn && (to.name === 'Login' || to.name === 'Register')) {
     // 用户已登录但访问登录/注册页，重定向到首页
+    console.log('[Router] 已登录但访问登录页，重定向到首页')
     next({ name: 'Home' })
   } else {
     // 其他情况，正常导航
+    console.log('[Router] 正常导航')
     next()
   }
 })

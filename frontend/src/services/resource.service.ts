@@ -48,6 +48,18 @@ export interface Chunk {
 }
 
 /**
+ * 分页响应
+ */
+export interface PageResponse<T> {
+  items: T[]
+  total: number
+  page: number
+  size: number
+  totalPages: number
+  hasNext: boolean
+}
+
+/**
  * 资源服务类
  */
 export class ResourceService {
@@ -55,28 +67,34 @@ export class ResourceService {
    * 上传资源
    */
   static async upload(data: ResourceUploadRequest): Promise<Resource> {
-    return api.post<Resource, Resource>('/resources', data)
+    const response = await api.post<any, Resource>('/resources', data)
+    return response
   }
 
   /**
-   * 获取资源列表
+   * 获取资源列表（分页）
    */
-  static async getResourceList(offset = 0, limit = 10): Promise<Resource[]> {
-    return api.get<Resource[]>(`/resources?offset=${offset}&limit=${limit}`)
+  static async getResourceList(page = 0, size = 10): Promise<PageResponse<Resource>> {
+    const response = await api.get<any, PageResponse<Resource>>('/resources', {
+      params: { page, size }
+    })
+    return response
   }
 
   /**
    * 获取资源详情
    */
   static async getResourceById(id: number): Promise<Resource> {
-    return api.get<Resource>(`/resources/${id}`)
+    const response = await api.get<any, Resource>(`/resources/${id}`)
+    return response
   }
 
   /**
    * 获取资源切片列表
    */
   static async getChunksByResourceId(id: number): Promise<Chunk[]> {
-    return api.get<Chunk[]>(`/resources/${id}/chunks`)
+    const response = await api.get<any, Chunk[]>(`/resources/${id}/chunks`)
+    return response
   }
 }
 

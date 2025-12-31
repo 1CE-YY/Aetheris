@@ -4,7 +4,7 @@
 package com.aetheris.rag.unit;
 
 import com.aetheris.rag.mapper.UserBehaviorMapper;
-import com.aetheris.rag.model.UserBehavior;
+import com.aetheris.rag.entity.UserBehavior;
 import com.aetheris.rag.service.BehaviorService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

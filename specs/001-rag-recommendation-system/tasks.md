@@ -231,15 +231,15 @@
 
 **独立测试**：上传测试文档，在资源列表查看元数据和切片信息（chunkIndex、页码/章节）
 
-- [ ] T035 创建 `backend/src/main/java/com/aetheris/rag/model/Resource.java` 和 `Chunk.java`，使用 Lombok 注解
+- [x] T035 创建 `backend/src/main/java/com/aetheris/rag/model/Resource.java` 和 `Chunk.java`，使用 Lombok 注解
   - **涉及表**：resources（id, title, tags, file_type, file_path, file_size, description, content_hash, uploaded_by, chunk_count, vectorized）
   - **涉及表**：resource_chunks（id, resource_id, chunk_index, chunk_text, location_info, page_start, page_end, chapter_path, text_hash, vectorized）
   - **注**：使用 Lombok @Data、@Builder 注解，不使用 Java 21 Record
-- [ ] T036 [P] 创建 `backend/src/main/java/com/aetheris/rag/mapper/ResourceMapper.java` 接口和 `ResourceMapper.xml`
+- [x] T036 [P] 创建 `backend/src/main/java/com/aetheris/rag/mapper/ResourceMapper.java` 接口和 `ResourceMapper.xml`
   - **SQL**：INSERT（useGeneratedKeys）、SELECT by id/content_hash/uploader、UPDATE chunk_status、SELECT paged
-- [ ] T037 [P] 创建 `backend/src/main/java/com/aetheris/rag/mapper/ChunkMapper.java` 接口和 `ChunkMapper.xml`
+- [x] T037 [P] 创建 `backend/src/main/java/com/aetheris/rag/mapper/ChunkMapper.java` 接口和 `ChunkMapper.xml`
   - **SQL**：INSERT、SELECT by resource_id、SELECT by text_hash、SELECT unvectorized、UPDATE vectorized、DELETE by resource_id
-- [ ] T038 创建 `backend/src/main/java/com/aetheris/rag/service/ResourceService.java` 接口和实现 `ResourceServiceImpl.java`
+- [x] T038 创建 `backend/src/main/java/com/aetheris/rag/service/ResourceService.java` 接口和实现 `ResourceServiceImpl.java`
   - **目标**：实现资源上传、内容哈希去重（FR-007 幂等性）、切片管理、向量化状态跟踪
   - **涉及表**：resources、resource_chunks
   - **Redis**：`resource:upload:{contentHash}` 分布式锁，防止并发重复上传
@@ -247,17 +247,17 @@
   - **关键配置**：`chunk.size`（1000 字符）、`chunk.overlap`（200 字符）
   - **测试要点**：单测验证内容哈希去重、切片逻辑、幂等性（重复上传返回已存在资源）
   - **验收标准**：FR-005/006/007/008/009、US1 验收场景 1/2/3、SC-001（入库完成并记录耗时）
-- [ ] T039 [P] 创建 `backend/src/main/java/com/aetheris/rag/service/impl/PdfProcessor.java`，实现 PDF 文本提取和页码范围记录
+- [x] T039 [P] 创建 `backend/src/main/java/com/aetheris/rag/service/impl/PdfProcessor.java`，实现 PDF 文本提取和页码范围记录
   - **目标**：使用 Apache PDFBox 逐页提取文本，记录每个 chunk 的 pageStart 和 pageEnd
   - **涉及字段**：resource_chunks.page_start、page_end
   - **测试要点**：单测验证页码范围计算正确、文本提取完整
   - **验收标准**：FR-008（PDF 切片保存页码范围）
-- [ ] T040 [P] 创建 `backend/src/main/java/com/aetheris/rag/service/impl/MarkdownProcessor.java`，实现 Markdown AST 解析和章节路径记录
+- [x] T040 [P] 创建 `backend/src/main/java/com/aetheris/rag/service/impl/MarkdownProcessor.java`，实现 Markdown AST 解析和章节路径记录
   - **目标**：使用 CommonMark Java 解析 heading 层级，记录 chapterPath（如 "第一章>1.1节"）
   - **涉及字段**：resource_chunks.chapter_path
   - **测试要点**：单测验证章节路径格式正确
   - **验收标准**：FR-008（Markdown 切片保存章节路径）
-- [ ] T041 创建 `backend/src/main/java/com/aetheris/rag/service/VectorService.java`（无接口），实现向量化批量处理
+- [x] T041 创建 `backend/src/main/java/com/aetheris/rag/service/VectorService.java`（无接口），实现向量化批量处理
   - **目标**：批量读取未向量化的切片，调用 ModelGateway.embed()，写入 Redis 向量索引
   - **涉及表**：resource_chunks（查询 vectorized=FALSE）、更新 vectorized=TRUE
   - **Redis**：RediSearch Vector KNN 索引，key 为 `chunk:{chunkId}`，字段包括 vector、resourceId、chunkId、chunkIndex、tags、docType
@@ -268,16 +268,16 @@
     - HNSW 参数：M=16、ef_construction=128
   - **测试要点**：集成测试使用 Testcontainers 验证 Redis 向量写入和检索
   - **验收标准**：FR-009（向量化入库）
-- [ ] T042 [P] 创建 `backend/src/main/java/com/aetheris/rag/controller/ResourceController.java`，实现上传、列表、详情端点
-- [ ] T043 [P] 创建 `backend/src/main/resources/mapper/ResourceMapper.xml` 和 `ChunkMapper.xml`，定义 SQL 语句（符合 Google Java Style）
+- [x] T042 [P] 创建 `backend/src/main/java/com/aetheris/rag/controller/ResourceController.java`，实现上传、列表、详情端点
+- [x] T043 [P] 创建 `backend/src/main/resources/mapper/ResourceMapper.xml` 和 `ChunkMapper.xml`，定义 SQL 语句（符合 Google Java Style）
 
 **前端任务（可并行）**：
 
-- [ ] T044 [P] 创建 `frontend/src/views/resource/UploadView.vue`，使用 Ant Design Upload 组件，支持拖拽上传
-- [ ] T045 [P] 创建 `frontend/src/views/resource/ResourceListView.vue`，使用 Ant Design Table 组件展示资源列表
-- [ ] T046 [P] 创建 `frontend/src/views/resource/ResourceDetailView.vue`，展示资源元数据和切片列表（chunkIndex、页码/章节、文本预览）
-- [ ] T047 [P] 创建 `frontend/src/services/resource.service.ts`，封装资源 API 调用
-- [ ] T048 创建 `frontend/src/components/resource/ResourceCard.vue` 和 `ResourceTable.vue`，可复用组件
+- [x] T044 [P] 创建 `frontend/src/views/resource/UploadView.vue`，使用 Ant Design Upload 组件，支持拖拽上传
+- [x] T045 [P] 创建 `frontend/src/views/resource/ResourceListView.vue`，使用 Ant Design Table 组件展示资源列表
+- [x] T046 [P] 创建 `frontend/src/views/resource/ResourceDetailView.vue`，展示资源元数据和切片列表（chunkIndex、页码/章节、文本预览）
+- [x] T047 [P] 创建 `frontend/src/services/resource.service.ts`，封装资源 API 调用
+- [x] T048 创建 `frontend/src/components/resource/ResourceCard.vue` 和 `ResourceTable.vue`，可复用组件
 
 **验收标准**：
 - [ ] 用户可成功上传 PDF 文档

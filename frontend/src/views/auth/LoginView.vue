@@ -109,17 +109,31 @@ const rules = {
  */
 async function handleLogin() {
   try {
-    await userStore.login({
+    console.log('[Login] 开始登录流程...')
+    const response = await userStore.login({
       email: formState.email,
       password: formState.password
     })
 
-    message.success('登录成功')
+    console.log('[Login] userStore.login 返回:', response)
+    console.log('[Login] token:', userStore.token)
+    console.log('[Login] userInfo:', userStore.userInfo)
+    console.log('[Login] tokenValidated:', userStore.tokenValidated)
+    console.log('[Login] isLoggedIn:', userStore.isLoggedIn)
 
-    // 跳转到首页或之前的页面
-    const redirect = router.currentRoute.value.query.redirect as string
-    router.push(redirect || '/')
+    // 使用 setTimeout 确保状态更新后再跳转
+    setTimeout(() => {
+      // 跳转到首页或之前的页面
+      const redirect = router.currentRoute.value.query.redirect as string
+      const targetUrl = redirect || '/'
+
+      console.log('[Login] 准备跳转到:', targetUrl)
+
+      // 使用 window.location.href 强制刷新页面，避免路由守卫问题
+      window.location.href = targetUrl
+    }, 100)
   } catch (error: any) {
+    console.error('[Login] 登录失败:', error)
     // 显示具体的错误信息
     message.error(error.message || '登录失败，请稍后重试')
   }

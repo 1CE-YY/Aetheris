@@ -39,6 +39,8 @@ api.interceptors.request.use(
 /**
  * 响应拦截器
  *
+ * <p>统一处理后端 ApiResponse<T> 格式，自动解包 data 字段
+ *
  * <p>统一处理错误响应，包括：
  * <ul>
  *   <li>401 未认证：清除 token，智能跳转（登录页不跳转）</li>
@@ -50,7 +52,17 @@ api.interceptors.request.use(
  */
 api.interceptors.response.use(
   (response: AxiosResponse) => {
-    return response.data
+    // 后端返回 ApiResponse<T> 格式：{ code, message, data }
+    // 自动解包，只返回 data 字段
+    const result = response.data
+
+    // 如果是 ApiResponse 格式（有 code 和 data 字段），返回 data
+    if (result && typeof result === 'object' && 'code' in result && 'data' in result) {
+      return result.data
+    }
+
+    // 否则直接返回原始数据（兼容非 ApiResponse 格式）
+    return result
   },
   (error) => {
     if (error.response) {

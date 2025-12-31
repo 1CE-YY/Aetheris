@@ -3,7 +3,12 @@
 > vite
 
 
-  VITE v5.4.21  ready in 369 ms
+  VITE v5.4.21  ready in 402 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
+3:38:17 PM [vite] hmr update /src/views/auth/LoginView.vue
+3:39:37 PM [vite] hmr update /src/views/auth/LoginView.vue
+3:39:45 PM [vite] page reload src/router/index.ts
+3:44:00 PM [vite] page reload src/services/api.ts
+3:45:41 PM [vite] hmr update /src/views/auth/LoginView.vue
