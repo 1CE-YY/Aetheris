@@ -1,18 +1,28 @@
 {
   "backend": {
-    "name": "Spring Boot Backend",
     "pid": null,
+    "name": "Aetheris RAG Backend",
     "port": 8080,
-    "log_file": "logs/backend.log",
     "status": "stopped",
+    "startedAt": "2025-12-31T10:19:50+08:00",
+    "healthCheck": "http://localhost:8080/actuator/health",
     "started_at": null
   },
   "frontend": {
-    "name": "Vite Frontend Dev Server",
-    "pid": null,
-    "port": 5173,
-    "log_file": "logs/frontend.log",
     "status": "stopped",
+    "port": 5173,
+    "pid": null,
     "started_at": null
-  }
+  },
+  "infrastructure": {
+    "mysql": {
+      "status": "healthy",
+      "port": 3306
+    },
+    "redis": {
+      "status": "healthy",
+      "port": 6379
+    }
+  },
+  "lastUpdated": "2025-12-31T10:19:50+08:00"
 }

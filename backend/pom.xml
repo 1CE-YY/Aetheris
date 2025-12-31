@@ -159,6 +159,13 @@
       <artifactId>spring-security-crypto</artifactId>
     </dependency>
 
+    <!-- Redisson for Distributed Lock (only core, not starter to avoid conflict) -->
+    <dependency>
+      <groupId>org.redisson</groupId>
+      <artifactId>redisson</artifactId>
+      <version>3.25.0</version>
+    </dependency>
+
     <!-- Document Processing -->
     <dependency>
       <groupId>org.apache.pdfbox</groupId>

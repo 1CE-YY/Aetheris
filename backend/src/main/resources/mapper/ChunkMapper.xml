@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  Copyright 2025 Aetheris RAG Team. All rights reserved.
+-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aetheris.rag.mapper.ChunkMapper">
+
+  <!-- 结果映射 -->
+  <resultMap id="ChunkResultMap" type="com.aetheris.rag.model.Chunk">
+    <id column="id" property="id" jdbcType="BIGINT"/>
+    <result column="resource_id" property="resourceId" jdbcType="BIGINT"/>
+    <result column="chunk_index" property="chunkIndex" jdbcType="INTEGER"/>
+    <result column="chunk_text" property="chunkText" jdbcType="LONGVARCHAR"/>
+    <result column="location_info" property="locationInfo" jdbcType="VARCHAR"/>
+    <result column="page_start" property="pageStart" jdbcType="INTEGER"/>
+    <result column="page_end" property="pageEnd" jdbcType="INTEGER"/>
+    <result column="chapter_path" property="chapterPath" jdbcType="VARCHAR"/>
+    <result column="text_hash" property="textHash" jdbcType="VARCHAR"/>
+    <result column="vectorized" property="vectorized" jdbcType="BOOLEAN"/>
+    <result column="created_at" property="createdAt" jdbcType="TIMESTAMP"/>
+  </resultMap>
+
+  <!-- 插入切片 -->
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO resource_chunks (
+      resource_id,
+      chunk_index,
+      chunk_text,
+      location_info,
+      page_start,
+      page_end,
+      chapter_path,
+      text_hash,
+      vectorized,
+      created_at
+    ) VALUES (
+      #{resourceId},
+      #{chunkIndex},
+      #{chunkText},
+      #{locationInfo},
+      #{pageStart},
+      #{pageEnd},
+      #{chapterPath},
+      #{textHash},
+      #{vectorized},
+      #{createdAt}
+    )
+  </insert>
+
+  <!-- 批量插入切片 -->
+  <insert id="batchInsert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO resource_chunks (
+      resource_id,
+      chunk_index,
+      chunk_text,
+      location_info,
+      page_start,
+      page_end,
+      chapter_path,
+      text_hash,
+      vectorized,
+      created_at
+    ) VALUES
+    <foreach collection="chunks" item="chunk" separator=",">
+      (#{chunk.resourceId},
+       #{chunk.chunkIndex},
+       #{chunk.chunkText},
+       #{chunk.locationInfo},
+       #{chunk.pageStart},
+       #{chunk.pageEnd},
+       #{chunk.chapterPath},
+       #{chunk.textHash},
+       #{chunk.vectorized},
+       #{chunk.createdAt})
+    </foreach>
+  </insert>
+
+  <!-- 根据资源ID查询所有切片 -->
+  <select id="findByResourceId" resultMap="ChunkResultMap">
+    SELECT id,
+           resource_id,
+           chunk_index,
+           chunk_text,
+           location_info,
+           page_start,
+           page_end,
+           chapter_path,
+           text_hash,
+           vectorized,
+           created_at
+    FROM resource_chunks
+    WHERE resource_id = #{resourceId}
+    ORDER BY chunk_index ASC
+  </select>
+
+  <!-- 根据文本哈希查询 -->
+  <select id="findByTextHash" resultMap="ChunkResultMap">
+    SELECT id,
+           resource_id,
+           chunk_index,
+           chunk_text,
+           location_info,
+           page_start,
+           page_end,
+           chapter_path,
+           text_hash,
+           vectorized,
+           created_at
+    FROM resource_chunks
+    WHERE text_hash = #{textHash}
+    LIMIT 1
+  </select>
+
+  <!-- 查询所有未向量化的切片 -->
+  <select id="findUnvectorized" resultMap="ChunkResultMap">
+    SELECT id,
+           resource_id,
+           chunk_index,
+           chunk_text,
+           location_info,
+           page_start,
+           page_end,
+           chapter_path,
+           text_hash,
+           vectorized,
+           created_at
+    FROM resource_chunks
+    WHERE vectorized = FALSE
+    ORDER BY resource_id ASC, chunk_index ASC
+  </select>
+
+  <!-- 根据资源ID查询未向量化的切片 -->
+  <select id="findUnvectorizedByResourceId" resultMap="ChunkResultMap">
+    SELECT id,
+           resource_id,
+           chunk_index,
+           chunk_text,
+           location_info,
+           page_start,
+           page_end,
+           chapter_path,
+           text_hash,
+           vectorized,
+           created_at
+    FROM resource_chunks
+    WHERE resource_id = #{resourceId}
+      AND vectorized = FALSE
+    ORDER BY chunk_index ASC
+  </select>
+
+  <!-- 更新向量化状态 -->
+  <update id="updateVectorized">
+    UPDATE resource_chunks
+    SET vectorized = #{vectorized}
+    WHERE id = #{id}
+  </update>
+
+  <!-- 批量更新向量化状态 -->
+  <update id="batchUpdateVectorized">
+    UPDATE resource_chunks
+    SET vectorized = #{vectorized}
+    WHERE id IN
+    <foreach collection="ids" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </update>
+
+  <!-- 根据资源ID删除所有切片 -->
+  <delete id="deleteByResourceId">
+    DELETE FROM resource_chunks
+    WHERE resource_id = #{resourceId}
+  </delete>
+
+  <!-- 统计资源的切片数量 -->
+  <select id="countByResourceId" resultType="int">
+    SELECT COUNT(*)
+    FROM resource_chunks
+    WHERE resource_id = #{resourceId}
+  </select>
+
+</mapper>

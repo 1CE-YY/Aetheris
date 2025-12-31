@@ -3,18 +3,18 @@
  */
 package com.aetheris.rag.controller;
 
+import com.aetheris.rag.common.response.ApiResponse;
 import com.aetheris.rag.dto.response.BehaviorCountResponse;
 import com.aetheris.rag.dto.response.BehaviorResponse;
 import com.aetheris.rag.exception.BadRequestException;
 import com.aetheris.rag.model.UserBehavior;
 import com.aetheris.rag.service.BehaviorService;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 用户行为控制器
@@ -42,7 +42,7 @@ public class BehaviorController {
     private final BehaviorService behaviorService;
 
     /**
-     * 查询用户最近的行为记录
+     * 查询用户最近的行为记录。
      *
      * <p>用于个人中心展示用户最近的行为历史，包括查询、点击、收藏等行为。
      *
@@ -51,9 +51,8 @@ public class BehaviorController {
      * @return 最近的行为列表，按行为时间倒序排列
      */
     @GetMapping("/recent")
-    public ResponseEntity<List<BehaviorResponse>> getRecentBehaviors(
-            @RequestParam Long userId,
-            @RequestParam(defaultValue = "10") int limit) {
+    public ResponseEntity<ApiResponse<List<BehaviorResponse>>> getRecentBehaviors(
+        @RequestParam Long userId, @RequestParam(defaultValue = "10") int limit) {
 
         log.info("查询用户最近行为: userId={}, limit={}", userId, limit);
 
@@ -70,23 +69,25 @@ public class BehaviorController {
         List<UserBehavior> behaviors = behaviorService.getRecentBehaviors(userId, limit);
 
         // 转换为 DTO
-        List<BehaviorResponse> response = behaviors.stream()
+        List<BehaviorResponse> behaviorResponses =
+            behaviors.stream()
                 .map(BehaviorResponse::fromEntity)
                 .collect(Collectors.toList());
 
         log.info("查询到 {} 条最近行为记录: userId={}", behaviors.size(), userId);
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success(behaviorResponses));
     }
 
     /**
-     * 统计用户查询行为数量
+     * 统计用户查询行为数量。
      *
      * @param userId 用户ID
      * @return 查询行为数量
      */
     @GetMapping("/count/query")
-    public ResponseEntity<BehaviorCountResponse> countQueries(@RequestParam Long userId) {
+    public ResponseEntity<ApiResponse<BehaviorCountResponse>> countQueries(
+        @RequestParam Long userId) {
         log.info("统计用户查询行为数量: userId={}", userId);
 
         if (userId == null || userId <= 0) {
@@ -97,22 +98,21 @@ public class BehaviorController {
         int count = behaviorService.countByType(userId, UserBehavior.BehaviorType.QUERY);
         log.info("用户查询行为统计: userId={}, count={}", userId, count);
 
-        BehaviorCountResponse response = BehaviorCountResponse.builder()
-                .behaviorType("QUERY")
-                .count(count)
-                .build();
+        BehaviorCountResponse countResponse =
+            BehaviorCountResponse.builder().behaviorType("QUERY").count(count).build();
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success(countResponse));
     }
 
     /**
-     * 统计用户点击行为数量
+     * 统计用户点击行为数量。
      *
      * @param userId 用户ID
      * @return 点击行为数量
      */
     @GetMapping("/count/click")
-    public ResponseEntity<BehaviorCountResponse> countClicks(@RequestParam Long userId) {
+    public ResponseEntity<ApiResponse<BehaviorCountResponse>> countClicks(
+        @RequestParam Long userId) {
         log.info("统计用户点击行为数量: userId={}", userId);
 
         if (userId == null || userId <= 0) {
@@ -123,22 +123,21 @@ public class BehaviorController {
         int count = behaviorService.countByType(userId, UserBehavior.BehaviorType.CLICK);
         log.info("用户点击行为统计: userId={}, count={}", userId, count);
 
-        BehaviorCountResponse response = BehaviorCountResponse.builder()
-                .behaviorType("CLICK")
-                .count(count)
-                .build();
+        BehaviorCountResponse countResponse =
+            BehaviorCountResponse.builder().behaviorType("CLICK").count(count).build();
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success(countResponse));
     }
 
     /**
-     * 统计用户收藏行为数量
+     * 统计用户收藏行为数量。
      *
      * @param userId 用户ID
      * @return 收藏行为数量
      */
     @GetMapping("/count/favorite")
-    public ResponseEntity<BehaviorCountResponse> countFavorites(@RequestParam Long userId) {
+    public ResponseEntity<ApiResponse<BehaviorCountResponse>> countFavorites(
+        @RequestParam Long userId) {
         log.info("统计用户收藏行为数量: userId={}", userId);
 
         if (userId == null || userId <= 0) {
@@ -149,11 +148,9 @@ public class BehaviorController {
         int count = behaviorService.countByType(userId, UserBehavior.BehaviorType.FAVORITE);
         log.info("用户收藏行为统计: userId={}, count={}", userId, count);
 
-        BehaviorCountResponse response = BehaviorCountResponse.builder()
-                .behaviorType("FAVORITE")
-                .count(count)
-                .build();
+        BehaviorCountResponse countResponse =
+            BehaviorCountResponse.builder().behaviorType("FAVORITE").count(count).build();
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.success(countResponse));
     }
 }

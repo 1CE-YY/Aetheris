@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+  Copyright 2025 Aetheris RAG Team. All rights reserved.
+-->
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aetheris.rag.mapper.ResourceMapper">
+
+  <!-- 结果映射 -->
+  <resultMap id="ResourceResultMap" type="com.aetheris.rag.model.Resource">
+    <id column="id" property="id" jdbcType="BIGINT"/>
+    <result column="title" property="title" jdbcType="VARCHAR"/>
+    <result column="tags" property="tags" jdbcType="VARCHAR"/>
+    <result column="file_type" property="fileType" jdbcType="VARCHAR"/>
+    <result column="file_path" property="filePath" jdbcType="VARCHAR"/>
+    <result column="file_size" property="fileSize" jdbcType="BIGINT"/>
+    <result column="description" property="description" jdbcType="VARCHAR"/>
+    <result column="content_hash" property="contentHash" jdbcType="VARCHAR"/>
+    <result column="uploaded_by" property="uploadedBy" jdbcType="BIGINT"/>
+    <result column="upload_time" property="uploadTime" jdbcType="TIMESTAMP"/>
+    <result column="chunk_count" property="chunkCount" jdbcType="INTEGER"/>
+    <result column="vectorized" property="vectorized" jdbcType="BOOLEAN"/>
+  </resultMap>
+
+  <!-- 插入资源 -->
+  <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO resources (
+      title,
+      tags,
+      file_type,
+      file_path,
+      file_size,
+      description,
+      content_hash,
+      uploaded_by,
+      upload_time,
+      chunk_count,
+      vectorized
+    ) VALUES (
+      #{title},
+      #{tags},
+      #{fileType},
+      #{filePath},
+      #{fileSize},
+      #{description},
+      #{contentHash},
+      #{uploadedBy},
+      #{uploadTime},
+      #{chunkCount},
+      #{vectorized}
+    )
+  </insert>
+
+  <!-- 根据ID查询 -->
+  <select id="findById" resultMap="ResourceResultMap">
+    SELECT id,
+           title,
+           tags,
+           file_type,
+           file_path,
+           file_size,
+           description,
+           content_hash,
+           uploaded_by,
+           upload_time,
+           chunk_count,
+           vectorized
+    FROM resources
+    WHERE id = #{id}
+  </select>
+
+  <!-- 根据内容哈希查询 -->
+  <select id="findByContentHash" resultMap="ResourceResultMap">
+    SELECT id,
+           title,
+           tags,
+           file_type,
+           file_path,
+           file_size,
+           description,
+           content_hash,
+           uploaded_by,
+           upload_time,
+           chunk_count,
+           vectorized
+    FROM resources
+    WHERE content_hash = #{contentHash}
+  </select>
+
+  <!-- 根据上传者查询 -->
+  <select id="findByUploader" resultMap="ResourceResultMap">
+    SELECT id,
+           title,
+           tags,
+           file_type,
+           file_path,
+           file_size,
+           description,
+           content_hash,
+           uploaded_by,
+           upload_time,
+           chunk_count,
+           vectorized
+    FROM resources
+    WHERE uploaded_by = #{uploadedBy}
+    ORDER BY upload_time DESC
+  </select>
+
+  <!-- 分页查询 -->
+  <select id="findPaged" resultMap="ResourceResultMap">
+    SELECT id,
+           title,
+           tags,
+           file_type,
+           file_path,
+           file_size,
+           description,
+           content_hash,
+           uploaded_by,
+           upload_time,
+           chunk_count,
+           vectorized
+    FROM resources
+    ORDER BY upload_time DESC
+    LIMIT #{offset}, #{limit}
+  </select>
+
+  <!-- 更新切片数量和向量化状态 -->
+  <update id="updateChunkStatus">
+    UPDATE resources
+    SET chunk_count = #{chunkCount},
+        vectorized = #{vectorized}
+    WHERE id = #{id}
+  </update>
+
+  <!-- 统计资源总数 -->
+  <select id="count" resultType="int">
+    SELECT COUNT(*)
+    FROM resources
+  </select>
+
+</mapper>

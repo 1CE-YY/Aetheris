@@ -3,6 +3,7 @@
  */
 package com.aetheris.rag.controller;
 
+import com.aetheris.rag.common.response.ApiResponse;
 import com.aetheris.rag.dto.request.LoginRequest;
 import com.aetheris.rag.dto.request.RegisterRequest;
 import com.aetheris.rag.dto.response.AuthResponse;
@@ -44,10 +45,14 @@ public class AuthController {
    * @return 包含 token 的认证响应
    */
   @PostMapping("/register")
-  public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+  public ResponseEntity<ApiResponse<AuthResponse>> register(
+      @Valid @RequestBody RegisterRequest request) {
     log.info("POST /api/auth/register - username: {}", request.getUsername());
 
-    AuthResponse response = authService.register(request);
+    AuthResponse authResponse = authService.register(request);
+    ApiResponse<AuthResponse> response =
+        ApiResponse.success(authResponse, "注册成功");
+
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
@@ -58,10 +63,14 @@ public class AuthController {
    * @return 包含 token 的认证响应
    */
   @PostMapping("/login")
-  public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
+  public ResponseEntity<ApiResponse<AuthResponse>> login(
+      @Valid @RequestBody LoginRequest request) {
     log.info("POST /api/auth/login - email: {}", request.getEmail());
 
-    AuthResponse response = authService.login(request);
+    AuthResponse authResponse = authService.login(request);
+    ApiResponse<AuthResponse> response =
+        ApiResponse.success(authResponse, "登录成功");
+
     return ResponseEntity.ok(response);
   }
 
@@ -73,11 +82,14 @@ public class AuthController {
    * @return 当前用户信息
    */
   @GetMapping("/me")
-  public ResponseEntity<UserResponse> getCurrentUser(Authentication authentication) {
+  public ResponseEntity<ApiResponse<UserResponse>> getCurrentUser(
+      Authentication authentication) {
     Long userId = (Long) authentication.getPrincipal();
     log.info("GET /api/auth/me - userId: {}", userId);
 
-    UserResponse response = authService.getCurrentUser(userId);
+    UserResponse userResponse = authService.getCurrentUser(userId);
+    ApiResponse<UserResponse> response = ApiResponse.success(userResponse);
+
     return ResponseEntity.ok(response);
   }
 }

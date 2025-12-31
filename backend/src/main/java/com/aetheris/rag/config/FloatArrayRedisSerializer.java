@@ -1,5 +1,6 @@
 package com.aetheris.rag.config;
 
+import com.aetheris.rag.exception.InternalServerException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class FloatArrayRedisSerializer implements RedisSerializer<float[]> {
       oos.flush();
       return bos.toByteArray();
     } catch (IOException e) {
-      throw new RuntimeException("Failed to serialize float array", e);
+      throw new InternalServerException("浮点数组序列化失败", e);
     }
   }
 
@@ -47,9 +48,9 @@ public class FloatArrayRedisSerializer implements RedisSerializer<float[]> {
       if (obj instanceof float[]) {
         return (float[]) obj;
       }
-      throw new RuntimeException("Deserialized object is not a float array");
+      throw new InternalServerException("反序列化对象不是浮点数组类型");
     } catch (IOException | ClassNotFoundException e) {
-      throw new RuntimeException("Failed to deserialize float array", e);
+      throw new InternalServerException("浮点数组反序列化失败", e);
     }
   }
 }

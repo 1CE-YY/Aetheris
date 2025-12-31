@@ -1,5 +1,6 @@
 package com.aetheris.rag.util;
 
+import com.aetheris.rag.exception.InternalServerException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -18,7 +19,7 @@ public final class HashUtil {
     try {
       SHA_256_DIGEST = MessageDigest.getInstance("SHA-256");
     } catch (NoSuchAlgorithmException e) {
-      throw new RuntimeException("SHA-256 algorithm not available", e);
+      throw new InternalServerException("SHA-256 算法不可用", e);
     }
   }
 
@@ -39,6 +40,30 @@ public final class HashUtil {
 
     String normalized = normalizeText(text);
     byte[] hash = SHA_256_DIGEST.digest(normalized.getBytes(StandardCharsets.UTF_8));
+    return bytesToHex(hash);
+  }
+
+  /**
+   * 计算文本的 SHA-256 哈希（别名方法）。
+   *
+   * @param text 要哈希的文本
+   * @return 十六进制哈希字符串
+   */
+  public static String sha256(String text) {
+    return hashText(text);
+  }
+
+  /**
+   * 计算字节数组的 SHA-256 哈希。
+   *
+   * @param data 要哈希的字节数组
+   * @return 十六进制哈希字符串
+   */
+  public static String sha256(byte[] data) {
+    if (data == null) {
+      return null;
+    }
+    byte[] hash = SHA_256_DIGEST.digest(data);
     return bytesToHex(hash);
   }
 

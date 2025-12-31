@@ -11,23 +11,13 @@
 [INFO] Copying 3 resources from src/main/resources to target/classes
 [INFO] 
 [INFO] --- maven-compiler-plugin:3.11.0:compile (default-compile) @ rag-backend ---
-[INFO] Changes detected - recompiling the module! :source
-[INFO] Compiling 45 source files with javac [debug release 21] to target/classes
-[INFO] 由于在类路径中发现了一个或多个处理程序，因此启用了
-  批注处理。未来发行版的 javac 可能会禁用批注处理，
-  除非至少按名称指定了一个处理程序 (-processor)，
-  或指定了搜索路径 (--processor-path, --processor-module-path)，
-  或显式启用了批注处理 (-proc:only, -proc:full)。
-  可使用 -Xlint:-options 隐藏此消息。
-  可使用 -proc:none 禁用批注处理。
-[INFO] /Users/hubin5/app/Aetheris/backend/src/main/java/com/aetheris/rag/util/JwtUtil.java: /Users/hubin5/app/Aetheris/backend/src/main/java/com/aetheris/rag/util/JwtUtil.java使用或覆盖了已过时的 API。
-[INFO] /Users/hubin5/app/Aetheris/backend/src/main/java/com/aetheris/rag/util/JwtUtil.java: 有关详细信息, 请使用 -Xlint:deprecation 重新编译。
+[INFO] Nothing to compile - all classes are up to date
 [INFO] 
 [INFO] --- maven-resources-plugin:3.3.1:testResources (default-testResources) @ rag-backend ---
 [INFO] skip non existing resourceDirectory /Users/hubin5/app/Aetheris/backend/src/test/resources
 [INFO] 
 [INFO] --- maven-compiler-plugin:3.11.0:testCompile (default-testCompile) @ rag-backend ---
-[INFO] Changes detected - recompiling the module! :dependency
+[INFO] Changes detected - recompiling the module! :source
 [INFO] Compiling 11 source files with javac [debug release 21] to target/test-classes
 [INFO] 由于在类路径中发现了一个或多个处理程序，因此启用了
   批注处理。未来发行版的 javac 可能会禁用批注处理，
@@ -55,572 +45,67 @@ Standard Commons Logging discovery in action with spring-jcl: please remove comm
 
  :: Spring Boot ::                (v3.5.9)
 
-2025-12-30 14:09:34.978 [main] INFO  c.a.rag.AetherisRagApplication - Starting AetherisRagApplication using Java 21.0.8 with PID 11592 (/Users/hubin5/app/Aetheris/backend/target/classes started by hubin5 in /Users/hubin5/app/Aetheris/backend)
-2025-12-30 14:09:34.979 [main] DEBUG c.a.rag.AetherisRagApplication - Running with Spring Boot v3.5.9, Spring v6.2.15
-2025-12-30 14:09:34.980 [main] INFO  c.a.rag.AetherisRagApplication - No active profile set, falling back to 1 default profile: "default"
-2025-12-30 14:09:35.791 [main] DEBUG o.m.s.b.a.MybatisAutoConfiguration - Searching for mappers annotated with @Mapper
-2025-12-30 14:09:35.791 [main] DEBUG o.m.s.b.a.MybatisAutoConfiguration - Using auto-configuration base package 'com.aetheris.rag'
-2025-12-30 14:09:35.993 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
-2025-12-30 14:09:35.996 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
-2025-12-30 14:09:36.022 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 10 ms. Found 0 Redis repository interfaces.
-2025-12-30 14:09:36.111 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [/Users/hubin5/app/Aetheris/backend/target/classes/com/aetheris/rag/mapper/UserBehaviorMapper.class]
-2025-12-30 14:09:36.112 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [/Users/hubin5/app/Aetheris/backend/target/classes/com/aetheris/rag/mapper/UserMapper.class]
-2025-12-30 14:09:36.112 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'userBehaviorMapper' and 'com.aetheris.rag.mapper.UserBehaviorMapper' mapperInterface
-2025-12-30 14:09:36.114 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'userMapper' and 'com.aetheris.rag.mapper.UserMapper' mapperInterface
-2025-12-30 14:09:36.593 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
-2025-12-30 14:09:36.606 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
-2025-12-30 14:09:36.606 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.50]
-2025-12-30 14:09:36.645 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
-2025-12-30 14:09:36.646 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1633 ms
+2025-12-31 09:46:52.094 [main] INFO  c.a.rag.AetherisRagApplication - Starting AetherisRagApplication using Java 21.0.8 with PID 2709 (/Users/hubin5/app/Aetheris/backend/target/classes started by hubin5 in /Users/hubin5/app/Aetheris/backend)
+2025-12-31 09:46:52.098 [main] DEBUG c.a.rag.AetherisRagApplication - Running with Spring Boot v3.5.9, Spring v6.2.15
+2025-12-31 09:46:52.099 [main] INFO  c.a.rag.AetherisRagApplication - No active profile set, falling back to 1 default profile: "default"
+2025-12-31 09:46:52.823 [main] DEBUG o.m.s.b.a.MybatisAutoConfiguration - Searching for mappers annotated with @Mapper
+2025-12-31 09:46:52.823 [main] DEBUG o.m.s.b.a.MybatisAutoConfiguration - Using auto-configuration base package 'com.aetheris.rag'
+2025-12-31 09:46:52.999 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2025-12-31 09:46:53.002 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2025-12-31 09:46:53.030 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 11 ms. Found 0 Redis repository interfaces.
+2025-12-31 09:46:53.124 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [/Users/hubin5/app/Aetheris/backend/target/classes/com/aetheris/rag/mapper/UserBehaviorMapper.class]
+2025-12-31 09:46:53.124 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: file [/Users/hubin5/app/Aetheris/backend/target/classes/com/aetheris/rag/mapper/UserMapper.class]
+2025-12-31 09:46:53.125 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'userBehaviorMapper' and 'com.aetheris.rag.mapper.UserBehaviorMapper' mapperInterface
+2025-12-31 09:46:53.126 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'userMapper' and 'com.aetheris.rag.mapper.UserMapper' mapperInterface
+2025-12-31 09:46:53.616 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2025-12-31 09:46:53.631 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2025-12-31 09:46:53.631 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.50]
+2025-12-31 09:46:53.690 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2025-12-31 09:46:53.691 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 1554 ms
 Standard Commons Logging discovery in action with spring-jcl: please remove commons-logging.jar from classpath in order to avoid potential conflicts
-2025-12-30 14:09:36.796 [main] INFO  com.aetheris.rag.util.JwtUtil - Initialized JwtUtil with expiration: 86400 ms
-2025-12-30 14:09:37.019 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
-2025-12-30 14:09:37.184 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@236fd411
-2025-12-30 14:09:37.187 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
-2025-12-30 14:09:37.227 [main] INFO  org.flywaydb.core.FlywayExecutor - Database: jdbc:mysql://localhost:3306/aetheris_rag?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true (MySQL 8.0)
-2025-12-30 14:09:37.564 [main] INFO  o.f.core.internal.command.DbValidate - Successfully validated 2 migrations (execution time 00:00.026s)
-2025-12-30 14:09:37.581 [main] INFO  o.f.core.internal.command.DbMigrate - Current version of schema `aetheris_rag`: 1
-2025-12-30 14:09:37.583 [main] INFO  o.f.core.internal.command.DbMigrate - Schema `aetheris_rag` is up to date. No migration necessary.
-2025-12-30 14:09:37.736 [main] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [/Users/hubin5/app/Aetheris/backend/target/classes/mapper/UserBehaviorMapper.xml]'
-2025-12-30 14:09:37.747 [main] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [/Users/hubin5/app/Aetheris/backend/target/classes/mapper/UserMapper.xml]'
-2025-12-30 14:09:38.054 [main] INFO  c.a.rag.gateway.cache.EmbeddingCache - Initialized EmbeddingCache with TTL: 30 days
-2025-12-30 14:09:38.322 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 4 endpoints beneath base path '/actuator'
-2025-12-30 14:09:38.351 [main] WARN  o.s.b.a.s.s.UserDetailsServiceAutoConfiguration - 
+2025-12-31 09:46:53.860 [main] INFO  com.aetheris.rag.util.JwtUtil - Initialized JwtUtil with expiration: 86400 ms
+2025-12-31 09:46:54.042 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2025-12-31 09:46:54.222 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@53525379
+2025-12-31 09:46:54.224 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2025-12-31 09:46:54.274 [main] INFO  org.flywaydb.core.FlywayExecutor - Database: jdbc:mysql://localhost:3306/aetheris_rag?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true (MySQL 8.0)
+2025-12-31 09:46:54.688 [main] INFO  o.f.core.internal.command.DbValidate - Successfully validated 2 migrations (execution time 00:00.049s)
+2025-12-31 09:46:54.708 [main] INFO  o.f.core.internal.command.DbMigrate - Current version of schema `aetheris_rag`: 1
+2025-12-31 09:46:54.713 [main] INFO  o.f.core.internal.command.DbMigrate - Schema `aetheris_rag` is up to date. No migration necessary.
+2025-12-31 09:46:54.965 [main] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [/Users/hubin5/app/Aetheris/backend/target/classes/mapper/UserBehaviorMapper.xml]'
+2025-12-31 09:46:54.976 [main] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'file [/Users/hubin5/app/Aetheris/backend/target/classes/mapper/UserMapper.xml]'
+2025-12-31 09:46:55.372 [main] INFO  c.a.rag.gateway.cache.EmbeddingCache - Initialized EmbeddingCache with TTL: 30 days
+2025-12-31 09:46:55.675 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 4 endpoints beneath base path '/actuator'
+2025-12-31 09:46:55.706 [main] WARN  o.s.b.a.s.s.UserDetailsServiceAutoConfiguration - 
 
-Using generated security password: 68f602ad-4abb-4077-ba26-9e4f21351f15
+Using generated security password: 3e892f97-0a90-4617-95cb-792db2da78ce
 
 This generated password is for development use only. Your security configuration must be updated before running your application in production.
 
-2025-12-30 14:09:38.358 [main] INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
-2025-12-30 14:09:38.541 [main] DEBUG o.m.s.b.a.MybatisAutoConfiguration - Not found configuration for registering mapper bean using @MapperScan, MapperFactoryBean and MapperScannerConfigurer.
-2025-12-30 14:09:38.747 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
-2025-12-30 14:09:38.759 [main] INFO  c.a.rag.AetherisRagApplication - Started AetherisRagApplication in 4.24 seconds (process running for 4.617)
-2025-12-30 14:09:58.749 [tomcat-handler-0] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
-2025-12-30 14:09:58.750 [tomcat-handler-0] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
-2025-12-30 14:09:58.751 [tomcat-handler-0] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
-2025-12-30 14:22:08.054 [tomcat-handler-6] WARN  c.a.r.e.GlobalExceptionHandler - 参数校验失败: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.aetheris.rag.dto.response.AuthResponse> com.aetheris.rag.controller.AuthController.login(com.aetheris.rag.dto.request.LoginRequest): [Field error in object 'loginRequest' on field 'email': rejected value [null]; codes [NotBlank.loginRequest.email,NotBlank.email,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [loginRequest.email,email]; arguments []; default message [email]]; default message [Email is required]] 
-2025-12-30 14:22:17.684 [tomcat-handler-7] WARN  c.a.r.e.GlobalExceptionHandler - 参数校验失败: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.aetheris.rag.dto.response.AuthResponse> com.aetheris.rag.controller.AuthController.login(com.aetheris.rag.dto.request.LoginRequest): [Field error in object 'loginRequest' on field 'email': rejected value [null]; codes [NotBlank.loginRequest.email,NotBlank.email,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [loginRequest.email,email]; arguments []; default message [email]]; default message [Email is required]] 
-2025-12-30 14:22:21.815 [tomcat-handler-8] WARN  c.a.r.e.GlobalExceptionHandler - 参数校验失败: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.aetheris.rag.dto.response.AuthResponse> com.aetheris.rag.controller.AuthController.login(com.aetheris.rag.dto.request.LoginRequest): [Field error in object 'loginRequest' on field 'email': rejected value [null]; codes [NotBlank.loginRequest.email,NotBlank.email,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [loginRequest.email,email]; arguments []; default message [email]]; default message [Email is required]] 
-2025-12-30 14:22:38.531 [tomcat-handler-9] WARN  c.a.r.e.GlobalExceptionHandler - 参数校验失败: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.aetheris.rag.dto.response.AuthResponse> com.aetheris.rag.controller.AuthController.login(com.aetheris.rag.dto.request.LoginRequest): [Field error in object 'loginRequest' on field 'email': rejected value [null]; codes [NotBlank.loginRequest.email,NotBlank.email,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [loginRequest.email,email]; arguments []; default message [email]]; default message [Email is required]] 
-2025-12-30 14:22:59.495 [tomcat-handler-10] WARN  c.a.r.e.GlobalExceptionHandler - 参数校验失败: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.aetheris.rag.dto.response.AuthResponse> com.aetheris.rag.controller.AuthController.login(com.aetheris.rag.dto.request.LoginRequest): [Field error in object 'loginRequest' on field 'email': rejected value [null]; codes [NotBlank.loginRequest.email,NotBlank.email,NotBlank.java.lang.String,NotBlank]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [loginRequest.email,email]; arguments []; default message [email]]; default message [Email is required]] 
-2025-12-30 14:26:38.212 [tomcat-handler-11] INFO  c.a.rag.controller.AuthController - POST /api/auth/login - email: admin@aetheris.com
-2025-12-30 14:26:38.213 [tomcat-handler-11] INFO  c.a.rag.service.impl.AuthServiceImpl - 用户登录尝试: admin@aetheris.com
-2025-12-30 14:26:38.228 [tomcat-handler-11] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:26:38.234 [tomcat-handler-11] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@9df58ae] was not registered for synchronization because synchronization is not active
-2025-12-30 14:26:38.243 [tomcat-handler-11] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@721911236 wrapping com.mysql.cj.jdbc.ConnectionImpl@236fd411] will not be managed by Spring
-2025-12-30 14:26:38.245 [tomcat-handler-11] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==>  Preparing: SELECT id, username, email, password_hash, created_at, updated_at, last_active_at FROM users WHERE email = ?
-2025-12-30 14:26:38.257 [tomcat-handler-11] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==> Parameters: admin@aetheris.com(String)
-2025-12-30 14:26:38.278 [tomcat-handler-11] DEBUG c.a.r.mapper.UserMapper.findByEmail - <==      Total: 1
-2025-12-30 14:26:38.279 [tomcat-handler-11] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@9df58ae]
-2025-12-30 14:26:38.364 [tomcat-handler-11] WARN  c.a.r.e.GlobalExceptionHandler - 未授权访问: 邮箱或密码错误
-2025-12-30 14:26:59.080 [tomcat-handler-12] INFO  c.a.rag.controller.AuthController - POST /api/auth/login - email: admin@aethries.com
-2025-12-30 14:26:59.080 [tomcat-handler-12] INFO  c.a.rag.service.impl.AuthServiceImpl - 用户登录尝试: admin@aethries.com
-2025-12-30 14:26:59.080 [tomcat-handler-12] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:26:59.080 [tomcat-handler-12] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@245af4a2] was not registered for synchronization because synchronization is not active
-2025-12-30 14:26:59.082 [tomcat-handler-12] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@744981132 wrapping com.mysql.cj.jdbc.ConnectionImpl@236fd411] will not be managed by Spring
-2025-12-30 14:26:59.082 [tomcat-handler-12] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==>  Preparing: SELECT id, username, email, password_hash, created_at, updated_at, last_active_at FROM users WHERE email = ?
-2025-12-30 14:26:59.082 [tomcat-handler-12] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==> Parameters: admin@aethries.com(String)
-2025-12-30 14:26:59.084 [tomcat-handler-12] DEBUG c.a.r.mapper.UserMapper.findByEmail - <==      Total: 0
-2025-12-30 14:26:59.084 [tomcat-handler-12] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@245af4a2]
-2025-12-30 14:26:59.085 [tomcat-handler-12] WARN  c.a.r.e.GlobalExceptionHandler - 未授权访问: 邮箱或密码错误
-2025-12-30 14:28:51.293 [tomcat-handler-13] INFO  c.a.rag.controller.AuthController - POST /api/auth/login - email: admin@aetheris.com
-2025-12-30 14:28:51.294 [tomcat-handler-13] INFO  c.a.rag.service.impl.AuthServiceImpl - 用户登录尝试: admin@aetheris.com
-2025-12-30 14:28:51.294 [tomcat-handler-13] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:28:51.294 [tomcat-handler-13] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f0a237f] was not registered for synchronization because synchronization is not active
-2025-12-30 14:28:51.295 [tomcat-handler-13] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1104008430 wrapping com.mysql.cj.jdbc.ConnectionImpl@236fd411] will not be managed by Spring
-2025-12-30 14:28:51.296 [tomcat-handler-13] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==>  Preparing: SELECT id, username, email, password_hash, created_at, updated_at, last_active_at FROM users WHERE email = ?
-2025-12-30 14:28:51.296 [tomcat-handler-13] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==> Parameters: admin@aetheris.com(String)
-2025-12-30 14:28:51.298 [tomcat-handler-13] DEBUG c.a.r.mapper.UserMapper.findByEmail - <==      Total: 1
-2025-12-30 14:28:51.298 [tomcat-handler-13] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f0a237f]
-2025-12-30 14:28:51.378 [tomcat-handler-13] WARN  c.a.r.e.GlobalExceptionHandler - 未授权访问: 邮箱或密码错误
-2025-12-30 14:36:14.172 [tomcat-handler-14] INFO  c.a.rag.controller.AuthController - POST /api/auth/login - email: admin@aetheris.com
-2025-12-30 14:36:14.172 [tomcat-handler-14] INFO  c.a.rag.service.impl.AuthServiceImpl - 用户登录尝试: admin@aetheris.com
-2025-12-30 14:36:14.173 [tomcat-handler-14] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:36:14.173 [tomcat-handler-14] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@55e3b89c] was not registered for synchronization because synchronization is not active
-2025-12-30 14:36:14.174 [tomcat-handler-14] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1529109584 wrapping com.mysql.cj.jdbc.ConnectionImpl@5f1bd3ec] will not be managed by Spring
-2025-12-30 14:36:14.174 [tomcat-handler-14] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==>  Preparing: SELECT id, username, email, password_hash, created_at, updated_at, last_active_at FROM users WHERE email = ?
-2025-12-30 14:36:14.175 [tomcat-handler-14] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==> Parameters: admin@aetheris.com(String)
-2025-12-30 14:36:14.176 [tomcat-handler-14] DEBUG c.a.r.mapper.UserMapper.findByEmail - <==      Total: 1
-2025-12-30 14:36:14.177 [tomcat-handler-14] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@55e3b89c]
-2025-12-30 14:36:14.254 [tomcat-handler-14] WARN  c.a.r.e.GlobalExceptionHandler - 未授权访问: 邮箱或密码错误
-2025-12-30 14:39:50.593 [tomcat-handler-16] WARN  c.a.r.e.GlobalExceptionHandler - 参数校验失败: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.aetheris.rag.dto.response.AuthResponse> com.aetheris.rag.controller.AuthController.register(com.aetheris.rag.dto.request.RegisterRequest): [Field error in object 'registerRequest' on field 'password': rejected value [test123]; codes [Size.registerRequest.password,Size.password,Size.java.lang.String,Size]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [registerRequest.password,password]; arguments []; default message [password],100,8]; default message [Password must be between 8 and 100 characters]] 
-2025-12-30 14:39:57.963 [tomcat-handler-17] INFO  c.a.rag.controller.AuthController - POST /api/auth/register - username: testuser
-2025-12-30 14:39:57.974 [tomcat-handler-17] INFO  c.a.rag.service.impl.AuthServiceImpl - 注册新用户: testuser
-2025-12-30 14:39:57.974 [tomcat-handler-17] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:39:57.974 [tomcat-handler-17] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@60bc7c09]
-2025-12-30 14:39:57.975 [tomcat-handler-17] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1370400356 wrapping com.mysql.cj.jdbc.ConnectionImpl@52c33a14] will be managed by Spring
-2025-12-30 14:39:57.975 [tomcat-handler-17] DEBUG c.a.r.mapper.UserMapper.emailExists - ==>  Preparing: SELECT COUNT(*) > 0 FROM users WHERE email = ?
-2025-12-30 14:39:57.975 [tomcat-handler-17] DEBUG c.a.r.mapper.UserMapper.emailExists - ==> Parameters: test@example.com(String)
-2025-12-30 14:39:57.978 [tomcat-handler-17] DEBUG c.a.r.mapper.UserMapper.emailExists - <==      Total: 1
-2025-12-30 14:39:57.979 [tomcat-handler-17] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@60bc7c09]
-2025-12-30 14:39:57.979 [tomcat-handler-17] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@60bc7c09]
-2025-12-30 14:39:57.979 [tomcat-handler-17] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@60bc7c09]
-2025-12-30 14:39:57.982 [tomcat-handler-17] WARN  c.a.r.e.GlobalExceptionHandler - 业务异常: code=CONFLICT, message=邮箱已被注册
-2025-12-30 14:40:07.046 [tomcat-handler-19] INFO  c.a.rag.controller.AuthController - POST /api/auth/register - username: testuser02
-2025-12-30 14:40:07.048 [tomcat-handler-19] INFO  c.a.rag.service.impl.AuthServiceImpl - 注册新用户: testuser02
-2025-12-30 14:40:07.049 [tomcat-handler-19] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:40:07.049 [tomcat-handler-19] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7bf0a68]
-2025-12-30 14:40:07.049 [tomcat-handler-19] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@744726730 wrapping com.mysql.cj.jdbc.ConnectionImpl@52c33a14] will be managed by Spring
-2025-12-30 14:40:07.049 [tomcat-handler-19] DEBUG c.a.r.mapper.UserMapper.emailExists - ==>  Preparing: SELECT COUNT(*) > 0 FROM users WHERE email = ?
-2025-12-30 14:40:07.049 [tomcat-handler-19] DEBUG c.a.r.mapper.UserMapper.emailExists - ==> Parameters: testuser02@example.com(String)
-2025-12-30 14:40:07.051 [tomcat-handler-19] DEBUG c.a.r.mapper.UserMapper.emailExists - <==      Total: 1
-2025-12-30 14:40:07.051 [tomcat-handler-19] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7bf0a68]
-2025-12-30 14:40:07.051 [tomcat-handler-19] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7bf0a68] from current transaction
-2025-12-30 14:40:07.051 [tomcat-handler-19] DEBUG c.a.r.m.UserMapper.usernameExists - ==>  Preparing: SELECT COUNT(*) > 0 FROM users WHERE username = ?
-2025-12-30 14:40:07.051 [tomcat-handler-19] DEBUG c.a.r.m.UserMapper.usernameExists - ==> Parameters: testuser02(String)
-2025-12-30 14:40:07.053 [tomcat-handler-19] DEBUG c.a.r.m.UserMapper.usernameExists - <==      Total: 1
-2025-12-30 14:40:07.053 [tomcat-handler-19] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7bf0a68]
-2025-12-30 14:40:07.132 [tomcat-handler-19] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7bf0a68] from current transaction
-2025-12-30 14:40:07.133 [tomcat-handler-19] DEBUG c.a.rag.mapper.UserMapper.insert - ==>  Preparing: INSERT INTO users (username, email, password_hash, created_at, updated_at, last_active_at) VALUES (?, ?, ?, ?, ?, ?)
-2025-12-30 14:40:07.134 [tomcat-handler-19] DEBUG c.a.rag.mapper.UserMapper.insert - ==> Parameters: testuser02(String), testuser02@example.com(String), $2a$10$0GshKPGXqXyihq7bRaYwve3RHJkeN4KFnGBUTPURJO6X6TKG5XSia(String), 2025-12-30 14:40:07.132142(Timestamp), 2025-12-30 14:40:07.132144(Timestamp), 2025-12-30 14:40:07.132145(Timestamp)
-2025-12-30 14:40:07.141 [tomcat-handler-19] DEBUG c.a.rag.mapper.UserMapper.insert - <==    Updates: 1
-2025-12-30 14:40:07.143 [tomcat-handler-19] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7bf0a68]
-2025-12-30 14:40:07.143 [tomcat-handler-19] INFO  c.a.rag.service.impl.AuthServiceImpl - User registered successfully: 6
-2025-12-30 14:40:07.220 [tomcat-handler-19] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7bf0a68]
-2025-12-30 14:40:07.220 [tomcat-handler-19] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7bf0a68]
-2025-12-30 14:40:07.220 [tomcat-handler-19] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7bf0a68]
-2025-12-30 14:40:14.274 [tomcat-handler-21] INFO  c.a.rag.controller.AuthController - POST /api/auth/login - email: testuser02@example.com
-2025-12-30 14:40:14.274 [tomcat-handler-21] INFO  c.a.rag.service.impl.AuthServiceImpl - 用户登录尝试: testuser02@example.com
-2025-12-30 14:40:14.274 [tomcat-handler-21] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:40:14.274 [tomcat-handler-21] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@281f7bea] was not registered for synchronization because synchronization is not active
-2025-12-30 14:40:14.275 [tomcat-handler-21] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1169316226 wrapping com.mysql.cj.jdbc.ConnectionImpl@52c33a14] will not be managed by Spring
-2025-12-30 14:40:14.275 [tomcat-handler-21] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==>  Preparing: SELECT id, username, email, password_hash, created_at, updated_at, last_active_at FROM users WHERE email = ?
-2025-12-30 14:40:14.276 [tomcat-handler-21] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==> Parameters: testuser02@example.com(String)
-2025-12-30 14:40:14.278 [tomcat-handler-21] DEBUG c.a.r.mapper.UserMapper.findByEmail - <==      Total: 1
-2025-12-30 14:40:14.278 [tomcat-handler-21] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@281f7bea]
-2025-12-30 14:40:14.362 [tomcat-handler-21] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:40:14.363 [tomcat-handler-21] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@152c7edd] was not registered for synchronization because synchronization is not active
-2025-12-30 14:40:14.363 [tomcat-handler-21] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1178572729 wrapping com.mysql.cj.jdbc.ConnectionImpl@52c33a14] will not be managed by Spring
-2025-12-30 14:40:14.363 [tomcat-handler-21] DEBUG c.a.r.m.UserMapper.updateLastActive - ==>  Preparing: UPDATE users SET last_active_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
-2025-12-30 14:40:14.365 [tomcat-handler-21] DEBUG c.a.r.m.UserMapper.updateLastActive - ==> Parameters: 2025-12-30 14:40:14.362824(Timestamp), 6(Long)
-2025-12-30 14:40:14.370 [tomcat-handler-21] DEBUG c.a.r.m.UserMapper.updateLastActive - <==    Updates: 1
-2025-12-30 14:40:14.370 [tomcat-handler-21] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@152c7edd]
-2025-12-30 14:40:14.370 [tomcat-handler-21] INFO  c.a.rag.service.impl.AuthServiceImpl - User logged in successfully: 6
-2025-12-30 14:41:28.330 [tomcat-handler-23] INFO  c.a.rag.controller.AuthController - POST /api/auth/login - email: testuser02@example.com
-2025-12-30 14:41:28.331 [tomcat-handler-23] INFO  c.a.rag.service.impl.AuthServiceImpl - 用户登录尝试: testuser02@example.com
-2025-12-30 14:41:28.331 [tomcat-handler-23] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:41:28.331 [tomcat-handler-23] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f4fb015] was not registered for synchronization because synchronization is not active
-2025-12-30 14:41:28.333 [tomcat-handler-23] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1099454348 wrapping com.mysql.cj.jdbc.ConnectionImpl@52c33a14] will not be managed by Spring
-2025-12-30 14:41:28.333 [tomcat-handler-23] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==>  Preparing: SELECT id, username, email, password_hash, created_at, updated_at, last_active_at FROM users WHERE email = ?
-2025-12-30 14:41:28.333 [tomcat-handler-23] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==> Parameters: testuser02@example.com(String)
-2025-12-30 14:41:28.336 [tomcat-handler-23] DEBUG c.a.r.mapper.UserMapper.findByEmail - <==      Total: 1
-2025-12-30 14:41:28.336 [tomcat-handler-23] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4f4fb015]
-2025-12-30 14:41:28.416 [tomcat-handler-23] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:41:28.416 [tomcat-handler-23] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@b55db7] was not registered for synchronization because synchronization is not active
-2025-12-30 14:41:28.416 [tomcat-handler-23] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@852003500 wrapping com.mysql.cj.jdbc.ConnectionImpl@52c33a14] will not be managed by Spring
-2025-12-30 14:41:28.417 [tomcat-handler-23] DEBUG c.a.r.m.UserMapper.updateLastActive - ==>  Preparing: UPDATE users SET last_active_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
-2025-12-30 14:41:28.417 [tomcat-handler-23] DEBUG c.a.r.m.UserMapper.updateLastActive - ==> Parameters: 2025-12-30 14:41:28.416664(Timestamp), 6(Long)
-2025-12-30 14:41:28.422 [tomcat-handler-23] DEBUG c.a.r.m.UserMapper.updateLastActive - <==    Updates: 1
-2025-12-30 14:41:28.422 [tomcat-handler-23] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@b55db7]
-2025-12-30 14:41:28.422 [tomcat-handler-23] INFO  c.a.rag.service.impl.AuthServiceImpl - User logged in successfully: 6
-2025-12-30 14:47:58.593 [tomcat-handler-24] INFO  c.a.rag.controller.AuthController - POST /api/auth/login - email: testuser02@example.com
-2025-12-30 14:47:58.594 [tomcat-handler-24] INFO  c.a.rag.service.impl.AuthServiceImpl - 用户登录尝试: testuser02@example.com
-2025-12-30 14:47:58.595 [tomcat-handler-24] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:47:58.595 [tomcat-handler-24] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@29a6697a] was not registered for synchronization because synchronization is not active
-2025-12-30 14:47:58.596 [tomcat-handler-24] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@660705854 wrapping com.mysql.cj.jdbc.ConnectionImpl@52c33a14] will not be managed by Spring
-2025-12-30 14:47:58.597 [tomcat-handler-24] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==>  Preparing: SELECT id, username, email, password_hash, created_at, updated_at, last_active_at FROM users WHERE email = ?
-2025-12-30 14:47:58.597 [tomcat-handler-24] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==> Parameters: testuser02@example.com(String)
-2025-12-30 14:47:58.599 [tomcat-handler-24] DEBUG c.a.r.mapper.UserMapper.findByEmail - <==      Total: 1
-2025-12-30 14:47:58.599 [tomcat-handler-24] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@29a6697a]
-2025-12-30 14:47:58.682 [tomcat-handler-24] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:47:58.682 [tomcat-handler-24] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@665c9805] was not registered for synchronization because synchronization is not active
-2025-12-30 14:47:58.682 [tomcat-handler-24] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@2091634701 wrapping com.mysql.cj.jdbc.ConnectionImpl@52c33a14] will not be managed by Spring
-2025-12-30 14:47:58.682 [tomcat-handler-24] DEBUG c.a.r.m.UserMapper.updateLastActive - ==>  Preparing: UPDATE users SET last_active_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
-2025-12-30 14:47:58.683 [tomcat-handler-24] DEBUG c.a.r.m.UserMapper.updateLastActive - ==> Parameters: 2025-12-30 14:47:58.682433(Timestamp), 6(Long)
-2025-12-30 14:47:58.687 [tomcat-handler-24] DEBUG c.a.r.m.UserMapper.updateLastActive - <==    Updates: 1
-2025-12-30 14:47:58.687 [tomcat-handler-24] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@665c9805]
-2025-12-30 14:47:58.687 [tomcat-handler-24] INFO  c.a.rag.service.impl.AuthServiceImpl - User logged in successfully: 6
-2025-12-30 14:52:40.857 [tomcat-handler-25] WARN  c.a.r.e.GlobalExceptionHandler - 参数校验失败: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.aetheris.rag.dto.response.AuthResponse> com.aetheris.rag.controller.AuthController.register(com.aetheris.rag.dto.request.RegisterRequest): [Field error in object 'registerRequest' on field 'password': rejected value [123qwe]; codes [Size.registerRequest.password,Size.password,Size.java.lang.String,Size]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [registerRequest.password,password]; arguments []; default message [password],100,8]; default message [Password must be between 8 and 100 characters]] 
-2025-12-30 14:52:48.355 [tomcat-handler-26] WARN  c.a.r.e.GlobalExceptionHandler - 参数校验失败: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.aetheris.rag.dto.response.AuthResponse> com.aetheris.rag.controller.AuthController.register(com.aetheris.rag.dto.request.RegisterRequest): [Field error in object 'registerRequest' on field 'password': rejected value [123qwe]; codes [Size.registerRequest.password,Size.password,Size.java.lang.String,Size]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [registerRequest.password,password]; arguments []; default message [password],100,8]; default message [Password must be between 8 and 100 characters]] 
-2025-12-30 14:56:33.236 [tomcat-handler-27] INFO  c.a.rag.controller.AuthController - POST /api/auth/register - username: 123
-2025-12-30 14:56:33.239 [tomcat-handler-27] INFO  c.a.rag.service.impl.AuthServiceImpl - 注册新用户: 123
-2025-12-30 14:56:33.239 [tomcat-handler-27] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:56:33.239 [tomcat-handler-27] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@712c8aa1]
-2025-12-30 14:56:33.240 [tomcat-handler-27] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@2077549009 wrapping com.mysql.cj.jdbc.ConnectionImpl@52c33a14] will be managed by Spring
-2025-12-30 14:56:33.240 [tomcat-handler-27] DEBUG c.a.r.mapper.UserMapper.emailExists - ==>  Preparing: SELECT COUNT(*) > 0 FROM users WHERE email = ?
-2025-12-30 14:56:33.240 [tomcat-handler-27] DEBUG c.a.r.mapper.UserMapper.emailExists - ==> Parameters: 123@123.com(String)
-2025-12-30 14:56:33.241 [tomcat-handler-27] DEBUG c.a.r.mapper.UserMapper.emailExists - <==      Total: 1
-2025-12-30 14:56:33.242 [tomcat-handler-27] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@712c8aa1]
-2025-12-30 14:56:33.242 [tomcat-handler-27] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@712c8aa1] from current transaction
-2025-12-30 14:56:33.242 [tomcat-handler-27] DEBUG c.a.r.m.UserMapper.usernameExists - ==>  Preparing: SELECT COUNT(*) > 0 FROM users WHERE username = ?
-2025-12-30 14:56:33.242 [tomcat-handler-27] DEBUG c.a.r.m.UserMapper.usernameExists - ==> Parameters: 123(String)
-2025-12-30 14:56:33.243 [tomcat-handler-27] DEBUG c.a.r.m.UserMapper.usernameExists - <==      Total: 1
-2025-12-30 14:56:33.244 [tomcat-handler-27] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@712c8aa1]
-2025-12-30 14:56:33.323 [tomcat-handler-27] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@712c8aa1] from current transaction
-2025-12-30 14:56:33.323 [tomcat-handler-27] DEBUG c.a.rag.mapper.UserMapper.insert - ==>  Preparing: INSERT INTO users (username, email, password_hash, created_at, updated_at, last_active_at) VALUES (?, ?, ?, ?, ?, ?)
-2025-12-30 14:56:33.324 [tomcat-handler-27] DEBUG c.a.rag.mapper.UserMapper.insert - ==> Parameters: 123(String), 123@123.com(String), $2a$10$C6g74ntgnLJnYUcoFjMiHO8uCi9E4XgaZeDhVJ3IrmbmoMNJAJ.GC(String), 2025-12-30 14:56:33.323397(Timestamp), 2025-12-30 14:56:33.323398(Timestamp), 2025-12-30 14:56:33.323398(Timestamp)
-2025-12-30 14:56:33.326 [tomcat-handler-27] DEBUG c.a.rag.mapper.UserMapper.insert - <==    Updates: 1
-2025-12-30 14:56:33.327 [tomcat-handler-27] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@712c8aa1]
-2025-12-30 14:56:33.327 [tomcat-handler-27] INFO  c.a.rag.service.impl.AuthServiceImpl - User registered successfully: 7
-2025-12-30 14:56:33.328 [tomcat-handler-27] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@712c8aa1]
-2025-12-30 14:56:33.328 [tomcat-handler-27] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@712c8aa1]
-2025-12-30 14:56:33.328 [tomcat-handler-27] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@712c8aa1]
-2025-12-30 14:56:45.340 [tomcat-handler-28] INFO  c.a.rag.controller.AuthController - POST /api/auth/login - email: 123@123.com
-2025-12-30 14:56:45.341 [tomcat-handler-28] INFO  c.a.rag.service.impl.AuthServiceImpl - 用户登录尝试: 123@123.com
-2025-12-30 14:56:45.341 [tomcat-handler-28] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:56:45.341 [tomcat-handler-28] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5ef99f80] was not registered for synchronization because synchronization is not active
-2025-12-30 14:56:45.342 [tomcat-handler-28] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@559772485 wrapping com.mysql.cj.jdbc.ConnectionImpl@52c33a14] will not be managed by Spring
-2025-12-30 14:56:45.342 [tomcat-handler-28] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==>  Preparing: SELECT id, username, email, password_hash, created_at, updated_at, last_active_at FROM users WHERE email = ?
-2025-12-30 14:56:45.342 [tomcat-handler-28] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==> Parameters: 123@123.com(String)
-2025-12-30 14:56:45.344 [tomcat-handler-28] DEBUG c.a.r.mapper.UserMapper.findByEmail - <==      Total: 1
-2025-12-30 14:56:45.344 [tomcat-handler-28] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@5ef99f80]
-2025-12-30 14:56:45.423 [tomcat-handler-28] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:56:45.423 [tomcat-handler-28] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@48a0b6d3] was not registered for synchronization because synchronization is not active
-2025-12-30 14:56:45.423 [tomcat-handler-28] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1521952216 wrapping com.mysql.cj.jdbc.ConnectionImpl@52c33a14] will not be managed by Spring
-2025-12-30 14:56:45.423 [tomcat-handler-28] DEBUG c.a.r.m.UserMapper.updateLastActive - ==>  Preparing: UPDATE users SET last_active_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
-2025-12-30 14:56:45.423 [tomcat-handler-28] DEBUG c.a.r.m.UserMapper.updateLastActive - ==> Parameters: 2025-12-30 14:56:45.423069(Timestamp), 7(Long)
-2025-12-30 14:56:45.427 [tomcat-handler-28] DEBUG c.a.r.m.UserMapper.updateLastActive - <==    Updates: 1
-2025-12-30 14:56:45.427 [tomcat-handler-28] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@48a0b6d3]
-2025-12-30 14:56:45.428 [tomcat-handler-28] INFO  c.a.rag.service.impl.AuthServiceImpl - User logged in successfully: 7
-2025-12-30 14:57:29.364 [tomcat-handler-29] INFO  c.a.rag.controller.AuthController - POST /api/auth/register - username: 1234
-2025-12-30 14:57:29.367 [tomcat-handler-29] INFO  c.a.rag.service.impl.AuthServiceImpl - 注册新用户: 1234
-2025-12-30 14:57:29.367 [tomcat-handler-29] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:57:29.367 [tomcat-handler-29] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@db77461]
-2025-12-30 14:57:29.367 [tomcat-handler-29] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@122625809 wrapping com.mysql.cj.jdbc.ConnectionImpl@52c33a14] will be managed by Spring
-2025-12-30 14:57:29.367 [tomcat-handler-29] DEBUG c.a.r.mapper.UserMapper.emailExists - ==>  Preparing: SELECT COUNT(*) > 0 FROM users WHERE email = ?
-2025-12-30 14:57:29.367 [tomcat-handler-29] DEBUG c.a.r.mapper.UserMapper.emailExists - ==> Parameters: 123@123.com(String)
-2025-12-30 14:57:29.369 [tomcat-handler-29] DEBUG c.a.r.mapper.UserMapper.emailExists - <==      Total: 1
-2025-12-30 14:57:29.369 [tomcat-handler-29] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@db77461]
-2025-12-30 14:57:29.369 [tomcat-handler-29] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@db77461]
-2025-12-30 14:57:29.369 [tomcat-handler-29] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@db77461]
-2025-12-30 14:57:29.371 [tomcat-handler-29] WARN  c.a.r.e.GlobalExceptionHandler - 业务异常: code=CONFLICT, message=邮箱已被注册
-2025-12-30 14:57:33.196 [tomcat-handler-30] INFO  c.a.rag.controller.AuthController - POST /api/auth/register - username: 1234
-2025-12-30 14:57:33.198 [tomcat-handler-30] INFO  c.a.rag.service.impl.AuthServiceImpl - 注册新用户: 1234
-2025-12-30 14:57:33.198 [tomcat-handler-30] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:57:33.198 [tomcat-handler-30] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@746ff1c8]
-2025-12-30 14:57:33.199 [tomcat-handler-30] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@210620335 wrapping com.mysql.cj.jdbc.ConnectionImpl@52c33a14] will be managed by Spring
-2025-12-30 14:57:33.199 [tomcat-handler-30] DEBUG c.a.r.mapper.UserMapper.emailExists - ==>  Preparing: SELECT COUNT(*) > 0 FROM users WHERE email = ?
-2025-12-30 14:57:33.199 [tomcat-handler-30] DEBUG c.a.r.mapper.UserMapper.emailExists - ==> Parameters: 123@123.com(String)
-2025-12-30 14:57:33.206 [tomcat-handler-30] DEBUG c.a.r.mapper.UserMapper.emailExists - <==      Total: 1
-2025-12-30 14:57:33.206 [tomcat-handler-30] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@746ff1c8]
-2025-12-30 14:57:33.206 [tomcat-handler-30] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@746ff1c8]
-2025-12-30 14:57:33.207 [tomcat-handler-30] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@746ff1c8]
-2025-12-30 14:57:33.211 [tomcat-handler-30] WARN  c.a.r.e.GlobalExceptionHandler - 业务异常: code=CONFLICT, message=邮箱已被注册
-2025-12-30 14:57:37.280 [tomcat-handler-31] INFO  c.a.rag.controller.AuthController - POST /api/auth/register - username: 1234
-2025-12-30 14:57:37.283 [tomcat-handler-31] INFO  c.a.rag.service.impl.AuthServiceImpl - 注册新用户: 1234
-2025-12-30 14:57:37.283 [tomcat-handler-31] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:57:37.283 [tomcat-handler-31] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@29882ae6]
-2025-12-30 14:57:37.284 [tomcat-handler-31] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@394870980 wrapping com.mysql.cj.jdbc.ConnectionImpl@52c33a14] will be managed by Spring
-2025-12-30 14:57:37.284 [tomcat-handler-31] DEBUG c.a.r.mapper.UserMapper.emailExists - ==>  Preparing: SELECT COUNT(*) > 0 FROM users WHERE email = ?
-2025-12-30 14:57:37.284 [tomcat-handler-31] DEBUG c.a.r.mapper.UserMapper.emailExists - ==> Parameters: 123@123.com(String)
-2025-12-30 14:57:37.285 [tomcat-handler-31] DEBUG c.a.r.mapper.UserMapper.emailExists - <==      Total: 1
-2025-12-30 14:57:37.285 [tomcat-handler-31] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@29882ae6]
-2025-12-30 14:57:37.286 [tomcat-handler-31] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@29882ae6]
-2025-12-30 14:57:37.286 [tomcat-handler-31] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@29882ae6]
-2025-12-30 14:57:37.288 [tomcat-handler-31] WARN  c.a.r.e.GlobalExceptionHandler - 业务异常: code=CONFLICT, message=邮箱已被注册
-2025-12-30 14:57:40.813 [tomcat-handler-32] INFO  c.a.rag.controller.AuthController - POST /api/auth/register - username: 1234
-2025-12-30 14:57:40.816 [tomcat-handler-32] INFO  c.a.rag.service.impl.AuthServiceImpl - 注册新用户: 1234
-2025-12-30 14:57:40.816 [tomcat-handler-32] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:57:40.817 [tomcat-handler-32] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4e1b7129]
-2025-12-30 14:57:40.817 [tomcat-handler-32] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1043606076 wrapping com.mysql.cj.jdbc.ConnectionImpl@52c33a14] will be managed by Spring
-2025-12-30 14:57:40.817 [tomcat-handler-32] DEBUG c.a.r.mapper.UserMapper.emailExists - ==>  Preparing: SELECT COUNT(*) > 0 FROM users WHERE email = ?
-2025-12-30 14:57:40.817 [tomcat-handler-32] DEBUG c.a.r.mapper.UserMapper.emailExists - ==> Parameters: 123@123.com(String)
-2025-12-30 14:57:40.819 [tomcat-handler-32] DEBUG c.a.r.mapper.UserMapper.emailExists - <==      Total: 1
-2025-12-30 14:57:40.819 [tomcat-handler-32] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4e1b7129]
-2025-12-30 14:57:40.820 [tomcat-handler-32] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4e1b7129]
-2025-12-30 14:57:40.820 [tomcat-handler-32] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4e1b7129]
-2025-12-30 14:57:40.822 [tomcat-handler-32] WARN  c.a.r.e.GlobalExceptionHandler - 业务异常: code=CONFLICT, message=邮箱已被注册
-2025-12-30 14:58:53.891 [tomcat-handler-33] INFO  c.a.rag.controller.AuthController - POST /api/auth/login - email: 123@123.com
-2025-12-30 14:58:53.891 [tomcat-handler-33] INFO  c.a.rag.service.impl.AuthServiceImpl - 用户登录尝试: 123@123.com
-2025-12-30 14:58:53.891 [tomcat-handler-33] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:58:53.892 [tomcat-handler-33] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39d708e] was not registered for synchronization because synchronization is not active
-2025-12-30 14:58:53.893 [tomcat-handler-33] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@224042637 wrapping com.mysql.cj.jdbc.ConnectionImpl@52c33a14] will not be managed by Spring
-2025-12-30 14:58:53.893 [tomcat-handler-33] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==>  Preparing: SELECT id, username, email, password_hash, created_at, updated_at, last_active_at FROM users WHERE email = ?
-2025-12-30 14:58:53.894 [tomcat-handler-33] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==> Parameters: 123@123.com(String)
-2025-12-30 14:58:53.895 [tomcat-handler-33] DEBUG c.a.r.mapper.UserMapper.findByEmail - <==      Total: 1
-2025-12-30 14:58:53.896 [tomcat-handler-33] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@39d708e]
-2025-12-30 14:58:53.977 [tomcat-handler-33] WARN  c.a.r.e.GlobalExceptionHandler - 未授权访问: 邮箱或密码错误
-2025-12-30 14:59:08.376 [tomcat-handler-34] INFO  c.a.rag.controller.AuthController - POST /api/auth/login - email: 123@123.com
-2025-12-30 14:59:08.377 [tomcat-handler-34] INFO  c.a.rag.service.impl.AuthServiceImpl - 用户登录尝试: 123@123.com
-2025-12-30 14:59:08.377 [tomcat-handler-34] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 14:59:08.377 [tomcat-handler-34] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4c6794b6] was not registered for synchronization because synchronization is not active
-2025-12-30 14:59:08.379 [tomcat-handler-34] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@605455540 wrapping com.mysql.cj.jdbc.ConnectionImpl@52c33a14] will not be managed by Spring
-2025-12-30 14:59:08.379 [tomcat-handler-34] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==>  Preparing: SELECT id, username, email, password_hash, created_at, updated_at, last_active_at FROM users WHERE email = ?
-2025-12-30 14:59:08.379 [tomcat-handler-34] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==> Parameters: 123@123.com(String)
-2025-12-30 14:59:08.382 [tomcat-handler-34] DEBUG c.a.r.mapper.UserMapper.findByEmail - <==      Total: 1
-2025-12-30 14:59:08.382 [tomcat-handler-34] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4c6794b6]
-2025-12-30 14:59:08.464 [tomcat-handler-34] WARN  c.a.r.e.GlobalExceptionHandler - 未授权访问: 邮箱或密码错误
-2025-12-30 15:19:18.496 [tomcat-handler-35] INFO  c.a.rag.controller.AuthController - POST /api/auth/register - username: 123
-2025-12-30 15:19:18.499 [tomcat-handler-35] INFO  c.a.rag.service.impl.AuthServiceImpl - 注册新用户: 123
-2025-12-30 15:19:18.500 [tomcat-handler-35] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 15:19:18.500 [tomcat-handler-35] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@15c828a7]
-2025-12-30 15:19:18.500 [tomcat-handler-35] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@523256791 wrapping com.mysql.cj.jdbc.ConnectionImpl@5a32de55] will be managed by Spring
-2025-12-30 15:19:18.500 [tomcat-handler-35] DEBUG c.a.r.mapper.UserMapper.emailExists - ==>  Preparing: SELECT COUNT(*) > 0 FROM users WHERE email = ?
-2025-12-30 15:19:18.500 [tomcat-handler-35] DEBUG c.a.r.mapper.UserMapper.emailExists - ==> Parameters: 123@123.com(String)
-2025-12-30 15:19:18.501 [tomcat-handler-35] DEBUG c.a.r.mapper.UserMapper.emailExists - <==      Total: 1
-2025-12-30 15:19:18.502 [tomcat-handler-35] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@15c828a7]
-2025-12-30 15:19:18.502 [tomcat-handler-35] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@15c828a7]
-2025-12-30 15:19:18.502 [tomcat-handler-35] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@15c828a7]
-2025-12-30 15:19:18.504 [tomcat-handler-35] WARN  c.a.r.e.GlobalExceptionHandler - 业务异常: code=CONFLICT, message=邮箱已被注册
-2025-12-30 15:19:30.993 [tomcat-handler-36] INFO  c.a.rag.controller.AuthController - POST /api/auth/register - username: 1234
-2025-12-30 15:19:31.003 [tomcat-handler-36] INFO  c.a.rag.service.impl.AuthServiceImpl - 注册新用户: 1234
-2025-12-30 15:19:31.003 [tomcat-handler-36] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 15:19:31.003 [tomcat-handler-36] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3e537fa6]
-2025-12-30 15:19:31.004 [tomcat-handler-36] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1947350397 wrapping com.mysql.cj.jdbc.ConnectionImpl@5a32de55] will be managed by Spring
-2025-12-30 15:19:31.004 [tomcat-handler-36] DEBUG c.a.r.mapper.UserMapper.emailExists - ==>  Preparing: SELECT COUNT(*) > 0 FROM users WHERE email = ?
-2025-12-30 15:19:31.004 [tomcat-handler-36] DEBUG c.a.r.mapper.UserMapper.emailExists - ==> Parameters: 1234@1234.com(String)
-2025-12-30 15:19:31.006 [tomcat-handler-36] DEBUG c.a.r.mapper.UserMapper.emailExists - <==      Total: 1
-2025-12-30 15:19:31.006 [tomcat-handler-36] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3e537fa6]
-2025-12-30 15:19:31.006 [tomcat-handler-36] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3e537fa6] from current transaction
-2025-12-30 15:19:31.006 [tomcat-handler-36] DEBUG c.a.r.m.UserMapper.usernameExists - ==>  Preparing: SELECT COUNT(*) > 0 FROM users WHERE username = ?
-2025-12-30 15:19:31.006 [tomcat-handler-36] DEBUG c.a.r.m.UserMapper.usernameExists - ==> Parameters: 1234(String)
-2025-12-30 15:19:31.009 [tomcat-handler-36] DEBUG c.a.r.m.UserMapper.usernameExists - <==      Total: 1
-2025-12-30 15:19:31.009 [tomcat-handler-36] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3e537fa6]
-2025-12-30 15:19:31.095 [tomcat-handler-36] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3e537fa6] from current transaction
-2025-12-30 15:19:31.095 [tomcat-handler-36] DEBUG c.a.rag.mapper.UserMapper.insert - ==>  Preparing: INSERT INTO users (username, email, password_hash, created_at, updated_at, last_active_at) VALUES (?, ?, ?, ?, ?, ?)
-2025-12-30 15:19:31.095 [tomcat-handler-36] DEBUG c.a.rag.mapper.UserMapper.insert - ==> Parameters: 1234(String), 1234@1234.com(String), $2a$10$nIoB1vx7xzPpoSyvYEV0QO5u50tG6iJAMNNO0maKLTx33p1fGviNq(String), 2025-12-30 15:19:31.095119(Timestamp), 2025-12-30 15:19:31.09512(Timestamp), 2025-12-30 15:19:31.09512(Timestamp)
-2025-12-30 15:19:31.098 [tomcat-handler-36] DEBUG c.a.rag.mapper.UserMapper.insert - <==    Updates: 1
-2025-12-30 15:19:31.098 [tomcat-handler-36] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3e537fa6]
-2025-12-30 15:19:31.098 [tomcat-handler-36] INFO  c.a.rag.service.impl.AuthServiceImpl - User registered successfully: 8
-2025-12-30 15:19:31.099 [tomcat-handler-36] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3e537fa6]
-2025-12-30 15:19:31.099 [tomcat-handler-36] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3e537fa6]
-2025-12-30 15:19:31.099 [tomcat-handler-36] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3e537fa6]
-2025-12-30 15:19:42.833 [tomcat-handler-37] INFO  c.a.rag.controller.AuthController - POST /api/auth/login - email: 1234@1234.com
-2025-12-30 15:19:42.833 [tomcat-handler-37] INFO  c.a.rag.service.impl.AuthServiceImpl - 用户登录尝试: 1234@1234.com
-2025-12-30 15:19:42.833 [tomcat-handler-37] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 15:19:42.833 [tomcat-handler-37] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@21d4294b] was not registered for synchronization because synchronization is not active
-2025-12-30 15:19:42.835 [tomcat-handler-37] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1334391090 wrapping com.mysql.cj.jdbc.ConnectionImpl@5a32de55] will not be managed by Spring
-2025-12-30 15:19:42.835 [tomcat-handler-37] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==>  Preparing: SELECT id, username, email, password_hash, created_at, updated_at, last_active_at FROM users WHERE email = ?
-2025-12-30 15:19:42.835 [tomcat-handler-37] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==> Parameters: 1234@1234.com(String)
-2025-12-30 15:19:42.838 [tomcat-handler-37] DEBUG c.a.r.mapper.UserMapper.findByEmail - <==      Total: 1
-2025-12-30 15:19:42.838 [tomcat-handler-37] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@21d4294b]
-2025-12-30 15:19:42.916 [tomcat-handler-37] WARN  c.a.r.e.GlobalExceptionHandler - 未授权访问: 邮箱或密码错误
-2025-12-30 15:19:50.882 [tomcat-handler-38] INFO  c.a.rag.controller.AuthController - POST /api/auth/login - email: 1234@1234.com
-2025-12-30 15:19:50.883 [tomcat-handler-38] INFO  c.a.rag.service.impl.AuthServiceImpl - 用户登录尝试: 1234@1234.com
-2025-12-30 15:19:50.883 [tomcat-handler-38] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 15:19:50.883 [tomcat-handler-38] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@311542aa] was not registered for synchronization because synchronization is not active
-2025-12-30 15:19:50.884 [tomcat-handler-38] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1103029576 wrapping com.mysql.cj.jdbc.ConnectionImpl@5a32de55] will not be managed by Spring
-2025-12-30 15:19:50.884 [tomcat-handler-38] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==>  Preparing: SELECT id, username, email, password_hash, created_at, updated_at, last_active_at FROM users WHERE email = ?
-2025-12-30 15:19:50.884 [tomcat-handler-38] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==> Parameters: 1234@1234.com(String)
-2025-12-30 15:19:50.886 [tomcat-handler-38] DEBUG c.a.r.mapper.UserMapper.findByEmail - <==      Total: 1
-2025-12-30 15:19:50.886 [tomcat-handler-38] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@311542aa]
-2025-12-30 15:19:50.965 [tomcat-handler-38] WARN  c.a.r.e.GlobalExceptionHandler - 未授权访问: 邮箱或密码错误
-2025-12-30 15:19:55.402 [tomcat-handler-39] INFO  c.a.rag.controller.AuthController - POST /api/auth/login - email: 1234@1234.com
-2025-12-30 15:19:55.402 [tomcat-handler-39] INFO  c.a.rag.service.impl.AuthServiceImpl - 用户登录尝试: 1234@1234.com
-2025-12-30 15:19:55.402 [tomcat-handler-39] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 15:19:55.402 [tomcat-handler-39] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11d8174b] was not registered for synchronization because synchronization is not active
-2025-12-30 15:19:55.403 [tomcat-handler-39] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@180557768 wrapping com.mysql.cj.jdbc.ConnectionImpl@5a32de55] will not be managed by Spring
-2025-12-30 15:19:55.403 [tomcat-handler-39] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==>  Preparing: SELECT id, username, email, password_hash, created_at, updated_at, last_active_at FROM users WHERE email = ?
-2025-12-30 15:19:55.404 [tomcat-handler-39] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==> Parameters: 1234@1234.com(String)
-2025-12-30 15:19:55.405 [tomcat-handler-39] DEBUG c.a.r.mapper.UserMapper.findByEmail - <==      Total: 1
-2025-12-30 15:19:55.405 [tomcat-handler-39] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@11d8174b]
-2025-12-30 15:19:55.485 [tomcat-handler-39] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 15:19:55.485 [tomcat-handler-39] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7584ea6f] was not registered for synchronization because synchronization is not active
-2025-12-30 15:19:55.485 [tomcat-handler-39] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@616028635 wrapping com.mysql.cj.jdbc.ConnectionImpl@5a32de55] will not be managed by Spring
-2025-12-30 15:19:55.485 [tomcat-handler-39] DEBUG c.a.r.m.UserMapper.updateLastActive - ==>  Preparing: UPDATE users SET last_active_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
-2025-12-30 15:19:55.485 [tomcat-handler-39] DEBUG c.a.r.m.UserMapper.updateLastActive - ==> Parameters: 2025-12-30 15:19:55.485228(Timestamp), 8(Long)
-2025-12-30 15:19:55.490 [tomcat-handler-39] DEBUG c.a.r.m.UserMapper.updateLastActive - <==    Updates: 1
-2025-12-30 15:19:55.490 [tomcat-handler-39] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@7584ea6f]
-2025-12-30 15:19:55.490 [tomcat-handler-39] INFO  c.a.rag.service.impl.AuthServiceImpl - User logged in successfully: 8
-2025-12-30 15:39:25.668 [tomcat-handler-40] INFO  c.a.rag.controller.AuthController - POST /api/auth/login - email: 123@123.com
-2025-12-30 15:39:25.670 [tomcat-handler-40] INFO  c.a.rag.service.impl.AuthServiceImpl - 用户登录尝试: 123@123.com
-2025-12-30 15:39:25.670 [tomcat-handler-40] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 15:39:25.670 [tomcat-handler-40] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6b973fd3] was not registered for synchronization because synchronization is not active
-2025-12-30 15:39:25.671 [tomcat-handler-40] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1699798225 wrapping com.mysql.cj.jdbc.ConnectionImpl@616f54a3] will not be managed by Spring
-2025-12-30 15:39:25.671 [tomcat-handler-40] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==>  Preparing: SELECT id, username, email, password_hash, created_at, updated_at, last_active_at FROM users WHERE email = ?
-2025-12-30 15:39:25.672 [tomcat-handler-40] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==> Parameters: 123@123.com(String)
-2025-12-30 15:39:25.673 [tomcat-handler-40] DEBUG c.a.r.mapper.UserMapper.findByEmail - <==      Total: 1
-2025-12-30 15:39:25.674 [tomcat-handler-40] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@6b973fd3]
-2025-12-30 15:39:25.757 [tomcat-handler-40] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 15:39:25.757 [tomcat-handler-40] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@76561c13] was not registered for synchronization because synchronization is not active
-2025-12-30 15:39:25.757 [tomcat-handler-40] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@352579676 wrapping com.mysql.cj.jdbc.ConnectionImpl@616f54a3] will not be managed by Spring
-2025-12-30 15:39:25.757 [tomcat-handler-40] DEBUG c.a.r.m.UserMapper.updateLastActive - ==>  Preparing: UPDATE users SET last_active_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
-2025-12-30 15:39:25.757 [tomcat-handler-40] DEBUG c.a.r.m.UserMapper.updateLastActive - ==> Parameters: 2025-12-30 15:39:25.757106(Timestamp), 7(Long)
-2025-12-30 15:39:25.762 [tomcat-handler-40] DEBUG c.a.r.m.UserMapper.updateLastActive - <==    Updates: 1
-2025-12-30 15:39:25.762 [tomcat-handler-40] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@76561c13]
-2025-12-30 15:39:25.762 [tomcat-handler-40] INFO  c.a.rag.service.impl.AuthServiceImpl - User logged in successfully: 7
-2025-12-30 15:51:24.296 [tomcat-handler-41] DEBUG com.aetheris.rag.util.JwtUtil - Invalid JWT token: JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.
-2025-12-30 15:51:24.296 [tomcat-handler-42] DEBUG com.aetheris.rag.util.JwtUtil - Invalid JWT token: JWT signature does not match locally computed signature. JWT validity cannot be asserted and should not be trusted.
-2025-12-30 15:55:17.544 [tomcat-handler-45] INFO  c.a.rag.controller.AuthController - POST /api/auth/login - email: testuser02@example.com
-2025-12-30 15:55:17.545 [tomcat-handler-45] INFO  c.a.rag.service.impl.AuthServiceImpl - 用户登录尝试: testuser02@example.com
-2025-12-30 15:55:17.545 [tomcat-handler-45] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 15:55:17.545 [tomcat-handler-45] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2d59d323] was not registered for synchronization because synchronization is not active
-2025-12-30 15:55:17.546 [tomcat-handler-45] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@694567504 wrapping com.mysql.cj.jdbc.ConnectionImpl@616f54a3] will not be managed by Spring
-2025-12-30 15:55:17.546 [tomcat-handler-45] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==>  Preparing: SELECT id, username, email, password_hash, created_at, updated_at, last_active_at FROM users WHERE email = ?
-2025-12-30 15:55:17.546 [tomcat-handler-45] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==> Parameters: testuser02@example.com(String)
-2025-12-30 15:55:17.548 [tomcat-handler-45] DEBUG c.a.r.mapper.UserMapper.findByEmail - <==      Total: 1
-2025-12-30 15:55:17.548 [tomcat-handler-45] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@2d59d323]
-2025-12-30 15:55:17.631 [tomcat-handler-45] WARN  c.a.r.e.GlobalExceptionHandler - 未授权访问: 邮箱或密码错误
-2025-12-30 15:55:29.449 [tomcat-handler-49] INFO  c.a.rag.controller.AuthController - POST /api/auth/login - email: testuser02@example.com
-2025-12-30 15:55:29.449 [tomcat-handler-49] INFO  c.a.rag.service.impl.AuthServiceImpl - 用户登录尝试: testuser02@example.com
-2025-12-30 15:55:29.449 [tomcat-handler-49] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 15:55:29.449 [tomcat-handler-49] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@462d8b93] was not registered for synchronization because synchronization is not active
-2025-12-30 15:55:29.451 [tomcat-handler-49] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@206251607 wrapping com.mysql.cj.jdbc.ConnectionImpl@616f54a3] will not be managed by Spring
-2025-12-30 15:55:29.451 [tomcat-handler-49] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==>  Preparing: SELECT id, username, email, password_hash, created_at, updated_at, last_active_at FROM users WHERE email = ?
-2025-12-30 15:55:29.451 [tomcat-handler-49] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==> Parameters: testuser02@example.com(String)
-2025-12-30 15:55:29.453 [tomcat-handler-49] DEBUG c.a.r.mapper.UserMapper.findByEmail - <==      Total: 1
-2025-12-30 15:55:29.453 [tomcat-handler-49] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@462d8b93]
-2025-12-30 15:55:29.538 [tomcat-handler-49] WARN  c.a.r.e.GlobalExceptionHandler - 未授权访问: 邮箱或密码错误
-2025-12-30 15:55:29.568 [tomcat-handler-51] DEBUG com.aetheris.rag.util.JwtUtil - Invalid JWT token: Invalid compact JWT string: Compact JWSs must contain exactly 2 period characters, and compact JWEs must contain exactly 4.  Found: 0
-2025-12-30 15:55:43.391 [tomcat-handler-53] WARN  c.a.r.e.GlobalExceptionHandler - 参数校验失败: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<com.aetheris.rag.dto.response.AuthResponse> com.aetheris.rag.controller.AuthController.register(com.aetheris.rag.dto.request.RegisterRequest): [Field error in object 'registerRequest' on field 'password': rejected value [test123]; codes [Size.registerRequest.password,Size.password,Size.java.lang.String,Size]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [registerRequest.password,password]; arguments []; default message [password],100,8]; default message [Password must be between 8 and 100 characters]] 
-2025-12-30 15:55:43.420 [tomcat-handler-54] INFO  c.a.rag.controller.AuthController - POST /api/auth/login - email: testtoken@example.com
-2025-12-30 15:55:43.420 [tomcat-handler-54] INFO  c.a.rag.service.impl.AuthServiceImpl - 用户登录尝试: testtoken@example.com
-2025-12-30 15:55:43.420 [tomcat-handler-54] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 15:55:43.420 [tomcat-handler-54] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@710fb670] was not registered for synchronization because synchronization is not active
-2025-12-30 15:55:43.421 [tomcat-handler-54] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1245707811 wrapping com.mysql.cj.jdbc.ConnectionImpl@616f54a3] will not be managed by Spring
-2025-12-30 15:55:43.421 [tomcat-handler-54] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==>  Preparing: SELECT id, username, email, password_hash, created_at, updated_at, last_active_at FROM users WHERE email = ?
-2025-12-30 15:55:43.422 [tomcat-handler-54] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==> Parameters: testtoken@example.com(String)
-2025-12-30 15:55:43.423 [tomcat-handler-54] DEBUG c.a.r.mapper.UserMapper.findByEmail - <==      Total: 0
-2025-12-30 15:55:43.423 [tomcat-handler-54] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@710fb670]
-2025-12-30 15:55:43.424 [tomcat-handler-54] WARN  c.a.r.e.GlobalExceptionHandler - 未授权访问: 邮箱或密码错误
-2025-12-30 15:55:43.456 [tomcat-handler-56] DEBUG com.aetheris.rag.util.JwtUtil - Invalid JWT token: Invalid compact JWT string: Compact JWSs must contain exactly 2 period characters, and compact JWEs must contain exactly 4.  Found: 0
-2025-12-30 15:56:23.321 [tomcat-handler-58] INFO  c.a.rag.controller.AuthController - POST /api/auth/register - username: tokentest
-2025-12-30 15:56:23.324 [tomcat-handler-58] INFO  c.a.rag.service.impl.AuthServiceImpl - 注册新用户: tokentest
-2025-12-30 15:56:23.324 [tomcat-handler-58] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
-2025-12-30 15:56:23.324 [tomcat-handler-58] DEBUG org.mybatis.spring.SqlSessionUtils - Registering transaction synchronization for SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4a29baa7]
-2025-12-30 15:56:23.325 [tomcat-handler-58] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1087492567 wrapping com.mysql.cj.jdbc.ConnectionImpl@616f54a3] will be managed by Spring
-2025-12-30 15:56:23.325 [tomcat-handler-58] DEBUG c.a.r.mapper.UserMapper.emailExists - ==>  Preparing: SELECT COUNT(*) > 0 FROM users WHERE email = ?
-2025-12-30 15:56:23.325 [tomcat-handler-58] DEBUG c.a.r.mapper.UserMapper.emailExists - ==> Parameters: tokentest@example.com(String)
-2025-12-30 15:56:23.326 [tomcat-handler-58] DEBUG c.a.r.mapper.UserMapper.emailExists - <==      Total: 1
-2025-12-30 15:56:23.326 [tomcat-handler-58] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4a29baa7]
-2025-12-30 15:56:23.326 [tomcat-handler-58] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4a29baa7] from current transaction
-2025-12-30 15:56:23.326 [tomcat-handler-58] DEBUG c.a.r.m.UserMapper.usernameExists - ==>  Preparing: SELECT COUNT(*) > 0 FROM users WHERE username = ?
-2025-12-30 15:56:23.327 [tomcat-handler-58] DEBUG c.a.r.m.UserMapper.usernameExists - ==> Parameters: tokentest(String)
-2025-12-30 15:56:23.328 [tomcat-handler-58] DEBUG c.a.r.m.UserMapper.usernameExists - <==      Total: 1
-2025-12-30 15:56:23.328 [tomcat-handler-58] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4a29baa7]
-2025-12-30 15:56:23.412 [tomcat-handler-58] DEBUG org.mybatis.spring.SqlSessionUtils - Fetched SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4a29baa7] from current transaction
-2025-12-30 15:56:23.412 [tomcat-handler-58] DEBUG c.a.rag.mapper.UserMapper.insert - ==>  Preparing: INSERT INTO users (username, email, password_hash, created_at, updated_at, last_active_at) VALUES (?, ?, ?, ?, ?, ?)
-2025-12-30 15:56:23.412 [tomcat-handler-58] DEBUG c.a.rag.mapper.UserMapper.insert - ==> Parameters: tokentest(String), tokentest@example.com(String), $2a$10$KTKtKVoRaLa8zuf2xmxSFeagH.oic8oLLYySYpRMosCY1SnuHhcrC(String), 2025-12-30 15:56:23.412254(Timestamp), 2025-12-30 15:56:23.412255(Timestamp), 2025-12-30 15:56:23.412255(Timestamp)
-2025-12-30 15:56:23.415 [tomcat-handler-58] DEBUG c.a.rag.mapper.UserMapper.insert - <==    Updates: 1
-2025-12-30 15:56:23.415 [tomcat-handler-58] DEBUG org.mybatis.spring.SqlSessionUtils - Releasing transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4a29baa7]
-2025-12-30 15:56:23.415 [tomcat-handler-58] INFO  c.a.rag.service.impl.AuthServiceImpl - User registered successfully: 9
-2025-12-30 15:56:23.416 [tomcat-handler-58] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization committing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4a29baa7]
-2025-12-30 15:56:23.416 [tomcat-handler-58] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization deregistering SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4a29baa7]
-2025-12-30 15:56:23.416 [tomcat-handler-58] DEBUG org.mybatis.spring.SqlSessionUtils - Transaction synchronization closing SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@4a29baa7]
-2025-12-30 15:56:23.462 [tomcat-handler-60] DEBUG c.a.r.c.SecurityConfig$JwtAuthenticationFilter - Authenticated user: 9
-2025-12-30 15:56:23.465 [tomcat-handler-60] ERROR c.a.r.e.GlobalExceptionHandler - 未处理的异常: No static resource api/auth/me.
-org.springframework.web.servlet.resource.NoResourceFoundException: No static resource api/auth/me.
-	at org.springframework.web.servlet.resource.ResourceHttpRequestHandler.handleRequest(ResourceHttpRequestHandler.java:585)
-	at org.springframework.web.servlet.mvc.HttpRequestHandlerAdapter.handle(HttpRequestHandlerAdapter.java:52)
-	at org.springframework.web.servlet.DispatcherServlet.doDispatch(DispatcherServlet.java:1089)
-	at org.springframework.web.servlet.DispatcherServlet.doService(DispatcherServlet.java:979)
-	at org.springframework.web.servlet.FrameworkServlet.processRequest(FrameworkServlet.java:1014)
-	at org.springframework.web.servlet.FrameworkServlet.doGet(FrameworkServlet.java:903)
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:564)
-	at org.springframework.web.servlet.FrameworkServlet.service(FrameworkServlet.java:885)
-	at jakarta.servlet.http.HttpServlet.service(HttpServlet.java:658)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:193)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)
-	at org.apache.tomcat.websocket.server.WsFilter.doFilter(WsFilter.java:51)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)
-	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
-	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:108)
-	at org.springframework.security.web.FilterChainProxy.lambda$doFilterInternal$3(FilterChainProxy.java:231)
-	at org.springframework.security.web.ObservationFilterChainDecorator$FilterObservation$SimpleFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:490)
-	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$1(ObservationFilterChainDecorator.java:351)
-	at org.springframework.security.web.ObservationFilterChainDecorator.lambda$wrapSecured$0(ObservationFilterChainDecorator.java:83)
-	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:129)
-	at org.springframework.security.web.access.intercept.AuthorizationFilter.doFilter(AuthorizationFilter.java:101)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
-	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:125)
-	at org.springframework.security.web.access.ExceptionTranslationFilter.doFilter(ExceptionTranslationFilter.java:119)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
-	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
-	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:131)
-	at org.springframework.security.web.session.SessionManagementFilter.doFilter(SessionManagementFilter.java:85)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
-	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
-	at org.springframework.security.web.authentication.AnonymousAuthenticationFilter.doFilter(AnonymousAuthenticationFilter.java:100)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
-	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
-	at org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter.doFilter(SecurityContextHolderAwareRequestFilter.java:179)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
-	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
-	at org.springframework.security.web.savedrequest.RequestCacheAwareFilter.doFilter(RequestCacheAwareFilter.java:63)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
-	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
-	at com.aetheris.rag.config.SecurityConfig$JwtAuthenticationFilter.doFilterInternal(SecurityConfig.java:116)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
-	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
-	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:107)
-	at org.springframework.security.web.authentication.logout.LogoutFilter.doFilter(LogoutFilter.java:93)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
-	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
-	at org.springframework.web.filter.CorsFilter.doFilterInternal(CorsFilter.java:91)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
-	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
-	at org.springframework.security.web.header.HeaderWriterFilter.doHeadersAfter(HeaderWriterFilter.java:90)
-	at org.springframework.security.web.header.HeaderWriterFilter.doFilterInternal(HeaderWriterFilter.java:75)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
-	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
-	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:82)
-	at org.springframework.security.web.context.SecurityContextHolderFilter.doFilter(SecurityContextHolderFilter.java:69)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
-	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
-	at org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter.doFilterInternal(WebAsyncManagerIntegrationFilter.java:62)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:228)
-	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
-	at org.springframework.security.web.session.DisableEncodeUrlFilter.doFilterInternal(DisableEncodeUrlFilter.java:42)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.wrapFilter(ObservationFilterChainDecorator.java:241)
-	at org.springframework.security.web.ObservationFilterChainDecorator$AroundFilterObservation$SimpleAroundFilterObservation.lambda$wrap$0(ObservationFilterChainDecorator.java:334)
-	at org.springframework.security.web.ObservationFilterChainDecorator$ObservationFilter.doFilter(ObservationFilterChainDecorator.java:225)
-	at org.springframework.security.web.ObservationFilterChainDecorator$VirtualFilterChain.doFilter(ObservationFilterChainDecorator.java:138)
-	at org.springframework.security.web.FilterChainProxy.doFilterInternal(FilterChainProxy.java:233)
-	at org.springframework.security.web.FilterChainProxy.doFilter(FilterChainProxy.java:191)
-	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
-	at org.springframework.web.filter.ServletRequestPathFilter.doFilter(ServletRequestPathFilter.java:52)
-	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
-	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
-	at org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebSecurityConfiguration.java:319)
-	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
-	at org.springframework.web.servlet.handler.HandlerMappingIntrospector.lambda$createCacheFilter$4(HandlerMappingIntrospector.java:267)
-	at org.springframework.web.filter.CompositeFilter$VirtualFilterChain.doFilter(CompositeFilter.java:113)
-	at org.springframework.web.filter.CompositeFilter.doFilter(CompositeFilter.java:74)
-	at org.springframework.security.config.annotation.web.configuration.WebMvcSecurityConfiguration$CompositeFilterChainProxy.doFilter(WebMvcSecurityConfiguration.java:240)
-	at org.springframework.web.filter.DelegatingFilterProxy.invokeDelegate(DelegatingFilterProxy.java:362)
-	at org.springframework.web.filter.DelegatingFilterProxy.doFilter(DelegatingFilterProxy.java:278)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)
-	at org.springframework.web.filter.RequestContextFilter.doFilterInternal(RequestContextFilter.java:100)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)
-	at org.springframework.web.filter.FormContentFilter.doFilterInternal(FormContentFilter.java:93)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)
-	at org.springframework.web.filter.ServerHttpObservationFilter.doFilterInternal(ServerHttpObservationFilter.java:110)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)
-	at org.springframework.web.filter.CharacterEncodingFilter.doFilterInternal(CharacterEncodingFilter.java:201)
-	at org.springframework.web.filter.OncePerRequestFilter.doFilter(OncePerRequestFilter.java:116)
-	at org.apache.catalina.core.ApplicationFilterChain.internalDoFilter(ApplicationFilterChain.java:162)
-	at org.apache.catalina.core.ApplicationFilterChain.doFilter(ApplicationFilterChain.java:138)
-	at org.apache.catalina.core.StandardWrapperValve.invoke(StandardWrapperValve.java:165)
-	at org.apache.catalina.core.StandardContextValve.invoke(StandardContextValve.java:88)
-	at org.apache.catalina.authenticator.AuthenticatorBase.invoke(AuthenticatorBase.java:482)
-	at org.apache.catalina.core.StandardHostValve.invoke(StandardHostValve.java:113)
-	at org.apache.catalina.valves.ErrorReportValve.invoke(ErrorReportValve.java:83)
-	at org.apache.catalina.core.StandardEngineValve.invoke(StandardEngineValve.java:72)
-	at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:342)
-	at org.apache.coyote.http11.Http11Processor.service(Http11Processor.java:399)
-	at org.apache.coyote.AbstractProcessorLight.process(AbstractProcessorLight.java:63)
-	at org.apache.coyote.AbstractProtocol$ConnectionHandler.process(AbstractProtocol.java:903)
-	at org.apache.tomcat.util.net.NioEndpoint$SocketProcessor.doRun(NioEndpoint.java:1774)
-	at org.apache.tomcat.util.net.SocketProcessorBase.run(SocketProcessorBase.java:52)
-	at java.base/java.lang.VirtualThread.run(VirtualThread.java:329)
-2025-12-30 15:56:23.487 [tomcat-handler-61] DEBUG com.aetheris.rag.util.JwtUtil - Invalid JWT token: Invalid compact JWT string: Compact JWSs must contain exactly 2 period characters, and compact JWEs must contain exactly 4.  Found: 0
-2025-12-30 16:05:39.066 [tomcat-handler-65] DEBUG com.aetheris.rag.util.JwtUtil - Invalid JWT token: JWT expired 470064 milliseconds ago at 2025-12-30T07:57:49.000Z. Current time: 2025-12-30T08:05:39.064Z. Allowed clock skew: 0 milliseconds.
-2025-12-30 16:05:39.085 [tomcat-handler-67] DEBUG com.aetheris.rag.util.JwtUtil - Invalid JWT token: Invalid compact JWT string: Compact JWSs must contain exactly 2 period characters, and compact JWEs must contain exactly 4.  Found: 0
-2025-12-30 16:07:56.088 [tomcat-handler-71] DEBUG com.aetheris.rag.util.JwtUtil - Invalid JWT token: JWT expired 607088 milliseconds ago at 2025-12-30T07:57:49.000Z. Current time: 2025-12-30T08:07:56.088Z. Allowed clock skew: 0 milliseconds.
-2025-12-30 16:07:56.105 [tomcat-handler-73] DEBUG com.aetheris.rag.util.JwtUtil - Invalid JWT token: Invalid compact JWT string: Compact JWSs must contain exactly 2 period characters, and compact JWEs must contain exactly 4.  Found: 0
+2025-12-31 09:46:55.713 [main] INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2025-12-31 09:46:55.910 [main] DEBUG o.m.s.b.a.MybatisAutoConfiguration - Not found configuration for registering mapper bean using @MapperScan, MapperFactoryBean and MapperScannerConfigurer.
+2025-12-31 09:46:56.148 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2025-12-31 09:46:56.159 [main] INFO  c.a.rag.AetherisRagApplication - Started AetherisRagApplication in 4.556 seconds (process running for 4.866)
+2025-12-31 09:47:17.440 [tomcat-handler-0] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-12-31 09:47:17.440 [tomcat-handler-0] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2025-12-31 09:47:17.441 [tomcat-handler-0] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2025-12-31 09:47:48.582 [tomcat-handler-1] INFO  c.a.rag.controller.AuthController - POST /api/auth/login - email: 123@123.com
+2025-12-31 09:47:48.582 [tomcat-handler-1] INFO  c.a.rag.service.impl.AuthServiceImpl - 用户登录尝试: 123@123.com
+2025-12-31 09:47:48.588 [tomcat-handler-1] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-12-31 09:47:48.592 [tomcat-handler-1] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3fa8e27] was not registered for synchronization because synchronization is not active
+2025-12-31 09:47:48.601 [tomcat-handler-1] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@1953950746 wrapping com.mysql.cj.jdbc.ConnectionImpl@53525379] will not be managed by Spring
+2025-12-31 09:47:48.603 [tomcat-handler-1] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==>  Preparing: SELECT id, username, email, password_hash, created_at, updated_at, last_active_at FROM users WHERE email = ?
+2025-12-31 09:47:48.615 [tomcat-handler-1] DEBUG c.a.r.mapper.UserMapper.findByEmail - ==> Parameters: 123@123.com(String)
+2025-12-31 09:47:48.632 [tomcat-handler-1] DEBUG c.a.r.mapper.UserMapper.findByEmail - <==      Total: 1
+2025-12-31 09:47:48.633 [tomcat-handler-1] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@3fa8e27]
+2025-12-31 09:47:48.719 [tomcat-handler-1] DEBUG org.mybatis.spring.SqlSessionUtils - Creating a new SqlSession
+2025-12-31 09:47:48.720 [tomcat-handler-1] DEBUG org.mybatis.spring.SqlSessionUtils - SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@448f186] was not registered for synchronization because synchronization is not active
+2025-12-31 09:47:48.720 [tomcat-handler-1] DEBUG o.m.s.t.SpringManagedTransaction - JDBC Connection [HikariProxyConnection@986405147 wrapping com.mysql.cj.jdbc.ConnectionImpl@53525379] will not be managed by Spring
+2025-12-31 09:47:48.720 [tomcat-handler-1] DEBUG c.a.r.m.UserMapper.updateLastActive - ==>  Preparing: UPDATE users SET last_active_at = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?
+2025-12-31 09:47:48.722 [tomcat-handler-1] DEBUG c.a.r.m.UserMapper.updateLastActive - ==> Parameters: 2025-12-31 09:47:48.719344(Timestamp), 7(Long)
+2025-12-31 09:47:48.728 [tomcat-handler-1] DEBUG c.a.r.m.UserMapper.updateLastActive - <==    Updates: 1
+2025-12-31 09:47:48.728 [tomcat-handler-1] DEBUG org.mybatis.spring.SqlSessionUtils - Closing non transactional SqlSession [org.apache.ibatis.session.defaults.DefaultSqlSession@448f186]
+2025-12-31 09:47:48.729 [tomcat-handler-1] INFO  c.a.rag.service.impl.AuthServiceImpl - User logged in successfully: 7
+2025-12-31 09:51:49.795 [SpringApplicationShutdownHook] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-12-31 09:51:49.797 [tomcat-shutdown] INFO  o.s.b.w.e.tomcat.GracefulShutdown - Graceful shutdown complete
+2025-12-31 09:51:49.917 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2025-12-31 09:51:49.922 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.

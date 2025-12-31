@@ -35,25 +35,25 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/HomeView.vue'),
     meta: { requiresAuth: true }
   },
+  {
+    path: '/resources',
+    name: 'ResourceList',
+    component: () => import('@/views/resource/ResourceListView.vue'),
+    meta: { requiresAuth: true }
+  },
   // TODO: 以下路由待实现页面组件后取消注释
-  // {
-  //   path: '/resources',
-  //   name: 'ResourceList',
-  //   component: () => import('@/views/resource/ResourceListView.vue'),
-  //   meta: { requiresAuth: true }
-  // },
   // {
   //   path: '/resources/upload',
   //   name: 'ResourceUpload',
   //   component: () => import('@/views/resource/UploadView.vue'),
   //   meta: { requiresAuth: true }
   // },
-  // {
-  //   path: '/resources/:id',
-  //   name: 'ResourceDetail',
-  //   component: () => import('@/views/resource/ResourceDetailView.vue'),
-  //   meta: { requiresAuth: true }
-  // },
+  {
+    path: '/resources/:id',
+    name: 'ResourceDetail',
+    component: () => import('@/views/resource/ResourceDetailView.vue'),
+    meta: { requiresAuth: true }
+  },
   // {
   //   path: '/chat',
   //   name: 'Chat',

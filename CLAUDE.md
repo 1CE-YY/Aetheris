@@ -25,9 +25,9 @@
 
 ## 当前状态
 
-### 已完成（Phase 1-2）- 100%
+    ### 已完成（Phase 1-3）- 100%
 
-**交付内容**:
+**Phase 1-2 交付内容**:
 - ✅ 项目结构搭建（Spring Boot 3.5 + Java 21 + Vue 3）
 - ✅ Docker Compose 基础设施（MySQL 8 + Redis Stack）
 - ✅ 数据库表结构设计（8 张表，Flyway 迁移）
@@ -38,8 +38,18 @@
 - ✅ 完整的单元测试（78 个测试方法，39.2% 覆盖率）
 - ✅ 文档体系（925 行项目文档 + 782 行 API 规范）
 
-**验收报告**: `docs/PHASE1_2_ACCEPTANCE_REPORT.md`
-**评分**: ⭐⭐⭐⭐⭐ 97.1%
+**Phase 3 交付内容**:
+- ✅ 用户注册/登录功能（后端 API + 前端页面）
+- ✅ 用户行为记录系统（后端 API：查询、点击、收藏）
+- ✅ Token 验证系统（GET /api/auth/me，自动验证 token 有效性）
+- ✅ 前端用户状态管理（Pinia store + 路由守卫）
+- ✅ Token 失效自动跳转登录页（静默处理，无错误提示）
+- ✅ 错误处理优化（后端错误消息传递到前端）
+- ✅ 代码质量优化（统一异常、Service 接口分离、常量管理）
+
+**验收报告**:
+- Phase 1-2: `docs/PHASE1_2_ACCEPTANCE_REPORT.md` - ⭐⭐⭐⭐⭐ 97.1%
+- Phase 3: `specs/001-rag-recommendation-system/tasks.md` - ⭐⭐⭐⭐⭐ 95%
 
 ### 已修复问题（2025-12-29）
 
@@ -61,14 +71,17 @@
 3. JWT_SECRET 使用占位符（生产环境必须更换）
 4. 前端页面未实现（Phase 1-2 仅搭建架构）
 
-### 下一阶段（Phase 3）- 预计 4-6 周
+### 下一阶段（Phase 4）- 资源入库与文档切片
 
 **计划内容**:
-- 完成 ModelGateway 实现（调用智谱 AI API）
-- PDF/Markdown 文档解析
-- 文本分段与向量化
+- 资源上传功能（PDF/Markdown）
+- PDF 文本提取与页码记录（Apache PDFBox）
+- Markdown AST 解析与章节路径记录（CommonMark）
+- 文档自动切片（固定大小 + 重叠）
+- 向量化批量处理（调用 ModelGateway.embed()）
 - Redis Stack 向量索引创建
-- Embedding 缓存机制
+
+**预计时间**: 2-3 周
 
 ---
 
@@ -198,14 +211,30 @@ public class AuthServiceImpl implements AuthService {
 ```
 Aetheris/
 ├── backend/src/main/java/com/aetheris/rag/
-│   ├── controller/           # REST API（AuthController）
-│   ├── service/              # 业务接口（AuthService）
-│   ├── service/impl/         # 业务实现（AuthServiceImpl）
-│   ├── mapper/               # MyBatis 接口（UserMapper）
+│   ├── controller/           # REST API
+│   │   ├── AuthController.java        # 认证接口（/api/auth/login、/api/auth/me）
+│   │   └── BehaviorController.java    # 行为记录接口（/api/behaviors/*）
+│   ├── service/              # 业务接口
+│   │   ├── AuthService.java
+│   │   └── BehaviorService.java       # Phase 3 新增
+│   ├── service/impl/         # 业务实现
+│   │   ├── AuthServiceImpl.java       # 包含 getCurrentUser() 方法
+│   │   └── BehaviorServiceImpl.java   # Phase 3 新增
+│   ├── mapper/               # MyBatis 接口
+│   │   ├── UserMapper.java
+│   │   └── UserBehaviorMapper.java    # Phase 3 新增
 │   ├── model/                # 实体类（@Data，不使用 Record）
+│   │   ├── User.java
+│   │   └── UserBehavior.java         # Phase 3 新增
 │   ├── dto/                  # 请求/响应 DTO
 │   │   ├── request/          # LoginRequest、RegisterRequest
 │   │   └── response/         # AuthResponse、UserResponse、Citation
+│   ├── exception/            # 自定义异常
+│   │   ├── BaseException.java
+│   │   ├── ConflictException.java    # Phase 3 新增（409 错误）
+│   │   └── UnauthorizedException.java # Phase 3 新增（401 错误）
+│   ├── constants/            # 常量定义
+│   │   └── BehaviorConstants.java    # Phase 3 新增
 │   ├── gateway/              # ModelGateway 框架
 │   │   ├── EmbeddingGateway.java    # STUB（Phase 1-2）
 │   │   ├── ChatGateway.java         # STUB（Phase 1-2）
@@ -219,26 +248,36 @@ Aetheris/
 ├── backend/src/main/resources/
 │   ├── application.yml       # 主配置（192 行）
 │   ├── db/migration/         # Flyway 迁移脚本
-│   └── mapper/               # MyBatis XML（UserMapper.xml）
+│   └── mapper/               # MyBatis XML
+│       ├── UserMapper.xml
+│       └── UserBehaviorMapper.xml    # Phase 3 新增
 │
 ├── frontend/src/
-│   ├── api/                  # API 调用（待实现）
+│   ├── views/                # 页面组件
+│   │   ├── auth/
+│   │   │   ├── LoginView.vue         # 登录页面（Phase 3）
+│   │   │   └── RegisterView.vue      # 注册页面（Phase 3）
+│   │   ├── HomeView.vue              # 首页（Phase 3）
+│   │   └── NotFoundView.vue          # 404 页面（Phase 3）
+│   ├── services/             # API 服务
+│   │   ├── api.ts                    # Axios 封装（Phase 3 优化）
+│   │   └── auth.service.ts           # 认证服务（Phase 3）
+│   ├── stores/               # Pinia 状态管理
+│   │   └── user.ts                   # 用户状态（Phase 3，含 token 验证）
+│   ├── router/               # 路由配置
+│   │   └── index.ts                  # 路由守卫（Phase 3，异步验证）
 │   ├── components/           # Vue 组件（待实现）
-│   ├── views/                # 页面组件（目录已创建，待实现）
-│   ├── router/               # 路由配置（待实现）
-│   ├── stores/               # Pinia 状态（待实现）
 │   └── utils/                # 工具函数（待实现）
 │
 ├── docs/                    # 项目文档
 │   ├── STARTUP_GUIDE.md     # 启动指南（一键启动 + 完整步骤）
-│   ├── PHASE1_2_ACCEPTANCE_REPORT.md  # 验收报告
-│   ├── PHASE1_2_ACCEPTANCE_CHECKLIST.md  # 验收清单
-│   └── dev-logs/development-log.md  # 开发日志
+│   ├── PHASE1_2_ACCEPTANCE_REPORT.md  # Phase 1-2 验收报告
+│   └── dev-logs/            # 开发日志
 │
 ├── specs/001-rag-recommendation-system/
 │   ├── spec.md              # 需求规格
 │   ├── plan.md              # 实施计划
-│   ├── tasks.md             # 任务清单
+│   ├── tasks.md             # 任务清单（Phase 3 已更新验收状态）
 │   └── contracts/openapi.yaml  # API 规范（782 行）
 │
 ├── data/                   # 持久化数据（gitignore）
