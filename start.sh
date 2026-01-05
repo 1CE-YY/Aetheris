@@ -105,17 +105,33 @@ else
     echo -e "${BLUE}正在启动 Docker Compose 服务...${NC}"
     docker-compose up -d
 
-    # 等待服务健康
-    echo -e "${BLUE}等待服务启动...${NC}"
-    sleep 10
+    # 检查服务状态（更宽松的检查）
+    if docker-compose ps | grep -q "Up"; then
+        # 服务已启动，快速检查健康状态
+        echo -e "${BLUE}检查服务健康状态...${NC}"
 
-    # 检查服务状态
-    if docker-compose ps | grep -q "Up (healthy)"; then
-        echo -e "${GREEN}✅ 基础设施启动成功${NC}"
+        # 快速检查（最多等待 10 秒）
+        for i in {1..2}; do
+            if docker-compose ps | grep -q "healthy"; then
+                echo -e "${GREEN}✅ 基础设施启动成功${NC}"
+                break
+            fi
+            [ $i -eq 1 ] && echo -e "${YELLOW}等待服务就绪...${NC}"
+            sleep 5
+        done
+
+        # 如果仍未健康，显示提示但继续启动
+        if ! docker-compose ps | grep -q "healthy"; then
+            echo -e "${YELLOW}⚠️  服务启动中，继续启动后端...${NC}"
+        fi
     else
         echo -e "${RED}❌ 基础设施启动失败${NC}"
         docker-compose ps
-        exit 1
+        # 不退出，让用户决定是否继续
+        read -p "$(echo -e ${YELLOW}是否继续启动后端? [y/N]: ${NC})" choice
+        if [[ ! "$choice" =~ ^[Yy]$ ]]; then
+            exit 1
+        fi
     fi
 fi
 
@@ -132,6 +148,30 @@ cd "$PROJECT_ROOT/backend"
 if [ ! -d "target" ] || [ ! -d "target/classes" ]; then
     echo -e "${BLUE}后端未编译，开始编译...${NC}"
     mvn clean compile
+fi
+
+# 加载 .env 文件中的环境变量
+echo -e "${BLUE}加载环境变量...${NC}"
+if [ -f "$PROJECT_ROOT/.env" ]; then
+    # 使用更安全的方式加载 .env 文件
+    # 忽略注释行和空行，正确处理特殊字符
+    while IFS='=' read -r key value; do
+        # 跳过注释和空行
+        [[ "$key" =~ ^#.*$ ]] && continue
+        [[ -z "$key" ]] && continue
+
+        # 去除值前后的空白和引号
+        value=$(echo "$value" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^"//;s/"$//')
+
+        # 导出环境变量
+        export "$key=$value"
+
+    done < "$PROJECT_ROOT/.env"
+
+    echo -e "${GREEN}✅ 环境变量已从 .env 加载${NC}"
+    echo -e "${BLUE}提示: 如果 .env 文件不存在，将使用 application.yml 默认配置${NC}"
+else
+    echo -e "${YELLOW}⚠️  .env 文件不存在，使用 application.yml 默认配置${NC}"
 fi
 
 # 启动后端（后台运行）

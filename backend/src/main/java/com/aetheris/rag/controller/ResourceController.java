@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 资源管理 REST 控制器。
@@ -47,25 +48,28 @@ public class ResourceController {
   /**
    * 上传资源。
    *
-   * @param request 上传请求
+   * @param file 上传的文件
+   * @param title 资源标题
+   * @param tags 标签（可选）
+   * @param description 描述（可选）
    * @param authentication 认证信息
    * @return 资源响应
    * @throws Exception 如果文件处理失败（由 GlobalExceptionHandler 统一处理）
    */
   @PostMapping
   public ResponseEntity<ApiResponse<ResourceResponse>> uploadResource(
-      @Valid @RequestBody ResourceUploadRequest request, Authentication authentication)
+      @RequestParam("file") MultipartFile file,
+      @RequestParam("title") String title,
+      @RequestParam(value = "tags", required = false) String tags,
+      @RequestParam(value = "description", required = false) String description,
+      Authentication authentication)
       throws Exception {
     Long userId = (Long) authentication.getPrincipal();
-    log.info("POST /api/resources - userId={}, title={}", userId, request.getTitle());
-
-    // 转换文件路径
-    java.nio.file.Path filePath = Paths.get(request.getFilePath());
+    log.info("POST /api/resources - userId={}, title={}, file={}", userId, title, file.getOriginalFilename());
 
     // 上传资源（异常由 GlobalExceptionHandler 统一处理）
     Resource resource =
-        resourceService.uploadResource(
-            filePath, request.getTitle(), request.getTags(), request.getDescription(), userId);
+        resourceService.uploadResource(file, title, tags, description, userId);
 
     ResourceResponse resourceResponse = ResourceResponse.fromEntity(resource);
     ApiResponse<ResourceResponse> response =

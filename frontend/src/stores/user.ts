@@ -35,11 +35,6 @@ export const useUserStore = defineStore('user', () => {
   const loading = ref<boolean>(false)
 
   /**
-   * Token 验证状态
-   */
-  const tokenValidated = ref<boolean>(false)
-
-  /**
    * 正在验证 Token
    */
   const validatingToken = ref<boolean>(false)
@@ -47,10 +42,10 @@ export const useUserStore = defineStore('user', () => {
   // ========== 计算属性 ==========
   /**
    * 是否已登录
-   * <p>需要 token 存在且已通过验证
+   * <p>需要 token 存在且用户信息存在
    */
   const isLoggedIn = computed(() => {
-    return !!token.value && !!userInfo.value && tokenValidated.value
+    return !!token.value && !!userInfo.value
   })
 
   /**
@@ -84,7 +79,6 @@ export const useUserStore = defineStore('user', () => {
 
     const savedToken = AuthService.getToken()
     if (!savedToken) {
-      tokenValidated.value = true
       return false
     }
 
@@ -97,7 +91,6 @@ export const useUserStore = defineStore('user', () => {
       token.value = savedToken
       userInfo.value = user
       localStorage.setItem('userInfo', JSON.stringify(user))
-      tokenValidated.value = true
 
       return true
     } catch (error: any) {
@@ -105,7 +98,6 @@ export const useUserStore = defineStore('user', () => {
       console.error('Token 验证失败:', error)
       token.value = null
       userInfo.value = null
-      tokenValidated.value = true
       localStorage.removeItem('token')
       localStorage.removeItem('userInfo')
 
@@ -126,8 +118,6 @@ export const useUserStore = defineStore('user', () => {
       token.value = savedToken
       // 验证 token 有效性
       await validateToken()
-    } else {
-      tokenValidated.value = true
     }
   }
 
@@ -150,9 +140,6 @@ export const useUserStore = defineStore('user', () => {
 
       // 持久化用户信息到 localStorage
       localStorage.setItem('userInfo', JSON.stringify(response.user))
-
-      // 标记 token 已验证
-      tokenValidated.value = true
 
       return true
     } catch (error: any) {
@@ -206,7 +193,6 @@ export const useUserStore = defineStore('user', () => {
     AuthService.logout()
     token.value = null
     userInfo.value = null
-    tokenValidated.value = false
     localStorage.removeItem('userInfo')
   }
 
@@ -226,7 +212,6 @@ export const useUserStore = defineStore('user', () => {
     userInfo,
     token,
     loading,
-    tokenValidated,
     validatingToken,
 
     // 计算属性

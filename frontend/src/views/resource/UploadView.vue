@@ -9,7 +9,7 @@
         @finish="handleSubmit"
       >
         <!-- 文件选择 -->
-        <a-form-item label="选择文件" name="file" :rules="[{ required: true, message: '请选择文件' }]">
+        <a-form-item label="选择文件">
           <a-upload
             v-model:file-list="fileList"
             :before-upload="beforeUpload"
@@ -99,6 +99,7 @@ import { message } from 'ant-design-vue'
 import { UploadOutlined } from '@ant-design/icons-vue'
 import type { UploadProps } from 'ant-design-vue'
 import ResourceService, { type ResourceUploadRequest, type Resource } from '@/services/resource.service'
+import api from '@/services/api'
 
 const router = useRouter()
 
@@ -117,6 +118,7 @@ const uploadedResource = ref<Resource | null>(null)
 
 // 文件上传前校验
 const beforeUpload: UploadProps['beforeUpload'] = (file) => {
+  // 文件类型校验
   const isValidType = file.name.endsWith('.md') ||
                       file.name.endsWith('.markdown') ||
                       file.name.endsWith('.pdf')
@@ -125,46 +127,54 @@ const beforeUpload: UploadProps['beforeUpload'] = (file) => {
     return false
   }
 
+  // 文件大小校验
   const isValidSize = file.size <= 50 * 1024 * 1024 // 50MB
   if (!isValidSize) {
     message.error('文件大小不能超过 50MB')
     return false
   }
 
-  // 保存文件路径（实际项目中这里应该上传到服务器）
-  formState.filePath = file.name
-  formState.title = formState.title || file.name.replace(/\.(md|markdown|pdf)$/, '')
+  // 自动填充标题（如果为空）
+  if (!formState.title) {
+    formState.title = file.name.replace(/\.(md|markdown|pdf)$/, '')
+  }
 
-  return false // 阻止自动上传
+  return false // 阻止自动上传，我们将手动上传
 }
 
 // 移除文件
 const handleRemove = () => {
-  formState.filePath = ''
-  if (!formState.title) {
+  // 文件移除时，如果标题是从文件名自动生成的，则清空标题
+  if (fileList.value[0] && formState.title === fileList.value[0].name.replace(/\.(md|markdown|pdf)$/, '')) {
     formState.title = ''
   }
 }
 
 // 提交上传
 const handleSubmit = async (values: ResourceUploadRequest) => {
-  if (!formState.filePath) {
+  // 检查是否选择了文件
+  if (fileList.value.length === 0) {
     message.error('请先选择文件')
     return
   }
 
   uploading.value = true
   try {
-    // 注意：实际项目中需要先上传文件到服务器获取 filePath
-    // 这里使用模拟路径
-    const mockFilePath = `/path/to/uploads/${formState.filePath}`
+    const file = fileList.value[0].originFileObj
 
-    const resource = await ResourceService.upload({
-      ...values,
-      filePath: mockFilePath
+    // 创建 FormData
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('title', values.title)
+    formData.append('tags', values.tags || '')
+    formData.append('description', values.description || '')
+
+    // 发送请求（使用 api 实例，会自动添加 Authorization 头）
+    const response = await api.post<any, Resource>('/resources', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
     })
 
-    uploadedResource.value = resource
+    uploadedResource.value = response
     message.success('资源上传成功！')
 
     // 重置表单
@@ -178,11 +188,11 @@ const handleSubmit = async (values: ResourceUploadRequest) => {
 
 // 重置表单
 const handleReset = () => {
-  formState.filePath = ''
   formState.title = ''
   formState.tags = ''
   formState.description = ''
   fileList.value = []
+  uploadedResource.value = null
 }
 
 // 格式化文件大小

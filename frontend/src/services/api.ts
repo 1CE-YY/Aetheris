@@ -90,11 +90,15 @@ api.interceptors.response.use(
           break
 
         case 403:
-          // 403 错误处理
-          // 如果是 /api/auth/me，静默处理（token 验证失败）
-          // 其他情况显示错误
+          // 403 错误处理（通常是 token 过期或无效）
+          localStorage.removeItem('token')
+          localStorage.removeItem('userInfo')
+
+          // 如果是 /api/auth/me，静默处理（让 validateToken() 处理）
+          // 其他情况显示错误并跳转登录页
           if (requestUrl !== '/auth/me') {
-            message.error(data?.message || '无权限访问')
+            message.error('登录已过期，请重新登录')
+            window.location.href = '/login'
           }
           break
 

@@ -15,12 +15,16 @@ import com.aetheris.rag.util.PdfProcessor;
 import com.aetheris.rag.exception.ConflictException;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.multipart.MultipartFile;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -57,18 +61,54 @@ public class ResourceServiceImpl implements ResourceService {
   @Value("${chunk.overlap:200}")
   private int chunkOverlap;
 
+  /** 上传目录 */
+  @Value("${upload.dir:uploads}")
+  private String uploadDir;
+
   /** 分布式锁等待时间（秒） */
   private static final int LOCK_WAIT_TIME = 10;
 
   /** 分布式锁自动释放时间（秒） */
   private static final int LOCK_LEASE_TIME = 60;
 
+  /**
+   * 保存上传的文件到指定目录
+   *
+   * @param file 上传的文件
+   * @return 保存后的文件路径
+   * @throws IOException 如果文件保存失败
+   */
+  private Path saveUploadedFile(MultipartFile file) throws IOException {
+    // 创建上传目录（如果不存在）
+    Path uploadPath = Paths.get(uploadDir).toAbsolutePath().normalize();
+    if (!Files.exists(uploadPath)) {
+      Files.createDirectories(uploadPath);
+      log.info("创建上传目录: {}", uploadPath);
+    }
+
+    // 生成唯一文件名（时间戳 + 原始文件名）
+    String originalFilename = file.getOriginalFilename();
+    String fileName = System.currentTimeMillis() + "_" + originalFilename;
+    Path targetPath = uploadPath.resolve(fileName).normalize();
+
+    // 保存文件（使用 InputStream 复制，避免 transferTo 的路径问题）
+    try (InputStream inputStream = file.getInputStream()) {
+      Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
+      log.info("文件已保存: {}", targetPath);
+    }
+
+    return targetPath;
+  }
+
   @Override
   @Transactional
   public Resource uploadResource(
-      Path filePath, String title, String tags, String description, Long uploadedBy)
+      MultipartFile file, String title, String tags, String description, Long uploadedBy)
       throws Exception {
-    log.info("开始上传资源: {}, 文件: {}", title, filePath);
+    log.info("开始上传资源: {}, 文件: {}", title, file.getOriginalFilename());
+
+    // 1. 保存文件到服务器
+    Path filePath = saveUploadedFile(file);
 
     // 计算文件内容哈希
     String contentHash = calculateContentHash(filePath);
@@ -78,6 +118,23 @@ public class ResourceServiceImpl implements ResourceService {
     Resource existingResource = resourceMapper.findByContentHash(contentHash);
     if (existingResource != null) {
       log.info("资源已存在（内容哈希重复）: {}", existingResource.getId());
+
+      // 检查是否需要重新向量化
+      if (!existingResource.getVectorized()) {
+        log.info("资源未向量化，触发向量化: 资源ID={}", existingResource.getId());
+
+        // 异步触发向量化（避免阻塞）
+        try {
+          vectorService.vectorizeChunks(existingResource.getId());
+          log.info("向量化任务已触发: 资源ID={}", existingResource.getId());
+        } catch (Exception e) {
+          log.error("向量化失败: 资源ID={}", existingResource.getId(), e);
+          // 向量化失败不影响返回资源
+        }
+      } else {
+        log.info("资源已向量化，跳过: 资源ID={}", existingResource.getId());
+      }
+
       return existingResource;
     }
 

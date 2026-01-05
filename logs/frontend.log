@@ -2,13 +2,9 @@
 > aetheris-rag-frontend@1.0.0 dev
 > vite
 
+Port 5173 is in use, trying another one...
 
-  VITE v5.4.21  ready in 402 ms
+  VITE v5.4.21  ready in 377 ms
 
-  ➜  Local:   http://localhost:5173/
+  ➜  Local:   http://localhost:5174/
   ➜  Network: use --host to expose
-3:38:17 PM [vite] hmr update /src/views/auth/LoginView.vue
-3:39:37 PM [vite] hmr update /src/views/auth/LoginView.vue
-3:39:45 PM [vite] page reload src/router/index.ts
-3:44:00 PM [vite] page reload src/services/api.ts
-3:45:41 PM [vite] hmr update /src/views/auth/LoginView.vue

@@ -55,9 +55,13 @@ spring:
 # File storage configuration
 file:
   upload:
-    base-path: ${FILE_UPLOAD_PATH:./uploads} # Base directory for uploaded files
-    temp-path: ${FILE_TEMP_PATH:./uploads/temp} # Temporary directory for processing
+    base-path: ${FILE_UPLOAD_PATH:../uploads} # Base directory for uploaded files
+    temp-path: ${FILE_TEMP_PATH:../uploads/temp} # Temporary directory for processing
     max-size: ${MAX_FILE_SIZE:50MB}
+
+# Upload directory configuration
+upload:
+  dir: ${UPLOAD_DIR:../uploads} # Directory for uploaded files
 
   # Jackson configuration
   jackson:
@@ -160,7 +164,11 @@ recommendation:
 # JWT configuration
 jwt:
   secret: ${JWT_SECRET:your-256-bit-secret-key-change-in-production-minimum-32-bytes}
-  expiration: ${JWT_EXPIRATION:86400} # 24 hours in seconds
+  # Token 过期时间（单位：毫秒）
+  # - 1 小时 = 3600000 ms
+  # - 1 天  = 86400000 ms
+  # - 7 天  = 604800000 ms
+  expiration: ${JWT_EXPIRATION:604800000} # 7 days (604800000 milliseconds)
 
 # Logging configuration
 logging:
@@ -173,7 +181,7 @@ logging:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
   file:
-    name: ${LOG_FILE:logs/application.log}
+    name: ${LOG_FILE:../logs/application.log}
     max-size: ${LOG_MAX_SIZE:100MB}
     max-history: ${LOG_MAX_HISTORY:30}
 

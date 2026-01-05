@@ -5,8 +5,8 @@ package com.aetheris.rag.service;
 
 import com.aetheris.rag.entity.Chunk;
 import com.aetheris.rag.entity.Resource;
-import java.nio.file.Path;
 import java.util.List;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 资源服务接口。
@@ -25,7 +25,7 @@ public interface ResourceService {
    * <p>支持 PDF 和 Markdown 文件，自动提取文本、切片、向量化入库。
    * 使用内容哈希去重，相同内容不会重复入库（幂等性）。
    *
-   * @param filePath 文件路径
+   * @param file 上传的文件
    * @param title 资源标题
    * @param tags 标签（逗号分隔）
    * @param description 描述
@@ -34,7 +34,7 @@ public interface ResourceService {
    * @throws Exception 如果文件处理失败
    */
   Resource uploadResource(
-      Path filePath, String title, String tags, String description, Long uploadedBy)
+      MultipartFile file, String title, String tags, String description, Long uploadedBy)
       throws Exception;
 
   /**

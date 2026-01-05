@@ -136,20 +136,20 @@
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-api</artifactId>
-      <version>0.12.3</version>
+      <version>0.12.7</version>
     </dependency>
 
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-impl</artifactId>
-      <version>0.12.3</version>
+      <version>0.12.7</version>
       <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-jackson</artifactId>
-      <version>0.12.3</version>
+      <version>0.12.7</version>
       <scope>runtime</scope>
     </dependency>
 
@@ -235,6 +235,13 @@
       <artifactId>rest-assured</artifactId>
       <version>${rest-assured.version}</version>
       <scope>test</scope>
+    </dependency>
+
+    <!-- Dotenv - 自动加载 .env 文件 -->
+    <dependency>
+      <groupId>io.github.cdimascio</groupId>
+      <artifactId>dotenv-java</artifactId>
+      <version>3.0.0</version>
     </dependency>
   </dependencies>
 

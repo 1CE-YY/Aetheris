@@ -98,12 +98,11 @@ const router = createRouter({
  *
  * <p>在每次导航前，等待 token 验证完成后再进行认证检查
  */
-router.beforeEach((to, _from, next) => {
+router.beforeEach(async (to, _from, next) => {
   const userStore = useUserStore()
 
   console.log('[Router] 导航到:', to.path)
   console.log('[Router] validatingToken:', userStore.validatingToken)
-  console.log('[Router] tokenValidated:', userStore.tokenValidated)
   console.log('[Router] isLoggedIn:', userStore.isLoggedIn)
   console.log('[Router] token:', userStore.token?.substring(0, 20))
 
@@ -122,15 +121,19 @@ router.beforeEach((to, _from, next) => {
     return
   }
 
-  // 如果 token 尚未验证，启动验证并等待
-  if (!userStore.tokenValidated) {
-    console.log('[Router] Token 尚未验证，开始验证...')
-    userStore.initialize().then(() => {
+  // 如果有 token 但尚未验证（没有用户信息），启动验证
+  if (userStore.token && !userStore.userInfo) {
+    console.log('[Router] 发现 token 但未验证，开始验证...')
+    try {
+      await userStore.initialize()
       // 验证完成，重新触发路由守卫
       console.log('[Router] Token 验证完成，重新导航')
       next(to)
-    })
-    return
+      return
+    } catch (error) {
+      console.error('[Router] Token 验证失败:', error)
+      // 验证失败，继续路由守卫逻辑
+    }
   }
 
   // 检查路由是否需要认证

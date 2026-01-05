@@ -1,6 +1,10 @@
 package com.aetheris.rag.config;
 
 import com.aetheris.rag.util.JwtUtil;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.UnsupportedJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -93,22 +97,34 @@ public class SecurityConfig {
         String token = authHeader.substring(7);
 
         try {
-          if (jwtUtil.validateToken(token)) {
-            Long userId = jwtUtil.getUserIdFromToken(token);
+          // 只解析一次 token，避免重复解析
+          Claims claims = jwtUtil.parseToken(token);
+          Long userId = Long.parseLong(claims.getSubject());
 
-            // 使用用户 ID 和权限创建认证对象
-            UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(
-                    userId,
-                    null,
-                    List.of(new SimpleGrantedAuthority("ROLE_USER")));
+          // 使用用户 ID 和权限创建认证对象
+          UsernamePasswordAuthenticationToken authentication =
+              new UsernamePasswordAuthenticationToken(
+                  userId,
+                  null,
+                  List.of(new SimpleGrantedAuthority("ROLE_USER")));
 
-            // 在安全上下文中设置认证
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.debug("Authenticated user: {}", userId);
-          }
+          // 在安全上下文中设置认证
+          SecurityContextHolder.getContext().setAuthentication(authentication);
+          log.debug("Authenticated user: {}", userId);
+        } catch (ExpiredJwtException e) {
+          log.debug("Token 已过期: {}", e.getMessage());
+          SecurityContextHolder.clearContext();
+        } catch (MalformedJwtException e) {
+          log.debug("Token 格式错误: {}", e.getMessage());
+          SecurityContextHolder.clearContext();
+        } catch (UnsupportedJwtException e) {
+          log.debug("不支持的 Token 类型: {}", e.getMessage());
+          SecurityContextHolder.clearContext();
+        } catch (IllegalArgumentException e) {
+          log.debug("Token 参数非法: {}", e.getMessage());
+          SecurityContextHolder.clearContext();
         } catch (Exception e) {
-          log.debug("Invalid token: {}", e.getMessage());
+          log.error("验证 Token 时发生未知错误: {}", e.getMessage(), e);
           SecurityContextHolder.clearContext();
         }
       }
