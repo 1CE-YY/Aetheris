@@ -11,11 +11,21 @@
     </a-layout-header>
 
     <a-layout-content class="content">
-      <div class="action-bar">
-        <a-button type="primary" @click="handleUpload">上传资源</a-button>
-      </div>
+      <a-page-header
+        title="资源列表"
+        @back="() => router.push('/')"
+        class="page-header"
+      >
+        <template #extra>
+          <a-button type="primary" @click="handleUpload">
+            <template #icon><PlusOutlined /></template>
+            上传资源
+          </a-button>
+        </template>
+      </a-page-header>
 
-      <a-table
+      <div class="content-wrapper">
+        <a-table
         :columns="columns"
         :data-source="resources"
         :loading="loading"
@@ -43,6 +53,7 @@
           </template>
         </template>
       </a-table>
+      </div>
     </a-layout-content>
   </div>
 </template>
@@ -51,6 +62,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
+import { PlusOutlined } from '@ant-design/icons-vue'
 import { useUserStore } from '@/stores/user'
 import ResourceService from '@/services/resource.service'
 import type { Resource } from '@/services/resource.service'
@@ -112,13 +124,12 @@ const columns = [
 const loadResources = async () => {
   loading.value = true
   try {
-    const offset = (pagination.value.current - 1) * pagination.value.pageSize
-    const limit = pagination.value.pageSize
+    const page = pagination.value.current - 1  // 后端页码从 0 开始
+    const size = pagination.value.pageSize
 
-    const data = await ResourceService.getResourceList(offset, limit)
-    resources.value = data
-    // 注意：实际总数需要从后端返回，这里简化处理
-    // pagination.value.total = data.total
+    const data = await ResourceService.getResourceList(page, size)
+    resources.value = data.items
+    pagination.value.total = data.total
   } catch (error: any) {
     message.error('加载资源列表失败: ' + (error.customMessage || error.message))
   } finally {
@@ -133,8 +144,7 @@ const handleTableChange = (pag: any) => {
 }
 
 const handleUpload = () => {
-  // TODO: 实现上传功能
-  message.info('上传功能将在后续实现')
+  router.push({ name: 'ResourceUpload' })
 }
 
 const viewResource = (id: number) => {
@@ -198,7 +208,16 @@ onMounted(() => {
   background: #f0f2f5;
 }
 
-.action-bar {
+.page-header {
+  background: #fff;
+  padding: 16px 24px;
   margin-bottom: 16px;
+  border-radius: 4px;
+}
+
+.content-wrapper {
+  background: #fff;
+  padding: 24px;
+  border-radius: 4px;
 }
 </style>

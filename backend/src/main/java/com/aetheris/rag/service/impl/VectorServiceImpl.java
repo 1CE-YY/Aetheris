@@ -3,11 +3,13 @@
  */
 package com.aetheris.rag.service.impl;
 
-import com.aetheris.rag.gateway.ModelGateway;
+import com.aetheris.rag.gateway.EmbeddingGateway;
 import com.aetheris.rag.mapper.ChunkMapper;
 import com.aetheris.rag.entity.Chunk;
 import com.aetheris.rag.service.VectorService;
 import jakarta.annotation.PostConstruct;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.connection.RedisServerCommands;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,9 +26,6 @@ import org.springframework.stereotype.Service;
  *
  * <p>批量处理未向量化的切片，调用 EmbeddingGateway 获取向量，写入 Redis 向量索引。
  *
- * <p><strong>注意：</strong>当前 EmbeddingGateway 为 stub 实现，返回 dummy vectors。
- * 完整的向量化功能将在 Phase 5 实现 EmbeddingGateway 后自动生效。
- *
  * @author Aetheris Team
  * @version 1.0.0
  * @since 2025-12-31
@@ -37,18 +36,18 @@ import org.springframework.stereotype.Service;
 public class VectorServiceImpl implements VectorService {
 
   private final ChunkMapper chunkMapper;
-  private final ModelGateway modelGateway;
+  private final EmbeddingGateway embeddingGateway;
   private final StringRedisTemplate redisTemplate;
 
   /** 向量维度（智谱 embedding-v2） */
-  @Value("${embedding.vectorSize:1024}")
+  @Value("${rag.vector.dimension:1024}")
   private int vectorSize;
 
   /** Redis 向量索引名称 */
   private static final String INDEX_NAME = "chunk_vector_index";
 
   /** 批量处理大小 */
-  @Value("${vectorization.batchSize:10}")
+  @Value("${rag.vectorization.batchSize:10}")
   private int batchSize;
 
   /** 向量索引是否已初始化 */
@@ -62,12 +61,55 @@ public class VectorServiceImpl implements VectorService {
     }
 
     try {
-      // 索引检查将在 Phase 5 完整实现时执行
-      // 当前 stub 实现不需要检查索引状态
-      log.info("向量索引将在 Phase 5 完整实现时创建: {}", INDEX_NAME);
+      // 检查索引是否已存在
+      log.debug("检查向量索引是否存在: {}", INDEX_NAME);
+
+      // 使用 execute 方法执行 FT.INFO 命令
+      Boolean indexExists = redisTemplate.execute((RedisCallback<Boolean>) connection -> {
+        try {
+          // execute(String command, byte[]... args)
+          Object result = connection.execute("FT.INFO", INDEX_NAME.getBytes());
+          return result != null;
+        } catch (Exception e) {
+          // 索引不存在会抛出异常
+          log.debug("检查索引失败，可能是索引不存在", e);
+          return false;
+        }
+      });
+
+      if (indexExists) {
+        log.info("向量索引已存在: {}", INDEX_NAME);
+        indexInitialized = true;
+        return;
+      }
+
+      // 创建向量索引
+      log.info("创建向量索引: {}", INDEX_NAME);
+
+      // 执行 FT.CREATE 命令
+      String createResult = redisTemplate.execute((RedisCallback<String>) connection -> {
+        // FT.CREATE index_name ON HASH PREFIX 1 chunk: SCHEMA ...
+        // execute(String command, byte[]... args) - 第一个参数是String命令名
+        Object result = connection.execute(
+          "FT.CREATE",  // String 命令名
+          INDEX_NAME.getBytes(),
+          "ON".getBytes(), "HASH".getBytes(),
+          "PREFIX".getBytes(), "1".getBytes(), "chunk:".getBytes(),
+          "SCHEMA".getBytes(),
+          "vector".getBytes(), "VECTOR".getBytes(), "HNSW".getBytes(), "6".getBytes(),
+          "TYPE".getBytes(), "FLOAT32".getBytes(),
+          "DIM".getBytes(), String.valueOf(vectorSize).getBytes(),
+          "DISTANCE_METRIC".getBytes(), "COSINE".getBytes(),
+          "initial_size".getBytes(), "1000".getBytes()
+        );
+        return result != null ? result.toString() : "OK";
+      });
+
+      log.info("向量索引创建成功: {}, result: {}", INDEX_NAME, createResult);
       indexInitialized = true;
     } catch (Exception e) {
-      log.warn("初始化向量索引失败，将在首次向量化时重试", e);
+      log.error("初始化向量索引失败", e);
+      throw new RuntimeException("向量索引初始化失败: " + e.getMessage(), e);
     }
   }
 
@@ -114,10 +156,10 @@ public class VectorServiceImpl implements VectorService {
 
     for (Chunk chunk : chunks) {
       try {
-        // 调用 EmbeddingGateway 获取向量（stub 返回 dummy vectors）
-        float[] vector = modelGateway.embed(chunk.getChunkText());
+        // 调用 EmbeddingGateway 获取向量
+        float[] vector = embeddingGateway.embed(chunk.getChunkText());
 
-        // 写入 Redis 向量索引（Phase 5 完整实现）
+        // 写入 Redis 向量索引
         writeVectorToRedis(chunk, vector);
 
         vectorizedIds.add(chunk.getId());
@@ -152,7 +194,7 @@ public class VectorServiceImpl implements VectorService {
       fields.put("chunkIndex", chunk.getChunkIndex().toString());
       fields.put("chunkText", chunk.getChunkText());
 
-      // 将向量转换为字符串（Phase 5 完整实现时使用 Redis Vector 模块）
+      // 将向量转换为字符串（用于 RediSearch Vector）
       fields.put("vector", vectorToString(vector));
 
       // 写入 Redis Hash

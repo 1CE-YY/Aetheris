@@ -1,6 +1,23 @@
 <template>
   <div class="upload-view">
-    <a-card title="上传学习资源" :bordered="false">
+    <a-layout-header class="header">
+      <div class="header-content">
+        <div class="logo">Aetheris RAG</div>
+        <div class="user-info">
+          <span class="username">欢迎，{{ userStore.username }}</span>
+          <a-button type="link" @click="handleLogout">退出登录</a-button>
+        </div>
+      </div>
+    </a-layout-header>
+
+    <a-layout-content class="content">
+      <a-page-header
+        title="上传资源"
+        @back="() => router.push('/resources')"
+        class="page-header"
+      />
+
+      <a-card :bordered="false" class="upload-card">
       <a-form
         :model="formState"
         name="resourceUpload"
@@ -70,7 +87,7 @@
     </a-card>
 
     <!-- 上传结果 -->
-    <a-card v-if="uploadedResource" title="上传成功" :bordered="false" style="margin-top: 16px">
+    <a-card v-if="uploadedResource" title="上传成功" :bordered="false" class="result-card">
       <a-descriptions :column="2" bordered>
         <a-descriptions-item label="资源ID">{{ uploadedResource.id }}</a-descriptions-item>
         <a-descriptions-item label="文件类型">{{ uploadedResource.fileType }}</a-descriptions-item>
@@ -89,6 +106,7 @@
         查看详情
       </a-button>
     </a-card>
+    </a-layout-content>
   </div>
 </template>
 
@@ -98,10 +116,17 @@ import { useRouter } from 'vue-router'
 import { message } from 'ant-design-vue'
 import { UploadOutlined } from '@ant-design/icons-vue'
 import type { UploadProps } from 'ant-design-vue'
+import { useUserStore } from '@/stores/user'
 import ResourceService, { type ResourceUploadRequest, type Resource } from '@/services/resource.service'
 import api from '@/services/api'
 
 const router = useRouter()
+const userStore = useUserStore()
+
+const handleLogout = () => {
+  userStore.logout()
+  router.push('/login')
+}
 
 // 表单状态
 const formState = reactive<ResourceUploadRequest>({
@@ -215,9 +240,54 @@ const goToDetail = (id: number) => {
 
 <style scoped>
 .upload-view {
-  max-width: 800px;
+  min-height: 100vh;
+  background: #f0f2f5;
+}
+
+.header {
+  background: #fff;
+  padding: 0 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
   margin: 0 auto;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.content {
   padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  background: #fff;
+  border-radius: 4px;
+  margin-bottom: 16px;
+}
+
+.upload-card {
+  background: #fff;
+}
+
+.result-card {
+  background: #fff;
+  margin-top: 16px;
 }
 
 .upload-tip {

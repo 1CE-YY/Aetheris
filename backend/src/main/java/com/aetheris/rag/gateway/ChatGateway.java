@@ -2,9 +2,10 @@ package com.aetheris.rag.gateway;
 
 import com.aetheris.rag.gateway.retry.ModelRetryStrategy;
 import com.aetheris.rag.gateway.sanitize.LogSanitizer;
-import dev.langchain4j.data.message.AiMessage;
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.output.Response;
+import dev.langchain4j.community.model.zhipu.ZhipuAiChatModel;
+import dev.langchain4j.service.AiServices;
+import dev.langchain4j.service.SystemMessage;
+import dev.langchain4j.service.UserMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -21,78 +22,110 @@ import org.springframework.stereotype.Component;
  *   <li>日志清理以保护敏感数据
  * </ul>
  *
- * <p><strong>TODO</strong>: 此类为 Phase 1-2 完成而临时注释掉。
- * 将在 Phase 5（RAG 问答）中完全实现，届时需要智谱 AI API 集成。
- *
  * @author Aetheris Team
- * @version 1.0.0
+ * @version 1.2.0
  * @since 2025-12-26
  */
 @Slf4j
 @Component
 public class ChatGateway {
 
-  // TODO: Uncomment when implementing Phase 5
-  /*
-  private final ChatLanguageModel chatModel;
+  private final ChatService chatService;
   private final ModelRetryStrategy retryStrategy;
   private final String modelName;
 
+  /**
+   * 聊天服务接口（AiService 方式）。
+   */
+  @SystemMessage("你是一个专业的AI助手，擅长回答问题并提供有用的建议。")
+  interface ChatService {
+    @UserMessage
+    String chat(String userMessage);
+  }
+
+  /**
+   * 构造 ChatGateway。
+   */
   public ChatGateway(
       @Value("${model-gateway.chat.model-name}") String modelName,
       @Value("${model-gateway.chat.api-key}") String apiKey,
       @Value("${model-gateway.chat.temperature}") Double temperature,
       @Value("${model-gateway.chat.top-p}") Double topP,
-      @Value("${model-gateway.chat.max-tokens}") Integer maxTokens,
-      @Value("${model-gateway.chat.timeout}") Duration timeout,
       @Value("${model-gateway.chat.retry.max-attempts}") int maxRetries,
-      @Value("${model-gateway.chat.retry.backoff}") Duration retryBackoff) {
+      @Value("${model-gateway.chat.retry.backoff}") java.time.Duration retryBackoff) {
 
     this.modelName = modelName;
     this.retryStrategy = new ModelRetryStrategy(maxRetries, retryBackoff);
 
-    this.chatModel =
+    // LangChain4j 1.9.1: 构建 ZhipuAiChatModel
+    ZhipuAiChatModel model =
         ZhipuAiChatModel.builder()
             .apiKey(apiKey)
-            .modelName(modelName)
+            .model(modelName)
             .temperature(temperature)
             .topP(topP)
-            .maxTokens(maxTokens)
-            .timeout(timeout)
+            .maxRetries(maxRetries)
+            .logRequests(true)
+            .logResponses(true)
             .build();
 
-    log.info("Initialized ChatGateway with model: {}", modelName);
+    // 使用 AiServices 构建聊天服务
+    this.chatService = AiServices.builder(ChatService.class)
+        .chatModel(model)
+        .build();
+
+    log.info("初始化 ChatGateway，模型：{}，temperature：{}", modelName, temperature);
   }
-  */
 
   /**
    * 生成聊天响应。
    *
-   * <p><strong>TODO</strong>: 待 Phase 5 实现。
-   *
    * @param prompt 输入提示
    * @return 生成的响应文本
-   * @throws ModelException 如果 API 调用在所有重试后失败
+   * @throws RuntimeException 如果 API 调用在所有重试后失败
    */
   public String chat(String prompt) {
-    // TODO: 在 Phase 5 中实现
-    log.warn("ChatGateway.chat() not yet implemented - returning dummy response");
-    return "This is a dummy response. Chat functionality will be implemented in Phase 5.";
+    // 记录日志（脱敏）
+    String sanitizedPrompt = LogSanitizer.sanitize(prompt);
+    log.info("调用 Chat API：model={}, promptPreview={}", modelName, sanitizedPrompt);
+
+    // 使用重试策略调用 API
+    String response =
+        retryStrategy.executeWithRetry(
+            () -> {
+              return chatService.chat(prompt);
+            });
+
+    return response;
   }
 
   /**
    * 使用系统提示生成聊天响应。
    *
-   * <p><strong>TODO</strong>: 待 Phase 5 实现。
-   *
    * @param systemPrompt 系统提示
    * @param userPrompt 用户提示
    * @return 生成的响应文本
-   * @throws ModelException 如果 API 调用在所有重试后失败
+   * @throws RuntimeException 如果 API 调用在所有重试后失败
    */
   public String chat(String systemPrompt, String userPrompt) {
-    // TODO: 在 Phase 5 中实现
-    log.warn("ChatGateway.chat(systemPrompt, userPrompt) not yet implemented - returning dummy response");
-    return "This is a dummy response. Chat functionality will be implemented in Phase 5.";
+    // 记录日志（脱敏）
+    String sanitizedSystemPrompt = LogSanitizer.sanitize(systemPrompt);
+    String sanitizedUserPrompt = LogSanitizer.sanitize(userPrompt);
+    log.info(
+        "调用 Chat API（带系统提示）：model={}, systemPromptPreview={}, userPromptPreview={}",
+        modelName,
+        sanitizedSystemPrompt,
+        sanitizedUserPrompt);
+
+    // 使用重试策略调用 API
+    // 注意：AiService 不支持动态系统提示，所以这里使用带系统提示的格式
+    String combinedPrompt = String.format("[系统提示]%s\n\n[用户问题]%s", systemPrompt, userPrompt);
+    String response =
+        retryStrategy.executeWithRetry(
+            () -> {
+              return chatService.chat(combinedPrompt);
+            });
+
+    return response;
   }
 }

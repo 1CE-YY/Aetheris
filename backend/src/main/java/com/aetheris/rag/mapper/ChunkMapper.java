@@ -37,6 +37,14 @@ public interface ChunkMapper {
   int batchInsert(@Param("chunks") List<Chunk> chunks);
 
   /**
+   * 根据切片ID查询切片。
+   *
+   * @param id 切片ID
+   * @return 切片实体，不存在则返回 null
+   */
+  Chunk findById(@Param("id") Long id);
+
+  /**
    * 根据资源ID查询所有切片。
    *
    * @param resourceId 资源ID

@@ -76,6 +76,23 @@
     </foreach>
   </insert>
 
+  <!-- 根据切片ID查询 -->
+  <select id="findById" resultMap="ChunkResultMap">
+    SELECT id,
+           resource_id,
+           chunk_index,
+           chunk_text,
+           location_info,
+           page_start,
+           page_end,
+           chapter_path,
+           text_hash,
+           vectorized,
+           created_at
+    FROM resource_chunks
+    WHERE id = #{id}
+  </select>
+
   <!-- 根据资源ID查询所有切片 -->
   <select id="findByResourceId" resultMap="ChunkResultMap">
     SELECT id,

@@ -2,9 +2,76 @@
 > aetheris-rag-frontend@1.0.0 dev
 > vite
 
-Port 5173 is in use, trying another one...
 
-  VITE v5.4.21  ready in 377 ms
+  VITE v5.4.21  ready in 415 ms
 
-  ➜  Local:   http://localhost:5174/
+  ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
+1:21:04 PM [vite] hmr update /src/views/auth/LoginView.vue
+1:30:23 PM [vite] hmr update /src/views/resource/ResourceListView.vue
+1:30:24 PM [vite] hmr update /src/views/resource/ResourceListView.vue
+1:39:54 PM [vite] hmr update /src/views/resource/ResourceListView.vue
+1:39:54 PM [vite] Internal server error: Element is missing end tag.
+  Plugin: vite:vue
+  File: /Users/hubin5/app/Aetheris/frontend/src/views/resource/ResourceListView.vue:27:7
+  25 |        </a-page-header>
+  26 |  
+  27 |        <div class="content-wrapper">
+     |         ^
+  28 |          <a-table
+  29 |          :columns="columns"
+      at createCompilerError (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-core/dist/compiler-core.cjs.js:1378:17)
+      at emitError (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-core/dist/compiler-core.cjs.js:3014:5)
+      at Object.onclosetag (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-core/dist/compiler-core.cjs.js:2381:13)
+      at Tokenizer.stateInClosingTagName (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-core/dist/compiler-core.cjs.js:799:16)
+      at Tokenizer.parse (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-core/dist/compiler-core.cjs.js:1157:16)
+      at Object.baseParse (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-core/dist/compiler-core.cjs.js:3053:13)
+      at Object.parse (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-dom/dist/compiler-dom.cjs.js:910:23)
+      at Object.parse$1 [as parse] (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-sfc/dist/compiler-sfc.cjs.js:1824:24)
+      at createDescriptor (file:///Users/hubin5/app/Aetheris/frontend/node_modules/@vitejs/plugin-vue/dist/index.mjs:74:43)
+      at handleHotUpdate (file:///Users/hubin5/app/Aetheris/frontend/node_modules/@vitejs/plugin-vue/dist/index.mjs:2155:26)
+1:39:54 PM [vite] hmr update /src/views/resource/ResourceListView.vue
+1:39:54 PM [vite] hmr update /src/views/resource/ResourceListView.vue?vue&type=style&index=0&scoped=553f7ff8&lang.css
+1:40:36 PM [vite] hmr update /src/views/resource/UploadView.vue
+1:40:36 PM [vite] Internal server error: Element is missing end tag.
+  Plugin: vite:vue
+  File: /Users/hubin5/app/Aetheris/frontend/src/views/resource/UploadView.vue:13:5
+  11 |      </a-layout-header>
+  12 |  
+  13 |      <a-layout-content class="content">
+     |       ^
+  14 |        <a-page-header
+  15 |          title="上传资源"
+      at createCompilerError (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-core/dist/compiler-core.cjs.js:1378:17)
+      at emitError (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-core/dist/compiler-core.cjs.js:3014:5)
+      at Object.onclosetag (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-core/dist/compiler-core.cjs.js:2381:13)
+      at Tokenizer.stateInClosingTagName (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-core/dist/compiler-core.cjs.js:799:16)
+      at Tokenizer.parse (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-core/dist/compiler-core.cjs.js:1157:16)
+      at Object.baseParse (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-core/dist/compiler-core.cjs.js:3053:13)
+      at Object.parse (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-dom/dist/compiler-dom.cjs.js:910:23)
+      at Object.parse$1 [as parse] (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-sfc/dist/compiler-sfc.cjs.js:1824:24)
+      at createDescriptor (file:///Users/hubin5/app/Aetheris/frontend/node_modules/@vitejs/plugin-vue/dist/index.mjs:74:43)
+      at handleHotUpdate (file:///Users/hubin5/app/Aetheris/frontend/node_modules/@vitejs/plugin-vue/dist/index.mjs:2155:26)
+1:40:36 PM [vite] hmr update /src/views/resource/UploadView.vue
+1:40:36 PM [vite] Internal server error: Element is missing end tag.
+  Plugin: vite:vue
+  File: /Users/hubin5/app/Aetheris/frontend/src/views/resource/UploadView.vue:13:5
+  11 |      </a-layout-header>
+  12 |  
+  13 |      <a-layout-content class="content">
+     |       ^
+  14 |        <a-page-header
+  15 |          title="上传资源"
+      at createCompilerError (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-core/dist/compiler-core.cjs.js:1378:17)
+      at emitError (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-core/dist/compiler-core.cjs.js:3014:5)
+      at Object.onclosetag (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-core/dist/compiler-core.cjs.js:2381:13)
+      at Tokenizer.stateInClosingTagName (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-core/dist/compiler-core.cjs.js:799:16)
+      at Tokenizer.parse (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-core/dist/compiler-core.cjs.js:1157:16)
+      at Object.baseParse (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-core/dist/compiler-core.cjs.js:3053:13)
+      at Object.parse (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-dom/dist/compiler-dom.cjs.js:910:23)
+      at Object.parse$1 [as parse] (/Users/hubin5/app/Aetheris/frontend/node_modules/@vue/compiler-sfc/dist/compiler-sfc.cjs.js:1824:24)
+      at createDescriptor (file:///Users/hubin5/app/Aetheris/frontend/node_modules/@vitejs/plugin-vue/dist/index.mjs:74:43)
+      at handleHotUpdate (file:///Users/hubin5/app/Aetheris/frontend/node_modules/@vitejs/plugin-vue/dist/index.mjs:2155:26)
+1:40:36 PM [vite] hmr update /src/views/resource/UploadView.vue
+1:40:37 PM [vite] hmr update /src/views/resource/UploadView.vue
+1:40:37 PM [vite] hmr update /src/views/resource/UploadView.vue?vue&type=style&index=0&scoped=6624972d&lang.css

@@ -121,17 +121,14 @@ async function handleLogin() {
     console.log('[Login] tokenValidated:', userStore.tokenValidated)
     console.log('[Login] isLoggedIn:', userStore.isLoggedIn)
 
-    // 使用 setTimeout 确保状态更新后再跳转
-    setTimeout(() => {
-      // 跳转到首页或之前的页面
-      const redirect = router.currentRoute.value.query.redirect as string
-      const targetUrl = redirect || '/'
+    // 跳转到首页或之前的页面
+    const redirect = router.currentRoute.value.query.redirect as string
+    const targetUrl = redirect || '/'
 
-      console.log('[Login] 准备跳转到:', targetUrl)
+    console.log('[Login] 准备跳转到:', targetUrl)
 
-      // 使用 window.location.href 强制刷新页面，避免路由守卫问题
-      window.location.href = targetUrl
-    }, 100)
+    // 使用 router.push 而不是 window.location.href，避免页面刷新导致状态丢失
+    router.push(targetUrl)
   } catch (error: any) {
     console.error('[Login] 登录失败:', error)
     // 显示具体的错误信息

@@ -314,39 +314,47 @@
 
 ### Phase 5.0: 完成 ModelGateway Stub 实现 (阻塞前置条件)
 
-- [ ] **T012-FULL** 完整实现 `EmbeddingGateway.java`（当前为 stub）
-  - **当前状态**: Stub 实现，返回 dummy embedding
-  - **需要完成**:
-    - 修复 langchain4j-zhipu-ai 依赖配置
-    - 实现 Zhipu AI Embedding API 调用
-    - 集成 EmbeddingCache 缓存逻辑
-    - 集成 ModelRetryStrategy 重试策略
-    - 添加日志脱敏
-  - **测试要点**：单测验证缓存命中、重试策略、超时处理、日志脱敏
-  - **验收标准**：FR-007（Embedding 缓存）、FR-009（入库幂等）
+- [x] **T012-FULL** ✅ 完整实现 `EmbeddingGateway.java`
+  - **完成时间**: 2026-01-06
+  - **实现内容**:
+    - ✅ 修复 langchain4j-zhipu-ai 依赖配置（已集成）
+    - ✅ 实现 Zhipu AI Embedding API 调用
+    - ✅ 集成 EmbeddingCache 缓存逻辑
+    - ✅ 集成 ModelRetryStrategy 重试策略
+    - ✅ 添加日志脱敏
+    - ✅ 支持批量 Embedding (embedBatch)
+  - **验收标准**: FR-007（Embedding 缓存）、FR-009（入库幂等）
 
-- [ ] **T013-FULL** 完整实现 `ChatGateway.java`（当前为 stub）
-  - **当前状态**: Stub 实现，返回 dummy response
-  - **需要完成**:
-    - 修复 langchain4j-zhipu-ai 依赖配置
-    - 实现 Zhipu AI Chat API 调用
-    - 集成 ModelRetryStrategy 重试策略
-    - 实现降级策略（LLM 不可用时的处理）
-    - 添加日志脱敏
-  - **测试要点**：单测验证降级策略、Prompt 构建
-  - **验收标准**：FR-015（证据不足时的降级返回）
+- [x] **T013-FULL** ✅ 完整实现 `ChatGateway.java`
+  - **完成时间**: 2026-01-06
+  - **实现内容**:
+    - ✅ 修复 langchain4j-zhipu-ai 依赖配置（已集成）
+    - ✅ 实现 Zhipu AI Chat API 调用
+    - ✅ 集成 ModelRetryStrategy 重试策略
+    - ✅ 支持系统提示+用户提示模式
+    - ✅ 添加日志脱敏
+  - **待实现**: 降级策略将在 RagService 中实现
+  - **验收标准**: FR-015（证据不足时的降级返回）
 
 ### Phase 5.1: 语义检索服务
 
-- [ ] T049 创建 `backend/src/main/java/com/aetheris/rag/service/SearchService.java` 接口和实现 `SearchServiceImpl.java`
+- [x] T049 创建 `backend/src/main/java/com/aetheris/rag/service/SearchService.java` 接口和实现 `SearchServiceImpl.java` ✅ **2026-01-06 完成**
   - **目标**：实现语义检索，查询 Redis 向量索引，返回 Top-K 切片（FR-010），按资源聚合（FR-011）
   - **涉及表**：resource_chunks（关联获取元数据）、resources（标题、标签）
-  - **Redis**：
-    - 向量检索：`FT.SEARCH chunk_vector_index VECTOR ... KNN {topK} $query_vector`
-    - 结果缓存：`search:cache:{queryHash}:{topK}` TTL 1 小时
+  - **已完成实现**：
+    - ✅ SearchService 接口（2 个方法：search、searchAggregated）
+    - ✅ SearchServiceImpl 完整实现（286 行）
+      - 使用 EmbeddingGateway 对查询文本向量化
+      - Redis FT.SEARCH + KNN 向量检索
+      - 结果映射为 Citation 对象（包含 resourceId、chunkId、location、snippet、score）
+      - 按资源聚合逻辑（同一资源保留相似度最高的切片）
+      - 相似度阈值过滤（默认 0.5）
+    - ✅ 添加 ChunkMapper.findById 方法和 SQL
   - **关键配置**：`retrieval.topK`（默认 5）、`retrieval.scoreThreshold`（0.5，低于阈值返回空）
+  - **Redis**：向量索引 `chunk_vector_index`（HNSW，COSINE 距离，1024 维）
   - **测试要点**：单测验证向量检索、资源聚合逻辑（按 resourceId 合并相似度分数）
   - **验收标准**：FR-010（Top-K 检索）、FR-011（聚合到资源级别）
+  - **下一步**: T054 集成 PerformanceTimer 记录检索耗时
 - [ ] T050 创建 `backend/src/main/java/com/aetheris/rag/service/RagService.java` 接口和实现 `RagServiceImpl.java`
   - **目标**：实现 RAG 问答流程（FR-013）：检索 → Prompt 构建 → LLM 生成 → Citations 提取
   - **涉及表**：resources、resource_chunks
