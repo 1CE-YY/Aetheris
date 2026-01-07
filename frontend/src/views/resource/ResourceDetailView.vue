@@ -16,9 +16,13 @@
         @back="handleBack"
       >
         <template #extra>
-          <a-tag :color="resource?.vectorized ? 'green' : 'orange'">
-            {{ resource?.vectorized ? '已向量化' : '处理中' }}
-          </a-tag>
+          <a-space>
+            <a-tag :color="resource?.vectorized ? 'green' : 'orange'">
+              {{ resource?.vectorized ? '已向量化' : '处理中' }}
+            </a-tag>
+            <a-button type="default" @click="handleEdit">编辑</a-button>
+            <a-button type="primary" danger @click="handleDelete">删除资源</a-button>
+          </a-space>
         </template>
       </a-page-header>
 
@@ -65,14 +69,57 @@
         </a-table>
       </a-card>
     </a-layout-content>
+
+    <!-- 编辑资源 Modal -->
+    <a-modal
+      v-model:open="editModalVisible"
+      title="编辑资源"
+      @ok="handleEditSubmit"
+      :confirm-loading="editSubmitting"
+      @cancel="handleEditCancel"
+    >
+      <a-form
+        :model="editFormState"
+        :label-col="{ span: 6 }"
+        :wrapper-col="{ span: 16 }"
+      >
+        <a-form-item label="资源标题">
+          <a-input
+            v-model:value="editFormState.title"
+            placeholder="请输入资源标题"
+            :maxlength="200"
+            show-count
+          />
+        </a-form-item>
+
+        <a-form-item label="标签">
+          <a-input
+            v-model:value="editFormState.tags"
+            placeholder="多个标签用逗号分隔"
+            :maxlength="500"
+          />
+        </a-form-item>
+
+        <a-form-item label="描述">
+          <a-textarea
+            v-model:value="editFormState.description"
+            placeholder="请输入资源描述"
+            :rows="4"
+            :maxlength="2000"
+            show-count
+          />
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, h } from 'vue'
 import { useRouter } from 'vue-router'
 import { useRoute } from 'vue-router'
-import { message } from 'ant-design-vue'
+import { message, Modal } from 'ant-design-vue'
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
 import { useUserStore } from '@/stores/user'
 import ResourceService from '@/services/resource.service'
 import type { Resource } from '@/services/resource.service'
@@ -85,6 +132,16 @@ const userStore = useUserStore()
 const loading = ref(false)
 const resource = ref<Resource>()
 const chunks = ref<Chunk[]>([])
+
+// 编辑相关状态
+const editModalVisible = ref(false)
+const editSubmitting = ref(false)
+const editingResourceId = ref<number | null>(null)
+const editFormState = ref({
+  title: '',
+  tags: '',
+  description: ''
+})
 
 const chunkColumns = [
   {
@@ -149,6 +206,72 @@ const loadChunks = async () => {
 
 const handleBack = () => {
   router.push('/resources')
+}
+
+const handleDelete = () => {
+  if (!resource.value) return
+
+  Modal.confirm({
+    title: '确认删除',
+    content: `确定要删除资源"${resource.value.title}"吗？删除后无法恢复。`,
+    icon: h(ExclamationCircleOutlined),
+    okText: '删除',
+    okType: 'danger',
+    cancelText: '取消',
+    onOk: async () => {
+      try {
+        await ResourceService.deleteResource(resource.value!.id)
+        message.success('资源已删除')
+        router.push('/resources')
+      } catch (error: any) {
+        message.error(error.response?.data?.message || '删除失败，请重试')
+      }
+    }
+  })
+}
+
+const handleEdit = () => {
+  if (!resource.value) return
+
+  editingResourceId.value = resource.value.id
+  editFormState.value = {
+    title: resource.value.title,
+    tags: resource.value.tags || '',
+    description: resource.value.description || ''
+  }
+  editModalVisible.value = true
+}
+
+const handleEditSubmit = async () => {
+  if (!editingResourceId.value) return
+
+  editSubmitting.value = true
+  try {
+    await ResourceService.updateResource(editingResourceId.value, {
+      title: editFormState.value.title,
+      tags: editFormState.value.tags || undefined,
+      description: editFormState.value.description || undefined
+    })
+
+    message.success('资源信息已更新')
+    editModalVisible.value = false
+
+    // 重新加载资源详情
+    await loadResource()
+  } catch (error: any) {
+    message.error(error.response?.data?.message || '更新失败，请重试')
+  } finally {
+    editSubmitting.value = false
+  }
+}
+
+const handleEditCancel = () => {
+  editModalVisible.value = false
+  editFormState.value = {
+    title: '',
+    tags: '',
+    description: ''
+  }
 }
 
 const handleLogout = () => {

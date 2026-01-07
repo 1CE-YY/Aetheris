@@ -76,4 +76,34 @@ public interface ResourceService {
    * @return 资源总数
    */
   Long getResourceCount();
+
+  /**
+   * 更新资源信息。
+   *
+   * @param id 资源ID
+   * @param title 标题
+   * @param tags 标签
+   * @param description 描述
+   * @return 更新后的资源
+   */
+  Resource updateResource(Long id, String title, String tags, String description);
+
+  /**
+   * 删除资源（级联删除切片）。
+   *
+   * @param id 资源ID
+   * @param userId 操作用户ID
+   * @return 被删除的资源
+   * @throws RuntimeException 如果资源不存在或无权删除
+   */
+  Resource deleteResource(Long id, Long userId);
+
+  /**
+   * 批量删除资源。
+   *
+   * @param ids 资源ID列表
+   * @param userId 操作用户ID
+   * @return 删除的资源列表
+   */
+  List<Resource> deleteResources(List<Long> ids, Long userId);
 }

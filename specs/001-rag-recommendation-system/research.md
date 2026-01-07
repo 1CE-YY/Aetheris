@@ -87,7 +87,7 @@ List<EmbeddingMatch<Text>> relevant = embeddingStore.findRelevant(
 ```yaml
 model-gateway:
   embedding:
-    model-name: "embedding-v2"        # 智谱 AI Embedding 模型
+    model-name: "embedding-3"        # 智谱 AI Embedding 模型
     base-url: "https://open.bigmodel.cn/api/paas/v4/"
     timeout: 30s                      # 超时时间
     max-tokens: 8192                  # 最大输入长度
@@ -102,7 +102,7 @@ model-gateway:
     rate-limit:
       permits-per-second: 10          # 并发限流
   chat:
-    model-name: "glm-4-flash"         # 智谱 AI Chat 模型（性价比高）
+    model-name: "glm-4.5-flash"         # 智谱 AI Chat 模型（高性能免费）
     temperature: 0.7                  # 创造性（0-1）
     top-p: 0.9
     max-tokens: 2048
@@ -182,7 +182,7 @@ log.info("调用 Embedding API: model={}, input={}, timeout={}ms",
 
 - **LangChain4j 内置支持**：ZhipuAi 模型已集成，无需手写 HTTP 客户端
 - **统一配置管理**：通过 application.yml 集中管理所有模型参数（符合宪章四原则）
-- **成本控制**：glm-4-flash 是高性价比模型，适合 MVP 阶段
+- **成本控制**：glm-4.5-flash 是高性能免费模型，成本为零，性能更强
 - **降级策略**：Chat API 不可用时返回检索结果 + 引用摘要，不导致完全失败（符合宪章四原则）
 
 #### 替代方案
@@ -729,8 +729,8 @@ public class EvalService {
 - chunkSize: 1000
 - overlap: 200
 - topK: 5
-- embeddingModel: embedding-v2
-- chatModel: glm-4-flash
+- embeddingModel: embedding-3
+- chatModel: glm-4.5-flash
 
 ## 语义检索指标
 

@@ -23,20 +23,24 @@ cd "$PROJECT_ROOT"
 stop_backend() {
     echo -e "${YELLOW}[停止后端]${NC}"
 
-    BACKEND_PIDS=$(pgrep -f "spring-boot:run|AetherisRagApplication" || true)
+    # 匹配多种后端启动方式：
+    # 1. java -jar rag-backend-*.jar
+    # 2. spring-boot:run (Maven)
+    # 3. AetherisRagApplication (主类)
+    BACKEND_PIDS=$(pgrep -f "rag-backend-.*\.jar|spring-boot:run|AetherisRagApplication" || true)
 
     if [ -n "$BACKEND_PIDS" ]; then
         echo -e "${BLUE}找到后端进程: $BACKEND_PIDS${NC}"
 
         # 优雅关闭
-        pkill -TERM -f "spring-boot:run|AetherisRagApplication" || true
+        pkill -TERM -f "rag-backend-.*\.jar|spring-boot:run|AetherisRagApplication" || true
         sleep 3
 
         # 检查并强制关闭
-        REMAINING_PIDS=$(pgrep -f "spring-boot:run|AetherisRagApplication" || true)
+        REMAINING_PIDS=$(pgrep -f "rag-backend-.*\.jar|spring-boot:run|AetherisRagApplication" || true)
         if [ -n "$REMAINING_PIDS" ]; then
             echo -e "${YELLOW}进程仍在运行，强制关闭...${NC}"
-            pkill -9 -f "spring-boot:run|AetherisRagApplication" || true
+            pkill -9 -f "rag-backend-.*\.jar|spring-boot:run|AetherisRagApplication" || true
             sleep 1
         fi
 

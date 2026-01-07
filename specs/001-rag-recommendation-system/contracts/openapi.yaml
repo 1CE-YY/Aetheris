@@ -698,10 +698,10 @@ components:
               example: 5
             embeddingModel:
               type: string
-              example: embedding-v2
+              example: embedding-3
             chatModel:
               type: string
-              example: glm-4-flash
+              example: glm-4.5-flash
         compareStrategies:
           type: boolean
           description: 是否对比无画像 vs 有画像

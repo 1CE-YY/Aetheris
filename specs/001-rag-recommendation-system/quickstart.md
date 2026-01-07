@@ -172,12 +172,12 @@ app:
   zhipu-ai:
     api-key: ${ZHIPU_AI_API_KEY:your-api-key-here}
     embedding:
-      model-name: embedding-v2
+      model-name: embedding-3
       base-url: https://open.bigmodel.cn/api/paas/v4/
       timeout: 30s
       max-tokens: 8192
     chat:
-      model-name: glm-4-flash
+      model-name: glm-4.5-flash
       temperature: 0.7
       top-p: 0.9
       max-tokens: 2048
@@ -1027,7 +1027,7 @@ curl -X GET 'http://localhost:8080/api/recommendations?topN=10' \
    curl -X POST https://open.bigmodel.cn/api/paas/v4/chat/completions \
      -H "Authorization: Bearer $ZHIPU_AI_API_KEY" \
      -H 'Content-Type: application/json' \
-     -d '{"model":"glm-4-flash","messages":[{"role":"user","content":"hello"}]}'
+     -d '{"model":"glm-4.5-flash","messages":[{"role":"user","content":"hello"}]}'
    ```
 
 ### 5.4 PDF 文件上传失败

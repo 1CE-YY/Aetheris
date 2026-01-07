@@ -5,7 +5,7 @@ package com.aetheris.rag.controller;
 
 import com.aetheris.rag.common.response.ApiResponse;
 import com.aetheris.rag.common.response.PageResponse;
-import com.aetheris.rag.dto.request.ResourceUploadRequest;
+import com.aetheris.rag.dto.request.ResourceUpdateRequest;
 import com.aetheris.rag.dto.response.ChunkResponse;
 import com.aetheris.rag.dto.response.ResourceResponse;
 import com.aetheris.rag.entity.Chunk;
@@ -19,13 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -123,6 +117,40 @@ public class ResourceController {
   }
 
   /**
+   * 更新资源信息。
+   *
+   * @param id 资源ID
+   * @param request 更新请求
+   * @param authentication 认证信息
+   * @return 更新后的资源响应
+   */
+  @PutMapping("/{id}")
+  public ResponseEntity<ApiResponse<ResourceResponse>> updateResource(
+      @PathVariable Long id,
+      @Valid @RequestBody ResourceUpdateRequest request,
+      Authentication authentication) {
+    Long userId = (Long) authentication.getPrincipal();
+    log.info("PUT /api/resources/{} - userId={}, title={}", id, userId, request.getTitle());
+
+    // 权限检查：只能修改自己上传的资源
+    Resource existing = resourceService.getResourceById(id);
+    if (existing == null) {
+      return ResponseEntity.notFound().build();
+    }
+    if (!userId.equals(existing.getUploadedBy())) {
+      return ResponseEntity.status(HttpStatus.FORBIDDEN)
+          .body(ApiResponse.error(403, "无权修改此资源"));
+    }
+
+    // 更新资源
+    Resource updated =
+        resourceService.updateResource(id, request.getTitle(), request.getTags(), request.getDescription());
+
+    ResourceResponse resourceResponse = ResourceResponse.fromEntity(updated);
+    return ResponseEntity.ok(ApiResponse.success(resourceResponse, "更新成功"));
+  }
+
+  /**
    * 获取资源的切片列表。
    *
    * @param id 资源ID
@@ -138,5 +166,66 @@ public class ResourceController {
         chunks.stream().map(ChunkResponse::fromEntity).toList();
 
     return ResponseEntity.ok(ApiResponse.success(chunkResponses));
+  }
+
+  /**
+   * 删除资源。
+   *
+   * @param id 资源ID
+   * @param authentication 认证信息
+   * @return 删除的资源响应
+   */
+  @DeleteMapping("/{id}")
+  public ResponseEntity<ApiResponse<ResourceResponse>> deleteResource(
+      @PathVariable Long id, Authentication authentication) {
+
+    Long userId = (Long) authentication.getPrincipal();
+    log.info("DELETE /api/resources/{} - userId={}", id, userId);
+
+    try {
+      // 删除资源（Service 层会检查权限）
+      Resource deleted = resourceService.deleteResource(id, userId);
+
+      return ResponseEntity.ok(
+          ApiResponse.success(ResourceResponse.fromEntity(deleted), "删除成功"));
+    } catch (RuntimeException e) {
+      if (e.getMessage().contains("资源不存在")) {
+        return ResponseEntity.notFound().build();
+      }
+      if (e.getMessage().contains("无权删除")) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+            .body(ApiResponse.error(403, e.getMessage()));
+      }
+      throw e;
+    }
+  }
+
+  /**
+   * 批量删除资源。
+   *
+   * @param request 批量删除请求
+   * @param authentication 认证信息
+   * @return 删除的资源响应列表
+   */
+  @DeleteMapping("/batch")
+  public ResponseEntity<ApiResponse<List<ResourceResponse>>> deleteResources(
+      @RequestBody com.aetheris.rag.dto.request.BatchDeleteRequest request,
+      Authentication authentication) {
+
+    Long userId = (Long) authentication.getPrincipal();
+    log.info(
+        "DELETE /api/resources/batch - userId={}, count={}",
+        userId,
+        request.getIds().size());
+
+    List<Resource> deleted = resourceService.deleteResources(request.getIds(), userId);
+
+    List<ResourceResponse> responses =
+        deleted.stream().map(ResourceResponse::fromEntity).toList();
+
+    return ResponseEntity.ok(
+        ApiResponse.success(
+            responses,
+            String.format("批量删除完成，成功删除 %d 个资源", deleted.size())));
   }
 }

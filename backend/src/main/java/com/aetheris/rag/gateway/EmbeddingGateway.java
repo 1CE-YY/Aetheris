@@ -43,7 +43,7 @@ public class EmbeddingGateway {
    * 构造 EmbeddingGateway。
    *
    * @param cache Embedding 缓存
-   * @param modelName 模型名称（如 embedding-v2）
+   * @param modelName 模型名称（如 embedding-3）
    * @param apiKey 智谱 AI API 密钥
    * @param timeout 超时时间
    * @param maxRetries 最大重试次数
@@ -81,7 +81,7 @@ public class EmbeddingGateway {
    * 为给定文本生成嵌入向量。
    *
    * @param text 要嵌入的输入文本
-   * @return 嵌入向量（embedding-v2 为 1024 维）
+   * @return 嵌入向量（embedding-3 默认为 2048 维）
    * @throws RuntimeException 如果 API 调用在所有重试后失败
    */
   public float[] embed(String text) {

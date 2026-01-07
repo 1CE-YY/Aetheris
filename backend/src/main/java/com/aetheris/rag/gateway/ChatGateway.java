@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
  * </ul>
  *
  * @author Aetheris Team
- * @version 1.2.0
+ * @version 1.3.0
  * @since 2025-12-26
  */
 @Slf4j
@@ -39,7 +39,7 @@ public class ChatGateway {
    */
   @SystemMessage("你是一个专业的AI助手，擅长回答问题并提供有用的建议。")
   interface ChatService {
-    @UserMessage
+    @UserMessage("{{userMessage}}")
     String chat(String userMessage);
   }
 

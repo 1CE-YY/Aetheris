@@ -109,31 +109,18 @@ router.beforeEach(async (to, _from, next) => {
   // 如果正在验证 token，等待验证完成
   if (userStore.validatingToken) {
     console.log('[Router] 正在验证 token，等待...')
-    // 使用 watch 等待验证完成，然后重新触发路由守卫
+    // 使用 $subscribe 等待验证完成
     const unwatch = userStore.$subscribe((_mutation, state) => {
       if (!state.validatingToken) {
         unwatch()
-        // 验证完成，重新触发路由守卫
+        // 验证完成，使用 router.replace 重新导航
         console.log('[Router] Token 验证完成，重新导航')
-        next(to)
+        router.replace(to.fullPath)
       }
     })
+    // 阻止当前导航，等待验证完成后重新导航
+    next(false)
     return
-  }
-
-  // 如果有 token 但尚未验证（没有用户信息），启动验证
-  if (userStore.token && !userStore.userInfo) {
-    console.log('[Router] 发现 token 但未验证，开始验证...')
-    try {
-      await userStore.initialize()
-      // 验证完成，重新触发路由守卫
-      console.log('[Router] Token 验证完成，重新导航')
-      next(to)
-      return
-    } catch (error) {
-      console.error('[Router] Token 验证失败:', error)
-      // 验证失败，继续路由守卫逻辑
-    }
   }
 
   // 检查路由是否需要认证

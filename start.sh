@@ -33,14 +33,14 @@ if ! command -v java &> /dev/null; then
 fi
 
 # 设置 Java 21
-export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.8/Contents/Home
+export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.9/Contents/Home
 export PATH=$JAVA_HOME/bin:$PATH
 
 JAVA_VERSION=$(java -version 2>&1 | head -n 1 | cut -d'"' -f2 | cut -d'.' -f1)
 if [ "$JAVA_VERSION" -ne 21 ]; then
     echo -e "${RED}❌ Java 版本错误: 当前版本 $JAVA_VERSION, 需要 Java 21${NC}"
     echo -e "${YELLOW}正在设置 Java 21...${NC}"
-    export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.8/Contents/Home
+    export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.9/Contents/Home
     export PATH=$JAVA_HOME/bin:$PATH
     echo -e "${GREEN}✅ Java 21 已设置${NC}"
 else

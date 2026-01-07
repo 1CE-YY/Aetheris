@@ -148,6 +148,6 @@ INSERT INTO users (username, email, password_hash) VALUES
 -- =============================================
 -- Note: The Redis vector index will be created by VectorService during application startup
 -- Index name: chunk_vector_index
--- Vector dimension: 1024 (Zhipu AI embedding-v2)
+-- Vector dimension: 2048 (Zhipu AI embedding-3)
 -- Distance metric: COSINE
 -- HNSW parameters: M=16, ef_construction=128

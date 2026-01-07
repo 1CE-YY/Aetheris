@@ -179,8 +179,8 @@ CREATE TABLE eval_runs (
     "chunkSize": 1000,
     "overlap": 200,
     "topK": 5,
-    "embeddingModel": "embedding-v2",
-    "chatModel": "glm-4-flash"
+    "embeddingModel": "embedding-3",
+    "chatModel": "glm-4.5-flash"
   },
   "metrics": {
     "precision@5": 0.65,
@@ -257,7 +257,7 @@ Key: embedding:{sha256(normalizedText)}
 Value (JSON):
 {
   "embedding": [0.123, -0.456, ...],
-  "modelName": "embedding-v2",
+  "modelName": "embedding-3",
   "createdAt": 1735104000000
 }
 TTL: 30 天

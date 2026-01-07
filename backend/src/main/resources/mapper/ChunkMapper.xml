@@ -196,4 +196,24 @@
     WHERE resource_id = #{resourceId}
   </select>
 
+  <!-- 批量查询切片 -->
+  <select id="findByResourceIds" resultMap="ChunkResultMap">
+    SELECT id,
+           resource_id,
+           chunk_index,
+           chunk_text,
+           location_info,
+           page_start,
+           page_end,
+           chapter_path,
+           vectorized,
+           created_at
+    FROM resource_chunks
+    WHERE resource_id IN
+    <foreach collection="resourceIds" item="resourceId" open="(" separator="," close=")">
+      #{resourceId}
+    </foreach>
+    ORDER BY resource_id, chunk_index
+  </select>
+
 </mapper>

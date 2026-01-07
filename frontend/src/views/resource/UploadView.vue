@@ -113,7 +113,7 @@
 <script setup lang="ts">
 import { ref, reactive, h } from 'vue'
 import { useRouter } from 'vue-router'
-import { message } from 'ant-design-vue'
+import { message, Modal } from 'ant-design-vue'
 import { UploadOutlined } from '@ant-design/icons-vue'
 import type { UploadProps } from 'ant-design-vue'
 import { useUserStore } from '@/stores/user'
@@ -141,8 +141,22 @@ const fileList = ref<any[]>([])
 const uploading = ref(false)
 const uploadedResource = ref<Resource | null>(null)
 
+// 保存上传时的表单数据（用于重复上传时覆盖）
+const uploadFormData = ref<{
+  file: File
+  title: string
+  tags: string
+  description: string
+} | null>(null)
+
 // 文件上传前校验
 const beforeUpload: UploadProps['beforeUpload'] = (file) => {
+  // 文件大小检查（0 字节 = 空文件）
+  if (file.size === 0) {
+    message.error('文件为空，请选择非空文件')
+    return false
+  }
+
   // 文件类型校验
   const isValidType = file.name.endsWith('.md') ||
                       file.name.endsWith('.markdown') ||
@@ -177,15 +191,38 @@ const handleRemove = () => {
 
 // 提交上传
 const handleSubmit = async (values: ResourceUploadRequest) => {
-  // 检查是否选择了文件
+  // 1. 检查是否选择了文件
   if (fileList.value.length === 0) {
     message.error('请先选择文件')
     return
   }
 
+  const file = fileList.value[0].originFileObj
+
+  // 2. 再次检查文件大小（防止空文件绕过 beforeUpload）
+  if (!file || file.size === 0) {
+    message.error('文件为空，请选择非空文件')
+    fileList.value = []  // 清空文件列表
+    return
+  }
+
+  // 3. 检查文件类型
+  const fileName = file.name
+  if (!fileName.endsWith('.md') && !fileName.endsWith('.markdown') && !fileName.endsWith('.pdf')) {
+    message.error('只支持 Markdown 和 PDF 文件')
+    fileList.value = []
+    return
+  }
+
+  // 4. 检查文件大小
+  if (file.size > 50 * 1024 * 1024) {
+    message.error('文件大小不能超过 50MB')
+    fileList.value = []
+    return
+  }
+
   uploading.value = true
   try {
-    const file = fileList.value[0].originFileObj
 
     // 创建 FormData
     const formData = new FormData()
@@ -194,18 +231,66 @@ const handleSubmit = async (values: ResourceUploadRequest) => {
     formData.append('tags', values.tags || '')
     formData.append('description', values.description || '')
 
+    // 保存表单数据（用于可能的覆盖操作）
+    uploadFormData.value = {
+      file,
+      title: values.title,
+      tags: values.tags || '',
+      description: values.description || ''
+    }
+
     // 发送请求（使用 api 实例，会自动添加 Authorization 头）
     const response = await api.post<any, Resource>('/resources', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
 
-    uploadedResource.value = response
-    message.success('资源上传成功！')
-
-    // 重置表单
-    handleReset()
+    // 检查是否为重复上传
+    if (response.duplicate) {
+      // 弹出询问对话框
+      Modal.confirm({
+        title: '文件已存在',
+        content: `该文件已上传，是否覆盖为新的标题、标签和描述？`,
+        okText: '覆盖',
+        cancelText: '保留原有',
+        onOk: async () => {
+          // 用户选择覆盖
+          try {
+            await ResourceService.updateResource(response.id, {
+              title: values.title,
+              tags: values.tags || '',
+              description: values.description || ''
+            })
+            message.success('资源信息已更新！')
+            uploadedResource.value = { ...response, title: values.title, tags: values.tags, description: values.description }
+            handleReset()
+          } catch (error: any) {
+            message.error(error.response?.data?.message || '更新失败，请重试')
+          }
+        },
+        onCancel: () => {
+          // 用户选择保留原有，显示原有资源信息
+          message.info('已保留原有资源信息')
+          uploadedResource.value = response
+          handleReset()
+        }
+      })
+    } else {
+      // 新上传成功
+      uploadedResource.value = response
+      message.success('资源上传成功！')
+      handleReset()
+    }
   } catch (error: any) {
-    message.error(error.response?.data?.message || '上传失败，请重试')
+    const errorMsg = error.response?.data?.message || error.message || '上传失败，请重试'
+
+    // 针对常见错误提供友好提示
+    if (errorMsg.includes('Missing root object') || errorMsg.includes('PDF') && errorMsg.includes('解析')) {
+      message.error('PDF 文件已损坏或不完整，请重新生成 PDF 文件')
+    } else if (errorMsg.includes('文件为空')) {
+      message.error('文件为空，请选择非空文件')
+    } else {
+      message.error('上传失败: ' + errorMsg)
+    }
   } finally {
     uploading.value = false
   }

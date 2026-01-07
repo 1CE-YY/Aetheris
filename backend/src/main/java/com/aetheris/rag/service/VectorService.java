@@ -35,4 +35,15 @@ public interface VectorService {
    * 批量向量化所有未向量化的切片。
    */
   void vectorizeAllUnvectorized();
+
+  /**
+   * 重建向量索引。
+   * <p>
+   * 该方法会：
+   * 1. 删除旧的 HNSW 索引
+   * 2. 创建新的空索引
+   * 3. 重新向量化所有资源
+   * </p>
+   */
+  void rebuildVectorIndex();
 }

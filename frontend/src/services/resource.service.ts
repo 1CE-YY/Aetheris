@@ -29,6 +29,7 @@ export interface Resource {
   uploadTime: string
   chunkCount: number
   vectorized: boolean
+  duplicate?: boolean // 是否为重复上传
 }
 
 /**
@@ -95,6 +96,33 @@ export class ResourceService {
   static async getChunksByResourceId(id: number): Promise<Chunk[]> {
     const response = await api.get<any, Chunk[]>(`/resources/${id}/chunks`)
     return response
+  }
+
+  /**
+   * 更新资源信息
+   */
+  static async updateResource(id: number, data: {
+    title: string
+    tags?: string
+    description?: string
+  }): Promise<Resource> {
+    const response = await api.put<any, Resource>(`/resources/${id}`, data)
+    return response
+  }
+
+  /**
+   * 删除单个资源（用于资源详情页）。
+   */
+  static async deleteResource(id: number): Promise<void> {
+    await api.delete(`/resources/${id}`)
+  }
+
+  /**
+   * 批量删除资源（用于资源列表页）。
+   * 单个删除时也使用此接口，传入 ids=[id]
+   */
+  static async batchDeleteResources(ids: number[]): Promise<void> {
+    await api.delete('/resources/batch', { data: { ids } })
   }
 }
 

@@ -28,6 +28,7 @@
         <a-table
         :columns="columns"
         :data-source="resources"
+        :row-selection="rowSelection"
         :loading="loading"
         :pagination="pagination"
         row-key="id"
@@ -53,16 +54,28 @@
           </template>
         </template>
       </a-table>
+
+      <!-- 批量删除浮层 -->
+      <div v-if="selectedRowKeys.length > 0" class="batch-actions">
+        <a-space>
+          <span>已选择 {{ selectedRowKeys.length }} 项</span>
+          <a-button type="primary" danger @click="handleBatchDelete">
+            批量删除
+          </a-button>
+          <a-button @click="clearSelection">取消选择</a-button>
+        </a-space>
+      </div>
       </div>
     </a-layout-content>
+
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, h } from 'vue'
 import { useRouter } from 'vue-router'
-import { message } from 'ant-design-vue'
-import { PlusOutlined } from '@ant-design/icons-vue'
+import { message, Modal } from 'ant-design-vue'
+import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue'
 import { useUserStore } from '@/stores/user'
 import ResourceService from '@/services/resource.service'
 import type { Resource } from '@/services/resource.service'
@@ -77,6 +90,15 @@ const pagination = ref({
   pageSize: 10,
   total: 0
 })
+
+// 行选择状态
+const selectedRowKeys = ref<number[]>([])
+const rowSelection = {
+  selectedRowKeys: selectedRowKeys,
+  onChange: (keys: number[]) => {
+    selectedRowKeys.value = keys
+  }
+}
 
 const columns = [
   {
@@ -151,6 +173,56 @@ const viewResource = (id: number) => {
   router.push({ name: 'ResourceDetail', params: { id } })
 }
 
+// 删除处理
+const handleDelete = (record: Resource) => {
+  Modal.confirm({
+    title: '确认删除',
+    content: `确定要删除资源"${record.title}"吗？删除后无法恢复。`,
+    icon: h(ExclamationCircleOutlined),
+    okText: '删除',
+    okType: 'danger',
+    cancelText: '取消',
+    onOk: async () => {
+      try {
+        // 单个删除也调用批量删除接口，传入单个 ID
+        await ResourceService.batchDeleteResources([record.id])
+        message.success('资源已删除')
+        clearSelection()
+        await loadResources()
+      } catch (error: any) {
+        message.error(error.response?.data?.message || '删除失败，请重试')
+      }
+    }
+  })
+}
+
+// 批量删除
+const handleBatchDelete = () => {
+  Modal.confirm({
+    title: '确认批量删除',
+    content: `确定要删除选中的 ${selectedRowKeys.value.length} 个资源吗？删除后无法恢复。`,
+    icon: h(ExclamationCircleOutlined),
+    okText: '删除',
+    okType: 'danger',
+    cancelText: '取消',
+    onOk: async () => {
+      try {
+        await ResourceService.batchDeleteResources(selectedRowKeys.value)
+        message.success(`成功删除 ${selectedRowKeys.value.length} 个资源`)
+        clearSelection()
+        await loadResources()
+      } catch (error: any) {
+        message.error(error.response?.data?.message || '批量删除失败，请重试')
+      }
+    }
+  })
+}
+
+// 清除选择
+const clearSelection = () => {
+  selectedRowKeys.value = []
+}
+
 const handleLogout = () => {
   userStore.logout()
   router.push('/login')
@@ -219,5 +291,17 @@ onMounted(() => {
   background: #fff;
   padding: 24px;
   border-radius: 4px;
+}
+
+.batch-actions {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 12px 20px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  z-index: 1000;
 }
 </style>

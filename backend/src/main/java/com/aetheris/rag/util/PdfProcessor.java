@@ -105,6 +105,18 @@ public class PdfProcessor {
       }
 
       log.info("PDF 处理完成，共生成 {} 个切片", chunks.size());
+    } catch (IOException e) {
+      String errorMsg = "PDF 文件解析失败";
+
+      // 提供更友好的错误信息
+      if (e.getMessage() != null && e.getMessage().contains("Missing root object")) {
+        errorMsg = "PDF 文件已损坏或不完整，请重新生成 PDF 文件";
+      } else if (e.getMessage() != null) {
+        errorMsg = "PDF 文件解析失败: " + e.getMessage();
+      }
+
+      log.error("{}: {}", errorMsg, filePath, e);
+      throw new IOException(errorMsg, e);
     }
 
     return chunks;

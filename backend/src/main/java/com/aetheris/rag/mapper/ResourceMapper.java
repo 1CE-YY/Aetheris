@@ -80,4 +80,52 @@ public interface ResourceMapper {
    * @return 资源总数
    */
   int count();
+
+  /**
+   * 更新资源信息。
+   *
+   * @param resource 资源实体
+   * @return 影响行数
+   */
+  int update(Resource resource);
+
+  /**
+   * 批量查询资源。
+   *
+   * @param ids 资源ID列表
+   * @return 资源实体列表
+   */
+  List<Resource> findByIds(@Param("ids") List<Long> ids);
+
+  /**
+   * 根据 ID 删除资源。
+   *
+   * @param id 资源ID
+   * @return 删除的行数
+   */
+  int deleteById(@Param("id") Long id);
+
+  /**
+   * 批量删除资源（SQL 优化）。
+   *
+   * @param ids 资源ID列表
+   * @return 删除的行数
+   */
+  int deleteByIds(@Param("ids") List<Long> ids);
+
+  /**
+   * 删除资源的所有切片。
+   *
+   * @param resourceId 资源ID
+   * @return 删除的行数
+   */
+  int deleteChunksByResourceId(@Param("resourceId") Long resourceId);
+
+  /**
+   * 批量删除切片（SQL 优化）。
+   *
+   * @param resourceIds 资源ID列表
+   * @return 删除的行数
+   */
+  int deleteChunksByResourceIds(@Param("resourceIds") List<Long> resourceIds);
 }

@@ -98,7 +98,7 @@ mybatis:
 model-gateway:
   # Embedding model configuration
   embedding:
-    model-name: ${EMBEDDING_MODEL:embedding-v2}
+    model-name: ${EMBEDDING_MODEL:embedding-3}
     base-url: ${EMBEDDING_BASE_URL:https://open.bigmodel.cn/api/paas/v4/}
     timeout: ${EMBEDDING_TIMEOUT:30s}
     max-tokens: ${EMBEDDING_MAX_TOKENS:8192}
@@ -113,7 +113,7 @@ model-gateway:
 
   # Chat model configuration
   chat:
-    model-name: ${CHAT_MODEL:glm-4-flash}
+    model-name: ${CHAT_MODEL:glm-4.5-flash}
     base-url: ${CHAT_BASE_URL:https://open.bigmodel.cn/api/paas/v4/}
     api-key: ${ZHIPU_API_KEY:}
     temperature: ${CHAT_TEMPERATURE:0.7}
@@ -141,7 +141,7 @@ rag:
   # Vector index configuration
   vector:
     index-name: ${VECTOR_INDEX_NAME:chunk_vector_index}
-    dimension: ${VECTOR_DIMENSION:1024}
+    dimension: ${VECTOR_DIMENSION:2048}
     distance-metric: ${VECTOR_DISTANCE_METRIC:COSINE}
     hnsw:
       m: ${VECTOR_HNSW_M:16}
@@ -193,8 +193,4 @@ management:
         include: health,info,metrics,prometheus
   endpoint:
     health:
-      show-details: when-authorized
-  metrics:
-    export:
-      prometheus:
-        enabled: true
+      show-details: always

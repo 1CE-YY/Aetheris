@@ -114,10 +114,23 @@ export const useUserStore = defineStore('user', () => {
    */
   async function initialize() {
     const savedToken = AuthService.getToken()
+    console.log('[UserStore] initialize() - savedToken:', savedToken ? '存在' : '不存在')
+
     if (savedToken) {
       token.value = savedToken
+      console.log('[UserStore] initialize() - token.value 已设置')
+
       // 验证 token 有效性
-      await validateToken()
+      const success = await validateToken()
+      console.log('[UserStore] initialize() - validateToken() 返回:', success)
+
+      if (success) {
+        console.log('[UserStore] initialize() - 成功, userInfo:', userInfo.value)
+      } else {
+        console.log('[UserStore] initialize() - 失败')
+      }
+    } else {
+      console.log('[UserStore] initialize() - 没有 savedToken，跳过验证')
     }
   }
 

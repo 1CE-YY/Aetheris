@@ -62,7 +62,7 @@
   - **目标**：封装 Embedding 调用，实现文本哈希缓存、超时/重试/限流、日志脱敏
   - **涉及表**：无（调用外部 API）
   - **Redis**：`embedding:cache:{textHash}` 存储 embedding 向量，TTL 30 天
-  - **配置项**：`embedding.modelName`（embedding-v2）、`embedding.timeout`（30s）、`embedding.maxRetries`（3）、`embedding.rateLimit`（5 req/s）
+  - **配置项**：`embedding.modelName`（embedding-3）、`embedding.timeout`（30s）、`embedding.maxRetries`（3）、`embedding.rateLimit`（5 req/s）
   - **API 端点**：无（内部服务）
   - **测试要点**：单测验证缓存命中、重试策略、超时处理、日志脱敏
   - **验收标准**：FR-007（Embedding 缓存）、FR-009（入库幂等）、宪章三（缓存与幂等）
@@ -72,7 +72,7 @@
   - **原因**: langchain4j-zhipu-ai 包依赖问题，需要在 Phase 5 (RAG Q&A) 时完整实现
   - **目标**：封装 LLM 调用，实现 Prompt 构建、超时/重试/限流、降级处理、日志脱敏
   - **涉及表**：无（调用外部 API）
-  - **配置项**：`chat.modelName`（glm-4-flash）、`chat.temperature`（0.7）、`chat.topP`（0.9）、`chat.maxTokens`（2000）、`chat.timeout`（60s）
+  - **配置项**：`chat.modelName`（glm-4.5-flash）、`chat.temperature`（0.7）、`chat.topP`（0.9）、`chat.maxTokens`（2000）、`chat.timeout`（60s）
   - **测试要点**：单测验证降级策略（LLM 不可用时返回检索结果+引用摘要）
   - **验收标准**：FR-015（证据不足时的降级返回）
   - **Phase 5 任务**: 完整实现 Zhipu AI Chat API 调用、Prompt 构建、降级策略
@@ -266,7 +266,7 @@
   - **Redis**：RediSearch Vector KNN 索引，key 为 `chunk:{chunkId}`，字段包括 vector、resourceId、chunkId、chunkIndex、tags、docType
   - **向量索引配置**：
     - 索引名：`chunk_vector_index`
-    - 向量维度：1024（智谱 embedding-v2）
+    - 向量维度：2048（智谱 embedding-3）
     - 距离算法：COSINE
     - HNSW 参数：M=16、ef_construction=128
   - **测试要点**：集成测试使用 Testcontainers 验证 Redis 向量写入和检索
@@ -579,8 +579,8 @@
         "chunkSize": 1000,
         "overlap": 200,
         "topK": 5,
-        "embeddingModel": "embedding-v2",
-        "chatModel": "glm-4-flash"
+        "embeddingModel": "embedding-3",
+        "chatModel": "glm-4.5-flash"
       },
       "useProfile": false,
       "metrics": {

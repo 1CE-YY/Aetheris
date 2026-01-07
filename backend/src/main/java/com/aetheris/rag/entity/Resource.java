@@ -63,4 +63,13 @@ public class Resource {
 
   /** 是否已向量化 */
   private Boolean vectorized;
+
+  /**
+   * 是否为重复上传（仅用于响应，不持久化）。
+   *
+   * <p>标记为 true 时表示此资源是重复上传，前端应提示用户。
+   *
+   * <p>注意：此字段不映射到数据库，仅在响应中使用。
+   */
+  @Builder.Default private Boolean duplicate = false;
 }

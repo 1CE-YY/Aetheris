@@ -57,6 +57,13 @@ public class ResourceResponse {
   private Boolean vectorized;
 
   /**
+   * 是否为重复上传。
+   *
+   * <p>标记为 true 时表示此资源是重复上传，前端应提示用户选择是否覆盖元数据。
+   */
+  private Boolean duplicate;
+
+  /**
    * 从 Resource 实体创建响应。
    *
    * @param resource 资源实体
@@ -75,6 +82,7 @@ public class ResourceResponse {
         .uploadTime(resource.getUploadTime())
         .chunkCount(resource.getChunkCount())
         .vectorized(resource.getVectorized())
+        .duplicate(resource.getDuplicate() != null ? resource.getDuplicate() : false)
         .build();
   }
 }

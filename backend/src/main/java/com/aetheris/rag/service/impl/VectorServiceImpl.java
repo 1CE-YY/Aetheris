@@ -5,6 +5,7 @@ package com.aetheris.rag.service.impl;
 
 import com.aetheris.rag.gateway.EmbeddingGateway;
 import com.aetheris.rag.mapper.ChunkMapper;
+import com.aetheris.rag.mapper.ResourceMapper;
 import com.aetheris.rag.entity.Chunk;
 import com.aetheris.rag.service.VectorService;
 import jakarta.annotation.PostConstruct;
@@ -36,11 +37,12 @@ import org.springframework.stereotype.Service;
 public class VectorServiceImpl implements VectorService {
 
   private final ChunkMapper chunkMapper;
+  private final ResourceMapper resourceMapper;
   private final EmbeddingGateway embeddingGateway;
   private final StringRedisTemplate redisTemplate;
 
-  /** 向量维度（智谱 embedding-v2） */
-  @Value("${rag.vector.dimension:1024}")
+  /** 向量维度（智谱 embedding-3，默认 2048 维） */
+  @Value("${rag.vector.dimension:2048}")
   private int vectorSize;
 
   /** Redis 向量索引名称 */
@@ -61,18 +63,22 @@ public class VectorServiceImpl implements VectorService {
     }
 
     try {
-      // 检查索引是否已存在
+      // 检查索引是否已存在（使用 FT._LIST 命令，避免 FT.INFO 的浮点数解析问题）
       log.debug("检查向量索引是否存在: {}", INDEX_NAME);
 
-      // 使用 execute 方法执行 FT.INFO 命令
       Boolean indexExists = redisTemplate.execute((RedisCallback<Boolean>) connection -> {
         try {
-          // execute(String command, byte[]... args)
-          Object result = connection.execute("FT.INFO", INDEX_NAME.getBytes());
-          return result != null;
+          // 使用 FT._LIST 命令列出所有索引，避免解析浮点数问题
+          Object result = connection.execute("FT._LIST");
+          if (result != null) {
+            String indexList = result.toString();
+            // 检查索引名是否在列表中
+            return indexList.contains(INDEX_NAME);
+          }
+          return false;
         } catch (Exception e) {
-          // 索引不存在会抛出异常
-          log.debug("检查索引失败，可能是索引不存在", e);
+          // 任何异常都认为索引不存在
+          log.debug("检查索引失败，可能是索引不存在: {}", e.getMessage());
           return false;
         }
       });
@@ -90,6 +96,7 @@ public class VectorServiceImpl implements VectorService {
       String createResult = redisTemplate.execute((RedisCallback<String>) connection -> {
         // FT.CREATE index_name ON HASH PREFIX 1 chunk: SCHEMA ...
         // execute(String command, byte[]... args) - 第一个参数是String命令名
+        // HNSW 参数：TYPE、DIM、DISTANCE_METRIC（共 6 个参数值，即 3 个键值对）
         Object result = connection.execute(
           "FT.CREATE",  // String 命令名
           INDEX_NAME.getBytes(),
@@ -99,8 +106,7 @@ public class VectorServiceImpl implements VectorService {
           "vector".getBytes(), "VECTOR".getBytes(), "HNSW".getBytes(), "6".getBytes(),
           "TYPE".getBytes(), "FLOAT32".getBytes(),
           "DIM".getBytes(), String.valueOf(vectorSize).getBytes(),
-          "DISTANCE_METRIC".getBytes(), "COSINE".getBytes(),
-          "initial_size".getBytes(), "1000".getBytes()
+          "DISTANCE_METRIC".getBytes(), "COSINE".getBytes()
         );
         return result != null ? result.toString() : "OK";
       });
@@ -108,8 +114,24 @@ public class VectorServiceImpl implements VectorService {
       log.info("向量索引创建成功: {}, result: {}", INDEX_NAME, createResult);
       indexInitialized = true;
     } catch (Exception e) {
-      log.error("初始化向量索引失败", e);
-      throw new RuntimeException("向量索引初始化失败: " + e.getMessage(), e);
+      // 检查是否是索引已存在的错误（检查整个异常链）
+      boolean indexAlreadyExists = false;
+      Throwable cause = e;
+      while (cause != null) {
+        if (cause.getMessage() != null && cause.getMessage().contains("Index already exists")) {
+          indexAlreadyExists = true;
+          break;
+        }
+        cause = cause.getCause();
+      }
+
+      if (indexAlreadyExists) {
+        log.info("向量索引已存在: {}", INDEX_NAME);
+        indexInitialized = true;
+      } else {
+        log.error("初始化向量索引失败", e);
+        throw new RuntimeException("向量索引初始化失败: " + e.getMessage(), e);
+      }
     }
   }
 
@@ -127,6 +149,18 @@ public class VectorServiceImpl implements VectorService {
 
     // 批量处理切片
     vectorizeBatch(chunks);
+
+    // 检查资源的所有切片是否都已向量化
+    List<Chunk> allChunks = chunkMapper.findByResourceId(resourceId);
+    boolean allVectorized = allChunks.stream().allMatch(Chunk::getVectorized);
+
+    if (allVectorized) {
+      resourceMapper.updateChunkStatus(resourceId, allChunks.size(), true);
+      log.info("资源向量化完成: resourceId={}, chunkCount={}", resourceId, allChunks.size());
+    } else {
+      long vectorizedCount = allChunks.stream().filter(Chunk::getVectorized).count();
+      log.warn("资源部分切片向量化失败: resourceId={}, 已向量化={}/{}", resourceId, vectorizedCount, allChunks.size());
+    }
   }
 
   @Override
@@ -224,5 +258,33 @@ public class VectorServiceImpl implements VectorService {
       sb.append(vector[i]);
     }
     return sb.toString();
+  }
+
+  @Override
+  public void rebuildVectorIndex() {
+    log.info("开始重建向量索引...");
+
+    try {
+      // 1. 删除旧索引
+      log.info("删除旧索引...");
+      redisTemplate.execute((RedisCallback<Object>) connection ->
+          connection.execute("FT.DROP", INDEX_NAME.getBytes()));
+      log.info("旧索引已删除");
+
+      // 2. 重置初始化状态并创建新索引
+      indexInitialized = false;
+      log.info("创建新索引...");
+      initializeVectorIndex();
+      log.info("新索引已创建");
+
+      // 3. 重新向量化所有资源
+      log.info("开始重新向量化所有资源...");
+      vectorizeAllUnvectorized();
+      log.info("向量索引重建完成");
+
+    } catch (Exception e) {
+      log.error("重建向量索引失败", e);
+      throw new RuntimeException("重建向量索引失败: " + e.getMessage(), e);
+    }
   }
 }

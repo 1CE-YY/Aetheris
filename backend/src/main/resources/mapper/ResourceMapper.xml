@@ -133,10 +133,70 @@
     WHERE id = #{id}
   </update>
 
+  <!-- 更新资源信息 -->
+  <update id="update">
+    UPDATE resources
+    SET title = #{title},
+        tags = #{tags},
+        description = #{description}
+    WHERE id = #{id}
+  </update>
+
   <!-- 统计资源总数 -->
   <select id="count" resultType="int">
     SELECT COUNT(*)
     FROM resources
   </select>
+
+  <!-- 批量查询资源 -->
+  <select id="findByIds" resultMap="ResourceResultMap">
+    SELECT id,
+           title,
+           tags,
+           file_type,
+           file_path,
+           file_size,
+           description,
+           content_hash,
+           uploaded_by,
+           upload_time,
+           chunk_count,
+           vectorized
+    FROM resources
+    WHERE id IN
+    <foreach collection="ids" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </select>
+
+  <!-- 删除单个资源 -->
+  <delete id="deleteById">
+    DELETE FROM resources
+    WHERE id = #{id}
+  </delete>
+
+  <!-- 批量删除资源（SQL 优化） -->
+  <delete id="deleteByIds">
+    DELETE FROM resources
+    WHERE id IN
+    <foreach collection="ids" item="id" open="(" separator="," close=")">
+      #{id}
+    </foreach>
+  </delete>
+
+  <!-- 删除单个资源的切片 -->
+  <delete id="deleteChunksByResourceId">
+    DELETE FROM resource_chunks
+    WHERE resource_id = #{resourceId}
+  </delete>
+
+  <!-- 批量删除切片（SQL 优化） -->
+  <delete id="deleteChunksByResourceIds">
+    DELETE FROM resource_chunks
+    WHERE resource_id IN
+    <foreach collection="resourceIds" item="resourceId" open="(" separator="," close=")">
+      #{resourceId}
+    </foreach>
+  </delete>
 
 </mapper>

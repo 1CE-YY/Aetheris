@@ -1,18 +1,18 @@
 {
   "backend": {
-    "pid": 6640,
+    "pid": 43689,
     "name": "Aetheris RAG Backend",
     "port": 8080,
     "status": "running",
     "startedAt": "2025-12-31T10:19:50+08:00",
     "healthCheck": "http://localhost:8080/actuator/health",
-    "started_at": "2026-01-06T05:15:57Z"
+    "started_at": "2026-01-07T09:28:35Z"
   },
   "frontend": {
-    "status": "stopped",
+    "status": "running",
     "port": 5173,
-    "pid": null,
-    "started_at": null
+    "pid": 43977,
+    "started_at": "2026-01-07T09:29:05Z"
   },
   "infrastructure": {
     "mysql": {

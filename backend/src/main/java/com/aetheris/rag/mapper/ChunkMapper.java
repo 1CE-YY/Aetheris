@@ -109,4 +109,12 @@ public interface ChunkMapper {
    * @return 切片数量
    */
   int countByResourceId(@Param("resourceId") Long resourceId);
+
+  /**
+   * 批量查询切片。
+   *
+   * @param resourceIds 资源ID列表
+   * @return 切片列表
+   */
+  List<Chunk> findByResourceIds(@Param("resourceIds") List<Long> resourceIds);
 }

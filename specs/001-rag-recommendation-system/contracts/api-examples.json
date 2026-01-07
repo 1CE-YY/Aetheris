@@ -350,14 +350,14 @@
         "description": "运行离线评测",
         "method": "POST",
         "endpoint": "/eval/run",
-        "curl": "curl -X POST http://localhost:8080/api/eval/run \\\n  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"config\": {\n      \"chunkSize\": 1000,\n      \"overlap\": 200,\n      \"topK\": 5,\n      \"embeddingModel\": \"embedding-v2\",\n      \"chatModel\": \"glm-4-flash\"\n    },\n    \"compareStrategies\": true\n  }'",
+        "curl": "curl -X POST http://localhost:8080/api/eval/run \\\n  -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"config\": {\n      \"chunkSize\": 1000,\n      \"overlap\": 200,\n      \"topK\": 5,\n      \"embeddingModel\": \"embedding-3\",\n      \"chatModel\": \"glm-4.5-flash\"\n    },\n    \"compareStrategies\": true\n  }'",
         "request": {
           "config": {
             "chunkSize": 1000,
             "overlap": 200,
             "topK": 5,
-            "embeddingModel": "embedding-v2",
-            "chatModel": "glm-4-flash"
+            "embeddingModel": "embedding-3",
+            "chatModel": "glm-4.5-flash"
           },
           "compareStrategies": true
         },
@@ -368,8 +368,8 @@
             "chunkSize": 1000,
             "overlap": 200,
             "topK": 5,
-            "embeddingModel": "embedding-v2",
-            "chatModel": "glm-4-flash"
+            "embeddingModel": "embedding-3",
+            "chatModel": "glm-4.5-flash"
           },
           "metrics": {
             "precisionAtK": 0.65,

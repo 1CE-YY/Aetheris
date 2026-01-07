@@ -45,26 +45,61 @@
 
 ## 🚀 快速开始
 
-### 一键启动（推荐）
+### ⚠️ 重要：服务管理规范
+
+**必须使用根目录下的脚本启动和停止服务，不要使用其他方式！**
+
+#### 一键启动（推荐）
 
 ```bash
 cd /Users/hubin5/app/Aetheris
 ./start.sh
 ```
 
-启动脚本会自动：
+**启动脚本会自动完成**：
 1. ✅ 检查环境（Java 21、Maven、Node.js、Docker）
 2. ✅ 创建 .env 配置文件（如不存在）
-3. ✅ 启动 MySQL + Redis（Docker）
+3. ✅ 启动 MySQL + Redis（Docker Compose）
 4. ✅ 启动后端（Spring Boot）
 5. ✅ 启动前端（Vite）
+6. ✅ 更新 `.pids.json` 进程管理文件
 
-### 手动启动
+#### 停止服务
+
+```bash
+cd /Users/hubin5/app/Aetheris
+./stop.sh                     # 交互式菜单
+./stop.sh all                 # 停止所有服务
+./stop.sh backend             # 仅停止后端
+./stop.sh frontend            # 仅停止前端
+./stop.sh docker              # 仅停止 Docker 服务
+```
+
+#### 查看服务状态和日志
+
+```bash
+cat .pids.json | jq           # 查看服务状态
+tail -f logs/backend.log      # 后端日志
+tail -f logs/application.log  # 应用日志
+tail -f logs/frontend.log     # 前端日志
+docker-compose logs -f        # Docker 日志
+```
+
+### ❌ 禁止的操作
+
+- ❌ 直接使用 `mvn spring-boot:run` 启动后端
+- ❌ 直接使用 `npm run dev` 启动前端
+- ❌ 单独使用 `docker-compose up -d` 启动基础设施
+- ❌ 手动使用 `kill` 命令杀进程
+
+### 手动启动（仅用于开发调试）
+
+如果需要单独启动某个组件进行调试：
 
 #### 1. 设置 Java 21（必须！）
 
 ```bash
-export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.8/Contents/Home
+export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.9/Contents/Home
 export PATH=$JAVA_HOME/bin:$PATH
 ```
 
@@ -74,14 +109,14 @@ export PATH=$JAVA_HOME/bin:$PATH
 docker-compose up -d
 ```
 
-#### 3. 启动后端
+#### 3. 启动后端（仅调试用）
 
 ```bash
 cd backend
 mvn spring-boot:run
 ```
 
-#### 4. 启动前端（新终端）
+#### 4. 启动前端（仅调试用）
 
 ```bash
 cd frontend
@@ -180,21 +215,36 @@ Aetheris/
 
 **详细报告**: [docs/PHASE1_2_ACCEPTANCE_REPORT.md](docs/PHASE1_2_ACCEPTANCE_REPORT.md)
 
-### 🚧 Phase 3：资源入库与向量化（进行中）
+### ✅ Phase 3：用户认证与前端页面（已完成）
 
-**计划周期**: 4-6 周
+**完成度**: 100% ✅
+**验收日期**: 2025-12-31
 
-**待实现功能**：
-- ⏳ ModelGateway 完整实现（调用智谱 AI API）
-- ⏳ PDF 文档解析（Apache PDFBox）
-- ⏳ Markdown 文档解析（CommonMark）
-- ⏳ 文本分段与向量化
-- ⏳ Redis Stack 向量索引创建
-- ⏳ Embedding 缓存机制
+**已实现功能**：
+- ✅ 用户注册/登录功能（后端 API + 前端页面）
+- ✅ 用户行为记录系统（后端 API）
+- ✅ Token 验证系统（GET /api/auth/me）
+- ✅ 前端用户状态管理（Pinia store + 路由守卫）
+- ✅ Token 失效自动跳转
+- ✅ 错误处理优化
 
-### 📋 Phase 4：RAG 问答系统（待开始）
+### ✅ Phase 4：资源入库与向量化（已完成）
 
-**计划周期**: 4-6 周
+**完成度**: 100% ✅
+**验收日期**: 2026-01-07
+
+**已实现功能**：
+- ✅ 资源上传功能（支持 PDF/Markdown 文件）
+- ✅ PDF 文本提取与页码记录（Apache PDFBox）
+- ✅ Markdown 解析与章节路径记录（CommonMark）
+- ✅ 文档自动切片（固定大小 + 重叠）
+- ✅ 向量化批量处理（调用 ModelGateway.embed()）
+- ✅ Redis Stack 向量索引创建
+- ✅ 包名重构（model → entity）
+
+### 🚧 Phase 5：RAG 问答系统（进行中）
+
+**当前状态**: 开发中
 
 **待实现功能**：
 - ⏳ 向量检索（RediSearch）
@@ -203,12 +253,10 @@ Aetheris/
 - ⏳ 引用来源生成
 - ⏳ 问答 API 实现
 
-### 📋 Phase 5：推荐系统与评测（待开始）
+### 📋 Phase 6：推荐系统与评测（待开始）
 
-**计划周期**: 4-6 周
-
-**待实现功能**：
-- ⏳ 用户行为记录
+**计划功能**：
+- ⏳ 用户行为记录完善
 - ⏳ 用户画像更新
 - ⏳ 个性化推荐算法
 - ⏳ 离线评测系统
@@ -546,5 +594,6 @@ git push origin feature/your-feature-name
 
 ---
 
-**最后更新**: 2025-12-29
-**文档版本**: v1.0.0
+**最后更新**: 2026-01-07
+**文档版本**: v2.0.0
+**当前阶段**: Phase 5（RAG 问答系统）
