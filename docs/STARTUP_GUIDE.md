@@ -77,7 +77,7 @@ curl -X POST http://localhost:8080/api/auth/login \
 java -version  # 需要是 Java 21
 
 # 如果不是 Java 21，设置环境变量
-export JAVA_HOME=/Users/hubin5/app/Aetheris/Library/Java/JavaVirtualMachines/corretto-21.0.8/Contents/Home
+export JAVA_HOME=/Users/hubin5/app/Aetheris/Library/Java/JavaVirtualMachines/corretto-21.0.9/Contents/Home
 export PATH=$JAVA_HOME/bin:$PATH
 
 # 验证
@@ -176,7 +176,7 @@ docker exec -it aetheris-redis redis-cli -a aetheris123 FT._LIST
 cd /Users/hubin5/app/Aetheris/backend
 
 # 设置 Java 21（如果尚未设置）
-export JAVA_HOME=/Users/hubin5/app/Aetheris/Library/Java/JavaVirtualMachines/corretto-21.0.8/Contents/Home
+export JAVA_HOME=/Users/hubin5/app/Aetheris/Library/Java/JavaVirtualMachines/corretto-21.0.9/Contents/Home
 export PATH=$JAVA_HOME/bin:$PATH
 
 # 清理并编译
@@ -405,7 +405,7 @@ cat backend/src/main/java/com/aetheris/rag/dto/response/Citation.java
 
 **解决方案**:
 ```bash
-export JAVA_HOME=/Users/hubin5/app/Aetheris/Library/Java/JavaVirtualMachines/corretto-21.0.8/Contents/Home
+export JAVA_HOME=/Users/hubin5/app/Aetheris/Library/Java/JavaVirtualMachines/corretto-21.0.9/Contents/Home
 export PATH=$JAVA_HOME/bin:$PATH
 java -version  # 确认是 Java 21
 ```

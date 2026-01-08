@@ -130,7 +130,7 @@ ${BLUE}选项:${NC}
   --help, -h           显示此帮助信息
 
 ${BLUE}交互模式:${NC}
-  无参数运行时进入交互模式，可选择要停止的服务
+  无参数运行时进入交互模式，选择后自动退出
 
 ${BLUE}示例:${NC}
   ./stop.sh                    # 进入交互菜单
@@ -158,58 +158,45 @@ show_menu() {
     echo -e "  ${YELLOW}3${NC}. 停止所有服务（前端 + 后端）"
     echo -e "  ${YELLOW}4${NC}. 停止 Docker 服务（MySQL + Redis）"
     echo -e "  ${YELLOW}5${NC}. 停止所有（包括 Docker）"
-    echo -e "  ${YELLOW}0${NC}. 退出"
     echo ""
-    echo -ne "${BLUE}请输入选项 [0-5]: ${NC}"
+    echo -ne "${BLUE}请输入选项 [1-5]: ${NC}"
 }
 
 handle_interactive_mode() {
-    while true; do
-        show_menu
-        read choice
+    show_menu
+    read choice
 
-        case $choice in
-            1)
-                stop_frontend || true
-                echo ""
-                read -p "按 Enter 键继续..."
-                ;;
-            2)
-                stop_backend || true
-                echo ""
-                read -p "按 Enter 键继续..."
-                ;;
-            3)
-                echo -e "${YELLOW}正在停止所有服务（前端 + 后端）...${NC}"
-                stop_backend || true
-                stop_frontend || true
-                echo ""
-                read -p "按 Enter 键继续..."
-                ;;
-            4)
-                stop_docker || true
-                echo ""
-                read -p "按 Enter 键继续..."
-                ;;
-            5)
-                echo -e "${YELLOW}正在停止所有服务（包括 Docker）...${NC}"
-                stop_backend || true
-                stop_frontend || true
-                stop_docker || true
-                echo ""
-                read -p "按 Enter 键继续..."
-                ;;
-            0)
-                echo -e "${BLUE}👋 已退出${NC}"
-                exit 0
-                ;;
-            *)
-                echo -e "${RED}❌ 无效选项，请输入 0-5${NC}"
-                echo ""
-                sleep 1
-                ;;
-        esac
-    done
+    case $choice in
+        1)
+            stop_frontend || true
+            echo -e "${GREEN}✅ 前端已停止${NC}"
+            ;;
+        2)
+            stop_backend || true
+            echo -e "${GREEN}✅ 后端已停止${NC}"
+            ;;
+        3)
+            echo -e "${YELLOW}正在停止所有服务（前端 + 后端）...${NC}"
+            stop_backend || true
+            stop_frontend || true
+            echo -e "${GREEN}✅ 所有服务已停止${NC}"
+            ;;
+        4)
+            stop_docker || true
+            echo -e "${GREEN}✅ Docker 服务已停止${NC}"
+            ;;
+        5)
+            echo -e "${YELLOW}正在停止所有服务（包括 Docker）...${NC}"
+            stop_backend || true
+            stop_frontend || true
+            stop_docker || true
+            echo -e "${GREEN}✅ 所有服务已停止${NC}"
+            ;;
+        *)
+            echo -e "${RED}❌ 无效选项，请输入 1-5${NC}"
+            exit 1
+            ;;
+    esac
 }
 
 # ========================================
@@ -217,9 +204,6 @@ handle_interactive_mode() {
 # ========================================
 
 parse_arguments() {
-    # 默认：交互模式
-    INTERACTIVE_MODE=true
-
     # 解析参数
     while [[ $# -gt 0 ]]; do
         case $1 in
@@ -260,18 +244,10 @@ parse_arguments() {
 # ========================================
 
 main() {
-    # 解析命令行参数
     if [ $# -eq 0 ]; then
-        # 无参数：进入交互模式
         handle_interactive_mode
     else
-        # 有参数：解析并执行
         parse_arguments "$@"
-
-        # 如果还有剩余参数（parse_arguments 没有退出），进入交互模式
-        if [ "$INTERACTIVE_MODE" = true ]; then
-            handle_interactive_mode
-        fi
     fi
 }
 

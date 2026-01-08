@@ -4,11 +4,14 @@
 package com.aetheris.rag.util;
 
 import com.aetheris.rag.entity.Chunk;
+import com.aetheris.rag.exception.BadRequestException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.commonmark.node.*;
 import org.commonmark.parser.Parser;
@@ -60,6 +63,12 @@ public class MarkdownProcessor {
     List<TextBlock> textBlocks = extractTextBlocks(document);
     log.debug("提取到 {} 个文本块", textBlocks.size());
 
+    // 验证内容是否为空
+    if (textBlocks.isEmpty()) {
+      log.warn("Markdown 文档内容为空: {}", filePath);
+      throw new BadRequestException("Markdown 文档内容为空，请确保文件包含有效的文本内容");
+    }
+
     // 按章节路径合并文本并切片
     int chunkIndex = 0;
     StringBuilder currentText = new StringBuilder();
@@ -67,18 +76,18 @@ public class MarkdownProcessor {
 
     for (TextBlock block : textBlocks) {
       // 更新章节路径
-      if (block.headingLevel() > 0) {
+      if (block.getHeadingLevel() > 0) {
         // 移除同级或更深层级的章节
         while (!currentChapterPath.isEmpty()
-            && currentChapterPath.size() >= block.headingLevel()) {
+            && currentChapterPath.size() >= block.getHeadingLevel()) {
           currentChapterPath.remove(currentChapterPath.size() - 1);
         }
         // 添加当前章节
-        currentChapterPath.add(block.text());
+        currentChapterPath.add(block.getText());
       }
 
       // 检查是否需要创建新切片
-      if (currentText.length() + block.text().length() > chunkSize && currentText.length() > 0) {
+      if (currentText.length() + block.getText().length() > chunkSize && currentText.length() > 0) {
         // 创建切片
         String chapterPath = String.join(">", currentChapterPath);
         Chunk chunk =
@@ -97,7 +106,7 @@ public class MarkdownProcessor {
         currentText = new StringBuilder(overlapText);
       }
 
-      currentText.append(block.text());
+      currentText.append(block.getText());
     }
 
     // 处理最后一个切片
@@ -215,7 +224,12 @@ public class MarkdownProcessor {
   }
 
   /** 文本块记录（内部类）。 */
-  private record TextBlock(String text, int headingLevel) {}
+  @Data
+  @AllArgsConstructor
+  private static class TextBlock {
+    private String text;
+    private int headingLevel;
+  }
 
   /** 文本累积器（内部类）。 */
   private static class TextAccumulator extends AbstractVisitor {

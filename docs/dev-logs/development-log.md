@@ -13,7 +13,7 @@
 - **问题**: Maven 使用 Java 8，项目需要 Java 21
 - **解决**: 编译前设置环境变量
   ```bash
-  export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.8/Contents/Home
+  export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.9/Contents/Home
   export PATH=$JAVA_HOME/bin:$PATH
   ```
 
@@ -109,7 +109,7 @@
 ### 启动后端
 ```bash
 # 1. 设置 Java 21
-export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.8/Contents/Home
+export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.9/Contents/Home
 export PATH=$JAVA_HOME/bin:$PATH
 
 # 2. 启动后端

@@ -221,43 +221,54 @@ public class VectorServiceImpl implements VectorService {
       // Redis key: chunk:{chunkId}
       String key = "chunk:" + chunk.getId();
 
-      // 准备数据
+      // 准备数据（文本字段）
       Map<String, String> fields = new HashMap<>();
       fields.put("chunkId", chunk.getId().toString());
       fields.put("resourceId", chunk.getResourceId().toString());
       fields.put("chunkIndex", chunk.getChunkIndex().toString());
       fields.put("chunkText", chunk.getChunkText());
 
-      // 将向量转换为字符串（用于 RediSearch Vector）
-      fields.put("vector", vectorToString(vector));
-
-      // 写入 Redis Hash
+      // 写入文本字段到 Redis Hash
       redisTemplate.opsForHash().putAll(key, fields);
+
+      // 将向量转换为二进制格式（FLOAT32）
+      byte[] vectorBytes = vectorToBytes(vector);
+
+      // 使用底层 connection 写入向量字段（必须用 HSET 直接写入字节）
+      redisTemplate.execute((RedisCallback<Object>) connection -> {
+        connection.hSet(key.getBytes(), "vector".getBytes(), vectorBytes);
+        return null;
+      });
 
       // 设置过期时间（30天）
       redisTemplate.expire(key, Duration.ofDays(30));
 
-      log.debug("向量已写入 Redis: chunkId={}", chunk.getId());
+      log.debug("向量已写入 Redis: chunkId={}, vectorSize={} bytes", chunk.getId(), vectorBytes.length);
     } catch (Exception e) {
       log.error("写入 Redis 向量失败: chunkId={}", chunk.getId(), e);
     }
   }
 
   /**
-   * 将向量转换为字符串。
+   * 将向量转换为 Redis Vector 索引所需的二进制格式（FLOAT32）。
    *
-   * @param vector 向量
-   * @return 向量字符串（逗号分隔）
+   * <p>Redis Stack 向量索引要求向量字段存储为字节序列，而不是字符串。
+   * 每个 float 占 4 字节（FLOAT32），2048 维向量 = 8192 字节。
+   *
+   * @param vector 向量数组
+   * @return 字节数组（FLOAT32 格式）
    */
-  private String vectorToString(float[] vector) {
-    StringBuilder sb = new StringBuilder();
+  private byte[] vectorToBytes(float[] vector) {
+    byte[] bytes = new byte[vector.length * 4]; // 每个 float 4 字节
     for (int i = 0; i < vector.length; i++) {
-      if (i > 0) {
-        sb.append(",");
-      }
-      sb.append(vector[i]);
+      int intBits = Float.floatToIntBits(vector[i]);
+      // 使用小端序（Little-Endian）- Redis/RediSearch 要求
+      bytes[i * 4] = (byte) intBits;              // 最低位字节
+      bytes[i * 4 + 1] = (byte) (intBits >> 8);
+      bytes[i * 4 + 2] = (byte) (intBits >> 16);
+      bytes[i * 4 + 3] = (byte) (intBits >> 24);  // 最高位字节
     }
-    return sb.toString();
+    return bytes;
   }
 
   @Override
@@ -267,17 +278,38 @@ public class VectorServiceImpl implements VectorService {
     try {
       // 1. 删除旧索引
       log.info("删除旧索引...");
-      redisTemplate.execute((RedisCallback<Object>) connection ->
-          connection.execute("FT.DROP", INDEX_NAME.getBytes()));
-      log.info("旧索引已删除");
+      try {
+        redisTemplate.execute((RedisCallback<Object>) connection -> {
+          connection.execute("FT.DROPINDEX", INDEX_NAME.getBytes(), "DD".getBytes());
+          return null;
+        });
+        log.info("旧索引已删除");
+      } catch (Exception e) {
+        log.warn("删除索引失败（可能不存在）: {}", e.getMessage());
+      }
 
-      // 2. 重置初始化状态并创建新索引
+      // 2. 删除所有旧的chunk数据（使用小端序存储的旧数据）
+      log.info("删除所有旧的chunk数据...");
+      try {
+        // 使用keys命令查找所有chunk:开头的key，然后批量删除
+        redisTemplate.delete(redisTemplate.keys("chunk:*"));
+        log.info("所有旧chunk数据已删除");
+      } catch (Exception e) {
+        log.warn("删除chunk数据时出错: {}", e.getMessage());
+      }
+
+      // 3. 重置所有切片的向量化状态
+      log.info("重置所有切片的向量化状态...");
+      chunkMapper.resetAllVectorized();
+      log.info("向量化状态已重置");
+
+      // 4. 重置初始化状态并创建新索引
       indexInitialized = false;
       log.info("创建新索引...");
       initializeVectorIndex();
       log.info("新索引已创建");
 
-      // 3. 重新向量化所有资源
+      // 5. 重新向量化所有资源（使用小端序）
       log.info("开始重新向量化所有资源...");
       vectorizeAllUnvectorized();
       log.info("向量索引重建完成");

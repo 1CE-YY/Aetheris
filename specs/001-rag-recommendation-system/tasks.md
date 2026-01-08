@@ -355,40 +355,45 @@
   - **测试要点**：单测验证向量检索、资源聚合逻辑（按 resourceId 合并相似度分数）
   - **验收标准**：FR-010（Top-K 检索）、FR-011（聚合到资源级别）
   - **下一步**: T054 集成 PerformanceTimer 记录检索耗时
-- [ ] T050 创建 `backend/src/main/java/com/aetheris/rag/service/RagService.java` 接口和实现 `RagServiceImpl.java`
+- [x] T050 创建 `backend/src/main/java/com/aetheris/rag/service/RagService.java` 接口和实现 `RagServiceImpl.java` ✅ **2026-01-08 完成**
   - **目标**：实现 RAG 问答流程（FR-013）：检索 → Prompt 构建 → LLM 生成 → Citations 提取
   - **涉及表**：resources、resource_chunks
   - **Redis**：使用 SearchService 的向量检索
   - **API 端点**：POST /api/chat/ask
   - **关键配置**：`chat.temperature`、`chat.maxTokens`、`retrieval.topK`
-  - **Prompt 模板**：
-    ```
-    基于以下学习资源片段回答问题。如果证据不足，明确说明"根据现有资料无法完整回答"。
-
-    问题：{query}
-
-    相关资料：
-    {evidence_chunks}
-
-    要求：
-    1. 答案必须严格基于上述资料
-    2. 每个关键论断标注引用来源 [资源标题, 页码/章节]
-    3. 如果资料不足，说明"建议查阅其他资源"
-    ```
-  - **测试要点**：
-    - 单测验证 Prompt 构建逻辑、Citations 提取（正则或结构化解析）
-    - 集成测试验证 LLM 不可用时的降级策略（返回 TopK 检索结果+引用摘要）
-  - **验收标准**：FR-013（RAG 问答）、FR-014（Citations）、FR-015（证据不足降级）、US2 验收场景 1/2/3、SC-002（返回结果包含至少 1 条可验证引用）
-- [ ] T051 [P] 创建 `backend/src/main/java/com/aetheris/rag/dto/request/AskRequest.java` 和 `dto/response/AnswerResponse.java`
+  - **已完成实现**：
+    - ✅ RagService 接口（ask 方法）
+    - ✅ RagServiceImpl 完整实现（220 行）
+      - 语义检索（调用 SearchService）
+      - Prompt 构建（基于检索结果）
+      - LLM 生成（调用 ChatGateway）
+      - Citations 提取（从检索结果映射）
+      - 证据不足检测（少于 2 个结果或相似度分数 < 0.5）
+      - LLM 不可用时的降级处理（返回检索结果 + 证据摘要）
+    - ✅ 集成 BehaviorService（异步记录查询行为）
+  - **验收标准**: FR-013（RAG 问答）、FR-014（Citations）、FR-015（证据不足降级）、US2 验收场景 1/2/3、SC-002（返回结果包含至少 1 条可验证引用）
+- [x] T051 [P] 创建 `backend/src/main/java/com/aetheris/rag/dto/request/AskRequest.java` 和 `dto/response/AnswerResponse.java` ✅ **2026-01-08 完成**
   - **AnswerResponse 字段**：answer（String）、citations（List<Citation>）、evidenceInsufficient（boolean）、fallbackResources（List<ResourceBrief>）、latencyMs（long）
-- [ ] T052 创建 `backend/src/main/java/com/aetheris/rag/controller/ChatController.java`，实现 POST /api/chat/ask 端点
-- [ ] T053 [P] 在 RagService 中集成 BehaviorService，记录查询行为（异步写入 user_behaviors 表）
+  - **已完成实现**：
+    - ✅ AskRequest（包含 question、topK）
+    - ✅ AnswerResponse（包含 answer、citations、evidenceInsufficient、fallbackResources、latencyMs）
+    - ✅ ResourceBrief（用于降级场景的资源简略信息）
+- [x] T052 创建 `backend/src/main/java/com/aetheris/rag/controller/ChatController.java` ✅ **2026-01-08 完成**
+  - **已完成实现**：
+    - ✅ ChatController（POST /api/chat/ask 端点）
+    - ✅ 从 Authentication 中获取用户 ID
+    - ✅ 调用 RagService 并返回统一响应格式
+- [x] T053 [P] 在 RagService 中集成 BehaviorService，记录查询行为（异步写入 user_behaviors 表） ✅ **2026-01-08 完成**
   - **依赖**: Phase 3 (T028) BehaviorService 已实现
   - **依赖**: Phase 3 (T029) POST /api/behaviors/query API 已就绪
   - **实现**: 注入 BehaviorService，调用 recordQuery(userId, queryText, sessionId)
   - **异步**: 使用 @Async 注解，避免阻塞问答主流程
   - **验收标准**: 每次问答调用自动记录到 user_behaviors 表
-- [ ] T054 [P] 在 SearchService 中集成 PerformanceTimer，记录检索耗时（用于 SC-006 性能统计）
+- [x] T054 [P] 在 SearchService 中集成 PerformanceTimer，记录检索耗时（用于 SC-006 性能统计） ✅ **2026-01-08 完成**
+  - **已完成实现**：
+    - ✅ 在 SearchServiceImpl.search 方法中添加 PerformanceTimer
+    - ✅ 记录三个阶段：embedding（向量化）、vector_conversion（向量转换）、vector_search（向量搜索）
+    - ✅ 日志输出总耗时和各阶段耗时
 
 **前端任务（可并行）**：
 

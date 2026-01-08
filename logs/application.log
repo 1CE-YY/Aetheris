@@ -1,0 +1,134 @@
+2026-01-08 17:35:46.722 [main] INFO  c.a.rag.AetherisRagApplication - Starting AetherisRagApplication v1.0.0-SNAPSHOT using Java 21.0.9 with PID 71200 (/Users/hubin5/app/Aetheris/backend/target/rag-backend-1.0.0-SNAPSHOT.jar started by hubin5 in /Users/hubin5/app/Aetheris/backend)
+2026-01-08 17:35:46.724 [main] DEBUG c.a.rag.AetherisRagApplication - Running with Spring Boot v3.5.9, Spring v6.2.15
+2026-01-08 17:35:46.725 [main] INFO  c.a.rag.AetherisRagApplication - No active profile set, falling back to 1 default profile: "default"
+2026-01-08 17:35:47.597 [main] DEBUG o.m.s.b.a.MybatisAutoConfiguration - Searching for mappers annotated with @Mapper
+2026-01-08 17:35:47.598 [main] DEBUG o.m.s.b.a.MybatisAutoConfiguration - Using auto-configuration base package 'com.aetheris.rag'
+2026-01-08 17:35:47.812 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Multiple Spring Data modules found, entering strict repository configuration mode
+2026-01-08 17:35:47.814 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2026-01-08 17:35:47.843 [main] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 12 ms. Found 0 Redis repository interfaces.
+2026-01-08 17:35:47.947 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: URL [jar:nested:/Users/hubin5/app/Aetheris/backend/target/rag-backend-1.0.0-SNAPSHOT.jar/!BOOT-INF/classes/!/com/aetheris/rag/mapper/ChunkMapper.class]
+2026-01-08 17:35:47.948 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: URL [jar:nested:/Users/hubin5/app/Aetheris/backend/target/rag-backend-1.0.0-SNAPSHOT.jar/!BOOT-INF/classes/!/com/aetheris/rag/mapper/ResourceMapper.class]
+2026-01-08 17:35:47.948 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: URL [jar:nested:/Users/hubin5/app/Aetheris/backend/target/rag-backend-1.0.0-SNAPSHOT.jar/!BOOT-INF/classes/!/com/aetheris/rag/mapper/UserBehaviorMapper.class]
+2026-01-08 17:35:47.948 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Identified candidate component class: URL [jar:nested:/Users/hubin5/app/Aetheris/backend/target/rag-backend-1.0.0-SNAPSHOT.jar/!BOOT-INF/classes/!/com/aetheris/rag/mapper/UserMapper.class]
+2026-01-08 17:35:47.949 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'chunkMapper' and 'com.aetheris.rag.mapper.ChunkMapper' mapperInterface
+2026-01-08 17:35:47.950 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'resourceMapper' and 'com.aetheris.rag.mapper.ResourceMapper' mapperInterface
+2026-01-08 17:35:47.950 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'userBehaviorMapper' and 'com.aetheris.rag.mapper.UserBehaviorMapper' mapperInterface
+2026-01-08 17:35:47.950 [main] DEBUG o.m.s.mapper.ClassPathMapperScanner - Creating MapperFactoryBean with name 'userMapper' and 'com.aetheris.rag.mapper.UserMapper' mapperInterface
+2026-01-08 17:35:48.774 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-01-08 17:35:48.798 [main] INFO  o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-01-08 17:35:48.799 [main] INFO  o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/10.1.50]
+2026-01-08 17:35:48.841 [main] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring embedded WebApplicationContext
+2026-01-08 17:35:48.841 [main] INFO  o.s.b.w.s.c.ServletWebServerApplicationContext - Root WebApplicationContext: initialization completed in 2072 ms
+2026-01-08 17:35:49.172 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: FILE_UPLOAD_PATH=./up***oads
+2026-01-08 17:35:49.173 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: REDIS_PASSWORD=aeth***s123
+2026-01-08 17:35:49.173 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: LOG_LEVEL_SPRING=***
+2026-01-08 17:35:49.173 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: MYSQL_USERNAME=***
+2026-01-08 17:35:49.173 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: RETRIEVAL_TOP_K=***
+2026-01-08 17:35:49.174 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: VECTOR_INDEX_NAME=chun***ndex
+2026-01-08 17:35:49.174 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: CHAT_BASE_URL=http***/v4/
+2026-01-08 17:35:49.174 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: DB_CONNECTION_TIMEOUT=***
+2026-01-08 17:35:49.174 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: MYSQL_DATABASE=aeth***_rag
+2026-01-08 17:35:49.174 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: LOG_MAX_SIZE=***
+2026-01-08 17:35:49.175 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: PROFILE_WINDOW_SIZE=***
+2026-01-08 17:35:49.175 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: MYSQL_PASSWORD=aeth***s123
+2026-01-08 17:35:49.175 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: VECTOR_DISTANCE_METRIC=***
+2026-01-08 17:35:49.175 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: CHAT_MAX_RETRIES=***
+2026-01-08 17:35:49.175 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: PROFILE_CLICK_WEIGHT=***
+2026-01-08 17:35:49.175 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: CHAT_MAX_TOKENS=***
+2026-01-08 17:35:49.175 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: JWT_EXPIRATION=6048***0000
+2026-01-08 17:35:49.175 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: EMBEDDING_CACHE_TTL_DAYS=***
+2026-01-08 17:35:49.176 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: JWT_SECRET=chan***4-32
+2026-01-08 17:35:49.176 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: CHAT_MODEL=glm-***lash
+2026-01-08 17:35:49.176 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: DB_MAX_LIFETIME=***
+2026-01-08 17:35:49.176 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: VECTOR_DIMENSION=***
+2026-01-08 17:35:49.176 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: CHUNK_OVERLAP=***
+2026-01-08 17:35:49.176 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: EMBEDDING_RATE_LIMIT=***
+2026-01-08 17:35:49.176 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: EMBEDDING_RETRY_BACKOFF=***
+2026-01-08 17:35:49.176 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: TOMCAT_MAX_THREADS=***
+2026-01-08 17:35:49.176 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: EMBEDDING_BASE_URL=http***/v4/
+2026-01-08 17:35:49.176 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: VECTOR_HNSW_EF_CONSTRUCTION=***
+2026-01-08 17:35:49.177 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: PROFILE_ENABLED=***
+2026-01-08 17:35:49.177 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: DB_MAX_POOL_SIZE=***
+2026-01-08 17:35:49.177 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: RECOMMENDATION_TOP_N=***
+2026-01-08 17:35:49.177 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: CHAT_TOP_P=***
+2026-01-08 17:35:49.177 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: REDIS_DB=***
+2026-01-08 17:35:49.177 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: REDIS_MAX_WAIT=***
+2026-01-08 17:35:49.177 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: EMBEDDING_CACHE_ENABLED=***
+2026-01-08 17:35:49.177 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: REDIS_TIMEOUT=***
+2026-01-08 17:35:49.177 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: PROFILE_FAVORITE_WEIGHT=***
+2026-01-08 17:35:49.177 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: FLYWAY_ENABLED=***
+2026-01-08 17:35:49.178 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: LOG_LEVEL_APP=***
+2026-01-08 17:35:49.178 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: PROFILE_QUERY_WEIGHT=***
+2026-01-08 17:35:49.178 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: CHAT_RATE_LIMIT=***
+2026-01-08 17:35:49.178 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: ZHIPU_API_KEY=e315***hvN9
+2026-01-08 17:35:49.178 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: REDIS_PORT=***
+2026-01-08 17:35:49.178 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: MYSQL_PORT=***
+2026-01-08 17:35:49.178 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: DB_MIN_IDLE=***
+2026-01-08 17:35:49.179 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: VECTOR_HNSW_M=***
+2026-01-08 17:35:49.179 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: PROFILE_UPDATE_TRIGGER=***
+2026-01-08 17:35:49.179 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: CHAT_RETRY_BACKOFF=***
+2026-01-08 17:35:49.179 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: DB_IDLE_TIMEOUT=***
+2026-01-08 17:35:49.179 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: TOMCAT_MIN_THREADS=***
+2026-01-08 17:35:49.179 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: REDIS_MIN_IDLE=***
+2026-01-08 17:35:49.179 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: CHAT_TIMEOUT=***
+2026-01-08 17:35:49.179 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: SERVER_PORT=***
+2026-01-08 17:35:49.180 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: RECOMMENDATION_ENABLED=***
+2026-01-08 17:35:49.180 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: EMBEDDING_MAX_RETRIES=***
+2026-01-08 17:35:49.180 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: REDIS_HOST=loca***host
+2026-01-08 17:35:49.180 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: MYSQL_URL=jdbc***true
+2026-01-08 17:35:49.180 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: MAX_REQUEST_SIZE=***
+2026-01-08 17:35:49.180 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: MYSQL_ROOT_PASSWORD=***
+2026-01-08 17:35:49.180 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: RETRIEVAL_SCORE_THRESHOLD=***
+2026-01-08 17:35:49.180 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: LOG_LEVEL_ROOT=***
+2026-01-08 17:35:49.180 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: MAX_FILE_SIZE=***
+2026-01-08 17:35:49.180 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: EMBEDDING_MAX_TOKENS=***
+2026-01-08 17:35:49.181 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: LOG_MAX_HISTORY=***
+2026-01-08 17:35:49.181 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: CHAT_TEMPERATURE=***
+2026-01-08 17:35:49.181 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: REDIS_MAX_IDLE=***
+2026-01-08 17:35:49.181 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: EMBEDDING_TIMEOUT=***
+2026-01-08 17:35:49.181 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: CHUNK_SIZE=***
+2026-01-08 17:35:49.181 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: REDIS_MAX_ACTIVE=***
+2026-01-08 17:35:49.181 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: LOG_LEVEL_MYBATIS=***
+2026-01-08 17:35:49.181 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: EMBEDDING_MODEL=embe***ng-3
+2026-01-08 17:35:49.182 [main] DEBUG c.aetheris.rag.config.DotenvConfig - 从 .env 加载变量: FILE_TEMP_PATH=./up***temp
+2026-01-08 17:35:49.182 [main] INFO  c.aetheris.rag.config.DotenvConfig - ✅ .env 文件已加载: /Users/hubin5/app/Aetheris/.env
+2026-01-08 17:35:49.197 [main] INFO  com.aetheris.rag.util.JwtUtil - Initialized JwtUtil with expiration: 604800000 ms
+2026-01-08 17:35:49.423 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-01-08 17:35:49.593 [main] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@56ba8e8c
+2026-01-08 17:35:49.594 [main] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-01-08 17:35:49.638 [main] INFO  org.flywaydb.core.FlywayExecutor - Database: jdbc:mysql://localhost:3306/aetheris_rag?useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true (MySQL 8.0)
+2026-01-08 17:35:49.996 [main] INFO  o.f.core.internal.command.DbValidate - Successfully validated 2 migrations (execution time 00:00.033s)
+2026-01-08 17:35:50.017 [main] INFO  o.f.core.internal.command.DbMigrate - Current version of schema `aetheris_rag`: 1
+2026-01-08 17:35:50.021 [main] INFO  o.f.core.internal.command.DbMigrate - Schema `aetheris_rag` is up to date. No migration necessary.
+2026-01-08 17:35:50.255 [main] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'class path resource [mapper/ChunkMapper.xml]'
+2026-01-08 17:35:50.274 [main] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'class path resource [mapper/ResourceMapper.xml]'
+2026-01-08 17:35:50.284 [main] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'class path resource [mapper/UserBehaviorMapper.xml]'
+2026-01-08 17:35:50.295 [main] DEBUG o.m.spring.SqlSessionFactoryBean - Parsed mapper file: 'class path resource [mapper/UserMapper.xml]'
+2026-01-08 17:35:50.495 [main] WARN  i.n.r.d.DnsServerAddressStreamProviders - Can not find io.netty.resolver.dns.macos.MacOSDnsServerAddressStreamProvider in the classpath, fallback to system defaults. This may result in incorrect DNS resolutions on MacOS. Check whether you have a dependency on 'io.netty:netty-resolver-dns-native-macos'
+2026-01-08 17:35:50.682 [main] INFO  c.a.rag.gateway.cache.EmbeddingCache - Initialized EmbeddingCache with TTL: 30 days
+2026-01-08 17:35:50.844 [main] INFO  c.a.rag.gateway.EmbeddingGateway - 初始化 EmbeddingGateway，模型：embedding-3，缓存：启用
+2026-01-08 17:35:50.894 [main] INFO  c.aetheris.rag.gateway.ChatGateway - 初始化 ChatGateway，模型：glm-4-flash，temperature：0.7
+2026-01-08 17:35:50.911 [main] DEBUG c.a.r.service.impl.VectorServiceImpl - 检查向量索引是否存在: chunk_vector_index
+2026-01-08 17:35:51.301 [main] INFO  c.a.r.service.impl.VectorServiceImpl - 创建向量索引: chunk_vector_index
+2026-01-08 17:35:51.306 [main] INFO  c.a.r.service.impl.VectorServiceImpl - 向量索引已存在: chunk_vector_index
+2026-01-08 17:35:51.307 [main] INFO  c.aetheris.rag.config.RedissonConfig - 初始化 Redisson 客户端: localhost:6379
+2026-01-08 17:35:51.388 [main] INFO  org.redisson.Version - Redisson 3.25.0
+2026-01-08 17:35:51.486 [redisson-netty-5-6] INFO  o.r.c.p.MasterPubSubConnectionPool - 1 connections initialized for localhost/127.0.0.1:6379
+2026-01-08 17:35:51.492 [redisson-netty-5-8] INFO  o.r.c.pool.MasterConnectionPool - 2 connections initialized for localhost/127.0.0.1:6379
+2026-01-08 17:35:51.523 [main] INFO  c.aetheris.rag.config.RedissonConfig - Redisson 客户端初始化成功
+2026-01-08 17:35:51.887 [main] INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 4 endpoints beneath base path '/actuator'
+2026-01-08 17:35:51.921 [main] INFO  o.s.s.c.a.a.c.InitializeUserDetailsBeanManagerConfigurer$InitializeUserDetailsManagerConfigurer - Global AuthenticationManager configured with UserDetailsService bean with name userDetailsService
+2026-01-08 17:35:52.115 [main] DEBUG o.m.s.b.a.MybatisAutoConfiguration - Not found configuration for registering mapper bean using @MapperScan, MapperFactoryBean and MapperScannerConfigurer.
+2026-01-08 17:35:52.334 [main] INFO  o.s.b.w.e.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-01-08 17:35:52.356 [main] INFO  c.a.rag.AetherisRagApplication - Started AetherisRagApplication in 6.152 seconds (process running for 6.686)
+2026-01-08 17:36:05.881 [tomcat-handler-0] INFO  o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-01-08 17:36:05.881 [tomcat-handler-0] INFO  o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-01-08 17:36:05.882 [tomcat-handler-0] INFO  o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2026-01-08 17:36:18.721 [tomcat-handler-1] DEBUG c.a.r.c.SecurityConfig$JwtAuthenticationFilter - Authenticated user: 15
+2026-01-08 17:36:18.745 [tomcat-handler-1] INFO  c.a.r.controller.ResourceController - POST /api/resources - userId=15, title=ODT伪装测试, file=Untitled.pdf
+2026-01-08 17:36:18.755 [tomcat-handler-1] INFO  c.a.r.s.impl.ResourceServiceImpl - 开始上传资源: ODT伪装测试, 文件: Untitled.pdf
+2026-01-08 17:36:18.761 [tomcat-handler-1] WARN  c.a.r.e.GlobalExceptionHandler - 请求参数错误: 文件扩展名为 .pdf 但实际格式为 ZIP 压缩包，请上传正确的 PDF 文件
+2026-01-08 17:36:26.815 [tomcat-handler-2] DEBUG c.a.r.c.SecurityConfig$JwtAuthenticationFilter - Authenticated user: 15
+2026-01-08 17:36:26.818 [tomcat-handler-2] INFO  c.a.r.controller.ResourceController - POST /api/resources - userId=15, title=重复上传测试, file=Untitled.pdf
+2026-01-08 17:36:26.820 [tomcat-handler-2] INFO  c.a.r.s.impl.ResourceServiceImpl - 开始上传资源: 重复上传测试, 文件: Untitled.pdf
+2026-01-08 17:36:26.823 [tomcat-handler-2] WARN  c.a.r.e.GlobalExceptionHandler - 请求参数错误: 文件扩展名为 .pdf 但实际格式为 ZIP 压缩包，请上传正确的 PDF 文件

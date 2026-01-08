@@ -136,7 +136,7 @@ rag:
   # Retrieval configuration
   retrieval:
     top-k: ${RETRIEVAL_TOP_K:5}
-    score-threshold: ${RETRIEVAL_SCORE_THRESHOLD:0.5}
+    score-threshold: ${RETRIEVAL_SCORE_THRESHOLD:0.35}
 
   # Vector index configuration
   vector:

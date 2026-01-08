@@ -95,6 +95,13 @@ public interface ChunkMapper {
       @Param("ids") List<Long> ids, @Param("vectorized") Boolean vectorized);
 
   /**
+   * 重置所有切片的向量化状态为未向量化。
+   *
+   * @return 影响行数
+   */
+  int resetAllVectorized();
+
+  /**
    * 根据资源ID删除所有切片。
    *
    * @param resourceId 资源ID

@@ -3,7 +3,7 @@
 **项目**: Aetheris RAG 系统
 **版本**: Phase 1-4 已完成，Phase 5 进行中
 **项目路径**: `/Users/hubin5/app/Aetheris`
-**最后更新**: 2026-01-07
+**最后更新**: 2026-01-08
 
 ---
 
@@ -42,27 +42,55 @@
 
 **⚠️ 启动和停止服务必须使用根目录下的脚本**
 
-```bash
-# 启动服务
-./start.sh                    # 一键启动所有服务
+#### 启动服务（start.sh）
 
-# 停止服务
-./stop.sh                     # 停止所有服务（交互式）
-./stop.sh all                 # 停止所有服务
-./stop.sh backend             # 仅停止后端
-./stop.sh frontend            # 仅停止前端
-./stop.sh docker              # 仅停止 Docker 服务
+**脚本特性**：
+- ✅ 自动检查并配置 Java 21 环境（无需手动 export）
+- ✅ 支持交互式菜单和命令行参数两种模式
+- ✅ 支持选择性启动（前端/后端/Docker）
+- ✅ 选择后自动退出（无需选择 0 退出）
+
+```bash
+# 交互模式（弹出菜单，选择后自动执行并退出）
+./start.sh
+
+# 命令行模式
+./start.sh --frontend-only    # 仅启动前端
+./start.sh --backend-only     # 仅启动后端
+./start.sh --docker-only      # 仅启动 Docker（MySQL + Redis）
+./start.sh --all              # 启动所有服务
+./start.sh --help             # 显示帮助信息
 
 # 查看状态
 cat .pids.json | jq           # 查看服务状态
 tail -f logs/backend.log      # 查看后端日志
-tail -f logs/application.log  # 查看应用日志
+tail -f logs/frontend.log     # 查看前端日志
+```
+
+#### 停止服务（stop.sh）
+
+**脚本特性**：
+- ✅ 支持交互式菜单和命令行参数两种模式
+- ✅ 支持选择性停止（前端/后端/Docker）
+- ✅ 选择后自动退出（无需选择 0 退出）
+
+```bash
+# 交互模式（弹出菜单，选择后自动执行并退出）
+./stop.sh
+
+# 命令行模式
+./stop.sh --frontend-only     # 仅停止前端
+./stop.sh --backend-only      # 仅停止后端
+./stop.sh --docker-only       # 仅停止 Docker（MySQL + Redis）
+./stop.sh --all               # 停止所有服务（前端 + 后端）
+./stop.sh --help              # 显示帮助信息
 ```
 
 **❌ 禁止**：
 - 直接使用 `mvn spring-boot:run` 启动后端
 - 直接使用 `npm run dev` 启动前端
 - 手动使用 `kill` 命令杀进程
+- 手动 export JAVA_HOME（脚本会自动处理）
 
 ### 2. 虚拟线程必须启用
 ```yaml
@@ -153,15 +181,10 @@ spring:
 
 ## 常用命令
 
-### 环境设置
-```bash
-export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.9/Contents/Home
-export PATH=$JAVA_HOME/bin:$PATH
-```
-
 ### 后端开发
 ```bash
 cd backend
+# ⚠️ 注意：脚本已自动配置 Java 21 环境变量，无需手动 export
 mvn clean compile            # 编译
 mvn test                     # 运行测试
 mvn clean package            # 构建 JAR
@@ -192,9 +215,13 @@ docker exec -i aetheris-mysql mysql -u aetheris -paetheris123 aetheris_rag -e "S
 ## 故障排除
 
 ### 问题：Java 版本不匹配
+**解决方案**：`start.sh` 脚本已自动处理 Java 21 环境配置，无需手动设置。如果仍有问题：
 ```bash
-export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.9/Contents/Home
-export PATH=$JAVA_HOME/bin:$PATH
+# 检查脚本是否正确设置
+java -version  # 应显示 openjdk version "21.x.x"
+
+# 如果仍显示错误版本，检查 Java 21 安装路径
+ls -la /Users/hubin5/Library/Java/JavaVirtualMachines/
 ```
 
 ### 问题：端口被占用
@@ -212,4 +239,5 @@ DROP TABLE IF EXISTS flyway_schema_history;
 
 ---
 
-**记忆版本**: v3.1.0（精简版）
+**记忆版本**: v3.2.0
+**更新内容**：优化 start.sh 和 stop.sh 脚本，支持选择性启动/停止，自动环境配置

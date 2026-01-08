@@ -119,7 +119,7 @@ ls frontend/src/
 **执行命令**:
 ```bash
 cd backend
-export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.8/Contents/Home
+export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.9/Contents/Home
 export PATH=$JAVA_HOME/bin:$PATH
 mvn spring-boot:run
 ```

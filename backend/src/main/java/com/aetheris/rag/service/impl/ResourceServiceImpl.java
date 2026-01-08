@@ -12,7 +12,9 @@ import com.aetheris.rag.service.VectorService;
 import com.aetheris.rag.util.HashUtil;
 import com.aetheris.rag.util.MarkdownProcessor;
 import com.aetheris.rag.util.PdfProcessor;
+import com.aetheris.rag.util.FileValidationUtil;
 import com.aetheris.rag.exception.ConflictException;
+import com.aetheris.rag.exception.BadRequestException;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
@@ -126,8 +128,15 @@ public class ResourceServiceImpl implements ResourceService {
       throw new IllegalArgumentException("不支持的文件类型，仅支持 Markdown 和 PDF");
     }
 
-    // 4. 先计算文件内容哈希（从 MultipartFile 字节数组）
+    // 3.5. 严格验证文件格式（在计算哈希之前）
     byte[] fileBytes = file.getBytes();
+    FileValidationUtil.ValidationResult validationResult =
+        FileValidationUtil.validateFileFormat(fileBytes, fileName);
+    if (!validationResult.isValid()) {
+      throw new BadRequestException(validationResult.getErrorMessage());
+    }
+
+    // 4. 计算文件内容哈希
     String contentHash = HashUtil.sha256(fileBytes);
     log.debug("文件内容哈希: {}", contentHash);
 
@@ -163,6 +172,8 @@ public class ResourceServiceImpl implements ResourceService {
     RLock lock = redissonClient.getLock(lockKey);
 
     boolean lockAcquired = false;
+    Path filePath = null;
+
     try {
       // 尝试获取锁（等待时间、自动释放时间、时间单位）
       lockAcquired = lock.tryLock(LOCK_WAIT_TIME, LOCK_LEASE_TIME, TimeUnit.SECONDS);
@@ -179,7 +190,7 @@ public class ResourceServiceImpl implements ResourceService {
       }
 
       // 3. 只对新资源保存文件到服务器
-      Path filePath = saveUploadedFile(file);
+      filePath = saveUploadedFile(file);
 
       // 读取文件信息
       String savedFileName = filePath.getFileName().toString();
@@ -228,6 +239,19 @@ public class ResourceServiceImpl implements ResourceService {
       }
 
       return resource;
+    } catch (Exception e) {
+      // 清理已保存的文件
+      if (filePath != null && Files.exists(filePath)) {
+        try {
+          Files.delete(filePath);
+          log.info("上传失败，已删除文件: {}", filePath);
+        } catch (IOException ex) {
+          log.warn("删除文件失败: {}", filePath, ex);
+        }
+      }
+
+      // 抛出原始异常（事务会自动回滚数据库操作）
+      throw e;
     } finally {
       // 释放分布式锁
       if (lockAcquired) {
@@ -448,5 +472,44 @@ public class ResourceServiceImpl implements ResourceService {
     } else {
       throw new IllegalArgumentException("不支持的文件类型: " + fileName);
     }
+  }
+
+  @Override
+  @Transactional
+  public int reprocessResource(Long resourceId) throws Exception {
+    log.info("重新处理资源: resourceId={}", resourceId);
+
+    // 1. 查询资源
+    Resource resource = resourceMapper.findById(resourceId);
+    if (resource == null) {
+      throw new IllegalArgumentException("资源不存在: " + resourceId);
+    }
+
+    // 2. 删除旧切片
+    List<Chunk> oldChunks = chunkMapper.findByResourceId(resourceId);
+    if (!oldChunks.isEmpty()) {
+      chunkMapper.deleteByResourceId(resourceId);
+      log.info("删除了 {} 个旧切片", oldChunks.size());
+    }
+
+    // 3. 重新处理文档生成切片
+    String filePath = resource.getFilePath();
+    String fileType = resource.getFileType();
+    List<Chunk> chunks = processDocument(filePath, fileType, resourceId);
+
+    // 4. 插入新切片
+    if (!chunks.isEmpty()) {
+      chunkMapper.batchInsert(chunks);
+      log.info("重新生成了 {} 个切片", chunks.size());
+
+      // 更新资源切片数量
+      resourceMapper.updateChunkStatus(resourceId, chunks.size(), false);
+
+      // 5. 触发向量化
+      vectorService.vectorizeChunks(resourceId);
+      log.info("向量化任务已触发: 资源ID={}", resourceId);
+    }
+
+    return chunks.size();
   }
 }

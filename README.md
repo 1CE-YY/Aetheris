@@ -53,26 +53,51 @@
 
 ```bash
 cd /Users/hubin5/app/Aetheris
+
+# 交互模式（弹出菜单，选择后自动执行并退出）
 ./start.sh
+
+# 命令行模式（推荐）
+./start.sh --all              # 启动所有服务（Docker + 后端 + 前端）
 ```
 
-**启动脚本会自动完成**：
-1. ✅ 检查环境（Java 21、Maven、Node.js、Docker）
-2. ✅ 创建 .env 配置文件（如不存在）
+**启动脚本特性**：
+- ✅ 自动检查并配置 Java 21 环境（无需手动 export JAVA_HOME）
+- ✅ 自动检查环境依赖（Java 21、Maven、Node.js、Docker）
+- ✅ 自动创建 .env 配置文件（如不存在）
+- ✅ 支持选择性启动（前端/后端/Docker）
+- ✅ 选择后自动退出（无需选择 0 退出）
+
+**启动流程**：
+1. ✅ 环境检查（Java 21、Maven、Node.js、Docker）
+2. ✅ 配置 Java 21 环境变量（自动）
 3. ✅ 启动 MySQL + Redis（Docker Compose）
 4. ✅ 启动后端（Spring Boot）
 5. ✅ 启动前端（Vite）
 6. ✅ 更新 `.pids.json` 进程管理文件
 
+#### 选择性启动
+
+```bash
+./start.sh --frontend-only    # 仅启动前端
+./start.sh --backend-only     # 仅启动后端
+./start.sh --docker-only      # 仅启动 Docker（MySQL + Redis）
+./start.sh --all              # 启动所有服务
+./start.sh --help             # 显示帮助信息
+```
+
 #### 停止服务
 
 ```bash
-cd /Users/hubin5/app/Aetheris
-./stop.sh                     # 交互式菜单
-./stop.sh all                 # 停止所有服务
-./stop.sh backend             # 仅停止后端
-./stop.sh frontend            # 仅停止前端
-./stop.sh docker              # 仅停止 Docker 服务
+# 交互模式（弹出菜单，选择后自动执行并退出）
+./stop.sh
+
+# 命令行模式（推荐）
+./stop.sh --all               # 停止所有服务（前端 + 后端）
+./stop.sh --frontend-only     # 仅停止前端
+./stop.sh --backend-only      # 仅停止后端
+./stop.sh --docker-only       # 仅停止 Docker（MySQL + Redis）
+./stop.sh --help              # 显示帮助信息
 ```
 
 #### 查看服务状态和日志
@@ -91,32 +116,27 @@ docker-compose logs -f        # Docker 日志
 - ❌ 直接使用 `npm run dev` 启动前端
 - ❌ 单独使用 `docker-compose up -d` 启动基础设施
 - ❌ 手动使用 `kill` 命令杀进程
+- ❌ 手动 export JAVA_HOME（脚本会自动处理）
 
 ### 手动启动（仅用于开发调试）
 
-如果需要单独启动某个组件进行调试：
+如果需要单独启动某个组件进行调试，请按以下步骤操作：
 
-#### 1. 设置 Java 21（必须！）
-
-```bash
-export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.9/Contents/Home
-export PATH=$JAVA_HOME/bin:$PATH
-```
-
-#### 2. 启动基础设施
+#### 1. 启动基础设施
 
 ```bash
 docker-compose up -d
 ```
 
-#### 3. 启动后端（仅调试用）
+#### 2. 启动后端（仅调试用）
 
 ```bash
+# ⚠️ 注意：start.sh 已自动配置 Java 21，但如果需要在新的终端中调试
 cd backend
 mvn spring-boot:run
 ```
 
-#### 4. 启动前端（仅调试用）
+#### 3. 启动前端（仅调试用）
 
 ```bash
 cd frontend
@@ -351,8 +371,7 @@ openssl rand -base64 32
 
 ```bash
 cd backend
-export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.8/Contents/Home
-export PATH=$JAVA_HOME/bin:$PATH
+# ⚠️ 注意：start.sh 已自动配置 Java 21，无需手动 export
 mvn test
 ```
 
@@ -450,11 +469,18 @@ docker exec -i aetheris-mysql mysql -u aetheris -paetheris123 aetheris_rag -e "S
 
 **症状**：编译失败，提示 Java 版本不匹配
 
-**解决**：
+**解决方案**：`start.sh` 脚本已自动处理 Java 21 环境配置，无需手动设置。如果仍有问题：
+
 ```bash
-export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.8/Contents/Home
+# 检查当前 Java 版本
+java -version  # 应显示 openjdk version "21.x.x"
+
+# 检查 Java 21 安装路径
+ls -la /Users/hubin5/Library/Java/JavaVirtualMachines/
+
+# 如果需要在新终端中手动设置（仅在脚本失效时）
+export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.9/Contents/Home
 export PATH=$JAVA_HOME/bin:$PATH
-java -version  # 确认是 Java 21
 ```
 
 ### 问题 2：Redis 连接被拒绝
@@ -594,6 +620,12 @@ git push origin feature/your-feature-name
 
 ---
 
-**最后更新**: 2026-01-07
-**文档版本**: v2.0.0
+**最后更新**: 2026-01-08
+**文档版本**: v2.1.0
 **当前阶段**: Phase 5（RAG 问答系统）
+
+**最近更新**：
+- ✅ 优化 start.sh 和 stop.sh 脚本
+- ✅ 支持选择性启动/停止服务
+- ✅ 自动配置 Java 21 环境（无需手动 export）
+- ✅ 交互模式选择后自动退出（提升效率）

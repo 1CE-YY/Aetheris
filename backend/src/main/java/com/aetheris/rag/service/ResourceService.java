@@ -106,4 +106,13 @@ public interface ResourceService {
    * @return 删除的资源列表
    */
   List<Resource> deleteResources(List<Long> ids, Long userId);
+
+  /**
+   * 重新处理资源 - 删除旧切片并重新生成切片和向量化。
+   *
+   * @param resourceId 资源ID
+   * @return 生成的切片数量
+   * @throws Exception 如果文件处理失败
+   */
+  int reprocessResource(Long resourceId) throws Exception;
 }

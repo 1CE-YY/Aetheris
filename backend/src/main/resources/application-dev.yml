@@ -1,9 +1,6 @@
 # Development Environment Configuration
 
 spring:
-  profiles:
-    active: dev
-
   # Dev tools for hot reload
   devtools:
     restart:

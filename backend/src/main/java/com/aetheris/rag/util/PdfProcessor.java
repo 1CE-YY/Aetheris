@@ -4,10 +4,13 @@
 package com.aetheris.rag.util;
 
 import com.aetheris.rag.entity.Chunk;
+import com.aetheris.rag.exception.BadRequestException;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -55,6 +58,12 @@ public class PdfProcessor {
       // 逐页提取文本
       List<PageText> pageTexts = extractPageTexts(document);
 
+      // 验证内容是否为空
+      if (pageTexts.isEmpty()) {
+        log.warn("PDF 文档内容为空: {}", filePath);
+        throw new BadRequestException("PDF 文档内容为空，请确保文件包含有效的文本内容");
+      }
+
       // 按页码范围合并文本并切片
       int chunkIndex = 0;
       StringBuilder currentText = new StringBuilder();
@@ -63,7 +72,7 @@ public class PdfProcessor {
 
       for (int i = 0; i < pageTexts.size(); i++) {
         PageText pageText = pageTexts.get(i);
-        String text = pageText.text();
+        String text = pageText.getText();
 
         if (currentText.length() + text.length() > chunkSize && currentText.length() > 0) {
           // 创建切片
@@ -82,11 +91,11 @@ public class PdfProcessor {
           // 处理重叠
           String overlapText = getOverlapText(currentText.toString(), chunkOverlap);
           currentText = new StringBuilder(overlapText);
-          currentPageStart = pageText.pageNumber();
+          currentPageStart = pageText.getPageNumber();
         }
 
         currentText.append(text);
-        currentPageEnd = pageText.pageNumber();
+        currentPageEnd = pageText.getPageNumber();
       }
 
       // 处理最后一个切片
@@ -173,5 +182,10 @@ public class PdfProcessor {
   }
 
   /** 页文本记录（内部类）。 */
-  private record PageText(int pageNumber, String text) {}
+  @Data
+  @AllArgsConstructor
+  private static class PageText {
+    private int pageNumber;
+    private String text;
+  }
 }

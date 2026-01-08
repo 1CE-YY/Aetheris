@@ -183,6 +183,12 @@
     </foreach>
   </update>
 
+  <!-- 重置所有切片的向量化状态 -->
+  <update id="resetAllVectorized">
+    UPDATE resource_chunks
+    SET vectorized = 0
+  </update>
+
   <!-- 根据资源ID删除所有切片 -->
   <delete id="deleteByResourceId">
     DELETE FROM resource_chunks

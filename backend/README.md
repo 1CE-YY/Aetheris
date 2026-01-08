@@ -22,7 +22,7 @@ Spring Boot 3.5.9 后端服务，提供 RESTful API 和 RAG 核心功能。
 ### 1. 设置 Java 21（必须！）
 
 ```bash
-export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.8/Contents/Home
+export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.9/Contents/Home
 export PATH=$JAVA_HOME/bin:$PATH
 ```
 
@@ -345,7 +345,7 @@ spring:
 **A**: 设置 JAVA_HOME 环境变量：
 
 ```bash
-export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.8/Contents/Home
+export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.9/Contents/Home
 export PATH=$JAVA_HOME/bin:$PATH
 ```
 
