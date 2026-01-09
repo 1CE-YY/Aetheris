@@ -53,12 +53,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/resource/ResourceDetailView.vue'),
     meta: { requiresAuth: true }
   },
-  // {
-  //   path: '/chat',
-  //   name: 'Chat',
-  //   component: () => import('@/views/chat/ChatView.vue'),
-  //   meta: { requiresAuth: true }
-  // },
+  {
+    path: '/chat',
+    name: 'Chat',
+    component: () => import('@/views/chat/ChatView.vue'),
+    meta: { requiresAuth: true, title: '智能问答' }
+  },
   // {
   //   path: '/recommendations',
   //   name: 'Recommendations',

@@ -10,6 +10,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # 项目根目录
@@ -27,10 +28,14 @@ stop_backend() {
     # 1. java -jar rag-backend-*.jar
     # 2. spring-boot:run (Maven)
     # 3. AetherisRagApplication (主类)
-    BACKEND_PIDS=$(pgrep -f "rag-backend-.*\.jar|spring-boot:run|AetherisRagApplication" || true)
+    # 分别获取 Maven 和应用进程
+    MVN_PID=$(pgrep -f "java.*spring-boot:run" || true)
+    APP_PID=$(pgrep -f "java.*AetherisRagApplication" || true)
 
-    if [ -n "$BACKEND_PIDS" ]; then
-        echo -e "${BLUE}找到后端进程: $BACKEND_PIDS${NC}"
+    if [ -n "$MVN_PID" ] || [ -n "$APP_PID" ]; then
+        echo -e "${BLUE}找到后端进程:${NC}"
+        [ -n "$MVN_PID" ] && echo -e "  ${CYAN}- Maven 进程: $MVN_PID${NC}"
+        [ -n "$APP_PID" ] && echo -e "  ${CYAN}- 应用进程: $APP_PID${NC}"
 
         # 优雅关闭
         pkill -TERM -f "rag-backend-.*\.jar|spring-boot:run|AetherisRagApplication" || true
@@ -58,10 +63,14 @@ stop_backend() {
 stop_frontend() {
     echo -e "${YELLOW}[停止前端]${NC}"
 
-    FRONTEND_PIDS=$(pgrep -f "vite.*frontend|npm.*dev|node.*vite" || true)
+    # 分别获取 npm 和 node 进程
+    NPM_PID=$(pgrep -f "npm.*dev" || true)
+    NODE_PID=$(pgrep -f "node.*vite" || true)
 
-    if [ -n "$FRONTEND_PIDS" ]; then
-        echo -e "${BLUE}找到前端进程: $FRONTEND_PIDS${NC}"
+    if [ -n "$NPM_PID" ] || [ -n "$NODE_PID" ]; then
+        echo -e "${BLUE}找到前端进程:${NC}"
+        [ -n "$NPM_PID" ] && echo -e "  ${CYAN}- npm 进程: $NPM_PID${NC}"
+        [ -n "$NODE_PID" ] && echo -e "  ${CYAN}- node 进程 (Vite): $NODE_PID${NC}"
 
         # 优雅关闭
         pkill -TERM -f "vite.*frontend|npm.*dev|node.*vite" || true

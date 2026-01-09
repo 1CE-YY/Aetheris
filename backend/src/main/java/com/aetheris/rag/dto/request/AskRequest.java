@@ -19,6 +19,7 @@ import lombok.NoArgsConstructor;
  * <ul>
  *   <li>question：用户的问题文本（必填）
  *   <li>topK：检索返回的切片数量（可选，默认为 5）
+ *   <li>useRag：是否使用 RAG 流程（可选，默认为 true）
  * </ul>
  *
  * @author Aetheris Team
@@ -48,4 +49,13 @@ public class AskRequest {
   @Min(value = 1, message = "topK 至少为 1")
   @Max(value = 20, message = "topK 最多为 20")
   private Integer topK;
+
+  /**
+   * 是否使用 RAG 流程。
+   *
+   * <p>默认为 true，表示执行完整的检索增强生成流程。
+   * <p>设置为 false 时，跳过检索步骤，直接调用 LLM 生成答案（不包含引用来源）。
+   */
+  @Builder.Default
+  private Boolean useRag = true;
 }

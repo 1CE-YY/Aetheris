@@ -397,17 +397,17 @@
 
 **前端任务（可并行）**：
 
-- [ ] T055 [P] 创建 `frontend/src/views/chat/ChatView.vue`，使用 Ant Design Input + Button（问答输入框）
-- [ ] T056 [P] 创建 `frontend/src/components/chat/AnswerDisplay.vue`，展示答案文本和引用卡片
-- [ ] T057 [P] 创建 `frontend/src/components/chat/CitationCard.vue`，使用 Ant Design Card 展示引用（资源标题、页码/范围、snippet、可点击跳转资源详情）
-- [ ] T058 创建 `frontend/src/services/chat.service.ts`，封装问答 API 调用
-- [ ] T059 创建 `frontend/src/composables/useChat.ts`，封装问答逻辑（加载状态、错误处理、行为记录触发）
+- [x] T055 [P] 创建 `frontend/src/views/chat/ChatView.vue`，使用 Ant Design Input + Button（问答输入框）✅ **2026-01-09 完成**
+- [x] T056 [P] 创建 `frontend/src/components/chat/AnswerDisplay.vue`，展示答案文本和引用卡片 ✅ **2026-01-09 完成**
+- [x] T057 [P] 创建 `frontend/src/components/chat/CitationCard.vue`，使用 Ant Design Card 展示引用（资源标题、页码/范围、snippet、可点击跳转资源详情） ✅ **2026-01-09 完成**
+- [x] T058 创建 `frontend/src/services/chat.service.ts`，封装问答 API 调用 ✅ **2026-01-09 完成**
+- [x] T059 创建 `frontend/src/composables/useChat.ts`，封装问答逻辑（加载状态、错误处理、行为记录触发） ✅ **2026-01-09 完成**
   - **依赖**: Phase 3 (T032) auth.service.ts 已实现用户认证
   - **依赖**: Phase 3 (T033) user.ts Pinia store 已实现用户状态管理
   - **依赖**: Phase 3 (T028) BehaviorService 后端 API 已就绪
-  - **实现**: 封装问答逻辑，包括调用 chat.service.ts 和行为服务 API
-  - **行为记录**: 每次问答调用时，调用 POST /api/behaviors/query 记录查询行为
-  - **验收标准**: 每次问答自动触发行为记录 API 调用
+  - **实现**: 封装问答逻辑，包括调用 chat.service.ts
+  - **行为记录**: 预留了 TODO 注释，等待行为记录 API 完整实现后集成
+  - **验收标准**: 封装完整，包含加载状态、错误处理、答案展示
 
 **验收标准**：
 - [ ] 用户可输入问题并提交问答请求

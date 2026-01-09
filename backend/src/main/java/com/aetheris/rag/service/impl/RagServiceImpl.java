@@ -24,14 +24,12 @@ import java.util.stream.Collectors;
 /**
  * RAG 问答服务实现类。
  *
- * <p>实现完整的检索增强生成（RAG）流程，包括：
+ * <p>实现完整的检索增强生成（RAG）流程和纯 LLM 模式，包括：
  *
  * <ul>
- *   <li>语义检索（调用 SearchService）
- *   <li>Prompt 构建（基于检索结果）
- *   <li>LLM 生成答案（调用 ChatGateway）
- *   <li>提取引用来源（Citations）
- *   <li>降级处理（LLM 不可用或证据不足时）
+ *   <li>RAG 模式（useRag=true）：语义检索 → Prompt 构建 → LLM 生成 → 提取引用
+ *   <li>纯 LLM 模式（useRag=false）：跳过检索，直接调用 LLM 生成答案
+ *   <li>降级处理：LLM 不可用时返回检索结果或错误提示
  * </ul>
  *
  * @author Aetheris Team
@@ -56,52 +54,80 @@ public class RagServiceImpl implements RagService {
   @Override
   public AnswerResponse ask(Long userId, AskRequest request) {
     PerformanceTimer timer = new PerformanceTimer();
-    timer.recordStage("retrieval");
 
+    boolean useRag = request.getUseRag() != null ? request.getUseRag() : true;
     int topK = request.getTopK() != null ? request.getTopK() : 5;
 
-    // 1. 语义检索
-    log.info("执行 RAG 问答：userId={}, question='{}', topK={}", userId, request.getQuestion(), topK);
-    List<Citation> citations = searchService.searchAggregated(request.getQuestion(), topK);
+    log.info("执行问答：userId={}, question='{}', useRag={}, topK={}",
+        userId, request.getQuestion(), useRag, topK);
 
-    timer.endStage();
-    timer.recordStage("generation");
-
-    // 2. 检查证据是否充足
-    boolean evidenceInsufficient = isEvidenceInsufficient(citations);
-
-    // 3. 构建 Prompt 并生成答案
-    String answer;
+    List<Citation> citations;
+    boolean evidenceInsufficient = false;
     List<ResourceBrief> fallbackResources = null;
+    String answer;
 
-    if (!evidenceInsufficient) {
-      // 正常场景：调用 LLM 生成答案
-      try {
-        String prompt = buildPrompt(request.getQuestion(), citations);
-        answer = chatGateway.chat(buildSystemPrompt(), prompt);
-        log.info("LLM 生成答案成功：userId={}, answerLength={}", userId, answer.length());
-      } catch (Exception e) {
-        // LLM 调用失败，降级为检索结果摘要
-        log.warn("LLM 调用失败，降级为检索结果摘要：userId={}, error={}", userId, e.getMessage());
-        answer = buildFallbackAnswer(citations);
+    if (useRag) {
+      // ========== RAG 模式 ==========
+      timer.recordStage("retrieval");
+
+      // 语义检索
+      citations = searchService.searchAggregated(request.getQuestion(), topK);
+      timer.endStage();
+
+      timer.recordStage("generation");
+
+      // 检查证据是否充足
+      evidenceInsufficient = isEvidenceInsufficient(citations);
+
+      if (!evidenceInsufficient) {
+        // 正常场景：调用 LLM 生成答案
+        try {
+          String prompt = buildPrompt(request.getQuestion(), citations);
+          answer = chatGateway.chat(buildSystemPrompt(), prompt);
+          log.info("LLM 生成答案成功：userId={}, answerLength={}", userId, answer.length());
+        } catch (Exception e) {
+          // LLM 调用失败，降级为检索结果摘要
+          log.warn("LLM 调用失败，降级为检索结果摘要：userId={}, error={}", userId, e.getMessage());
+          answer = buildFallbackAnswer(citations);
+          fallbackResources = buildFallbackResources(citations);
+        }
+      } else {
+        // 证据不足场景
+        log.warn("证据不足：userId={}, citationsCount={}, avgScore={}",
+            userId, citations.size(), getAverageScore(citations));
+        answer = buildInsufficientEvidenceAnswer();
         fallbackResources = buildFallbackResources(citations);
       }
+
+      timer.endStage();
     } else {
-      // 证据不足场景：返回提示信息
-      log.warn("证据不足：userId={}, citationsCount={}, avgScore={}",
-          userId, citations.size(), getAverageScore(citations));
-      answer = "根据现有资料无法完整回答您的问题。建议您：\n"
-          + "1. 尝试更具体的问题\n"
-          + "2. 查阅以下相关资源获取更多信息";
-      fallbackResources = buildFallbackResources(citations);
+      // ========== 纯 LLM 模式 ==========
+      timer.recordStage("generation");
+
+      log.info("纯 LLM 模式：跳过检索，直接调用 LLM");
+
+      try {
+        // 直接调用 LLM，不提供检索结果
+        answer = chatGateway.chat(buildDirectChatSystemPrompt(), request.getQuestion());
+        log.info("LLM 直接生成答案成功：userId={}, answerLength={}", userId, answer.length());
+      } catch (Exception e) {
+        // LLM 调用失败
+        log.error("LLM 调用失败：userId={}, error={}", userId, e.getMessage());
+        answer = "抱歉，AI 服务暂时不可用，请稍后重试。";
+      }
+
+      // 纯 LLM 模式下，citations 为空列表
+      citations = List.of();
+      evidenceInsufficient = false;
+      fallbackResources = null;
+
+      timer.endStage();
     }
 
-    timer.endStage();
-
-    // 4. 异步记录查询行为（不阻塞主流程）
+    // 异步记录查询行为
     recordQueryBehaviorAsync(userId, request.getQuestion());
 
-    // 5. 构建响应
+    // 构建响应
     long totalLatency = timer.getElapsedMs();
     AnswerResponse response = AnswerResponse.builder()
         .answer(answer)
@@ -111,9 +137,8 @@ public class RagServiceImpl implements RagService {
         .latencyMs(totalLatency)
         .build();
 
-    log.info("RAG 问答完成：userId={}, latencyMs={}ms, retrieval={}ms, generation={}ms, citationsCount={}",
-        userId, totalLatency, timer.getStageDuration("retrieval"), timer.getStageDuration("generation"),
-        citations.size());
+    log.info("问答完成：userId={}, latencyMs={}ms, useRag={}, citationsCount={}",
+        userId, totalLatency, useRag, citations.size());
 
     return response;
   }
@@ -174,6 +199,37 @@ public class RagServiceImpl implements RagService {
         + "3. 如果资料不足，明确说明'根据现有资料无法完整回答'\n"
         + "4. 使用简洁清晰的语言回答问题\n"
         + "5. 避免添加资料外的主观推断";
+  }
+
+  /**
+   * 构建纯 LLM 模式的系统 Prompt。
+   *
+   * <p>不依赖检索结果，直接回答用户问题。
+   *
+   * @return 系统 Prompt
+   */
+  private String buildDirectChatSystemPrompt() {
+    return "你是一个专业的学习助手，擅长回答各类学习相关问题。\n"
+        + "请遵循以下要求：\n"
+        + "1. 使用简洁清晰的语言回答问题\n"
+        + "2. 如果遇到不确定的信息，明确说明\n"
+        + "3. 避免添加不必要的主观推断\n"
+        + "4. 回答应具有教育意义和实用性";
+  }
+
+  /**
+   * 构建证据不足场景的答案。
+   *
+   * <p>返回详细的用户友好提示文本，引导用户改进问题或使用纯 LLM 模式。
+   *
+   * @return 提示文本
+   */
+  private String buildInsufficientEvidenceAnswer() {
+    return "根据现有资料无法完整回答您的问题。建议您：\n\n"
+        + "1. 尝试更具体的问题描述\n"
+        + "2. 使用不同的关键词重新提问\n"
+        + "3. 查阅以下相关资源获取更多信息\n\n"
+        + "**提示**：您也可以切换到「纯 LLM 模式」，直接调用大模型获取答案（不基于学习资源）。";
   }
 
   /**

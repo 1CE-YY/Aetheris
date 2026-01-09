@@ -10,6 +10,7 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 # 项目根目录
@@ -180,12 +181,22 @@ start_backend() {
         sed -i '' 's/"started_at": null/"started_at": "'$STARTED_AT'"/' "$PROJECT_ROOT/.pids.json"
     fi
 
-    echo -e "${GREEN}✅ 后端启动中... (PID: $BACKEND_PID)${NC}"
+    echo -e "${GREEN}✅ 后端启动中...${NC}"
     echo -e "${YELLOW}📄 查看日志: tail -f $PROJECT_ROOT/logs/backend.log${NC}"
 
     # 等待后端启动
     echo -e "${BLUE}等待后端启动 (10秒)...${NC}"
     sleep 10
+
+    # 检测并显示进程信息
+    MVN_PID=$(pgrep -f "java.*spring-boot:run" || true)
+    APP_PID=$(pgrep -f "java.*AetherisRagApplication" || true)
+
+    if [ -n "$MVN_PID" ] || [ -n "$APP_PID" ]; then
+        echo -e "${BLUE}后端进程信息:${NC}"
+        [ -n "$MVN_PID" ] && echo -e "  ${CYAN}- Maven 进程: $MVN_PID${NC}"
+        [ -n "$APP_PID" ] && echo -e "  ${CYAN}- 应用进程: $APP_PID${NC}"
+    fi
 
     # 检查后端是否启动成功
     if curl -s http://localhost:8080/actuator/health > /dev/null 2>&1; then
@@ -232,12 +243,22 @@ start_frontend() {
         sed -i '' 's/"started_at": null/"started_at": "'$STARTED_AT'"/' "$PROJECT_ROOT/.pids.json"
     fi
 
-    echo -e "${GREEN}✅ 前端启动中... (PID: $FRONTEND_PID)${NC}"
+    echo -e "${GREEN}✅ 前端启动中...${NC}"
     echo -e "${YELLOW}📄 查看日志: tail -f $PROJECT_ROOT/logs/frontend.log${NC}"
 
     # 等待前端启动
     echo -e "${BLUE}等待前端启动 (5秒)...${NC}"
     sleep 5
+
+    # 检测并显示进程信息
+    NPM_PID=$(pgrep -f "npm.*dev" || true)
+    NODE_PID=$(pgrep -f "node.*vite" || true)
+
+    if [ -n "$NPM_PID" ] || [ -n "$NODE_PID" ]; then
+        echo -e "${BLUE}前端进程信息:${NC}"
+        [ -n "$NPM_PID" ] && echo -e "  ${CYAN}- npm 进程: $NPM_PID${NC}"
+        [ -n "$NODE_PID" ] && echo -e "  ${CYAN}- node 进程 (Vite): $NODE_PID${NC}"
+    fi
 
     return 0
 }

@@ -30,10 +30,11 @@
 - 🚧 Phase 5: RAG 问答系统（进行中）
 
 ### 默认账户
-- 用户名：`admin`
-- 邮箱：`admin@aetheris.com`
-- 密码：`admin123`
+- 用户名：`123`
+- 邮箱：`123@123.com`
+- 密码：`1234qwer`
 
+一些接口测试时显示没有权限403，需要先登陆获取token再测试
 ---
 
 ## 关键约束（必须遵守）
@@ -163,6 +164,7 @@ spring:
 - `backend/src/main/resources/application.yml` - Spring Boot 主配置
 - `docker-compose.yml` - Docker 编排配置
 - `.env.example` - 环境变量模板
+- `.env` - 环境变量文件
 - `.pids.json` - 进程管理文件（由脚本自动管理）
 
 ### 核心代码
@@ -174,6 +176,7 @@ spring:
 
 ### 文档
 - `README.md` - 项目主页
+- `specs` - 需求规格，需要严格遵守
 - `specs/001-rag-recommendation-system/tasks.md` - 任务清单
 - `specs/001-rag-recommendation-system/contracts/openapi.yaml` - API 规范
 
