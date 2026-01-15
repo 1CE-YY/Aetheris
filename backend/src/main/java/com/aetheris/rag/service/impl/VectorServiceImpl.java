@@ -13,6 +13,8 @@ import com.aetheris.rag.mapper.ResourceMapper;
 import com.aetheris.rag.entity.Chunk;
 import com.aetheris.rag.entity.Resource;
 import com.aetheris.rag.service.VectorService;
+import com.aetheris.rag.util.VectorUtils;
+import com.aetheris.rag.util.VectorizationStatusUtil;
 import jakarta.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.HashSet;
@@ -182,9 +184,9 @@ public class VectorServiceImpl implements VectorService {
       }
 
       // 有切片数据且都已向量化，确认状态
-      boolean allVectorized = allChunks.stream().allMatch(Chunk::getVectorized);
+      VectorizationStatusUtil.updateResourceVectorizationStatus(resourceMapper, resourceId, allChunks);
+      boolean allVectorized = VectorizationStatusUtil.calculateVectorizationStatus(allChunks);
       if (allVectorized) {
-        resourceMapper.updateChunkStatus(resourceId, allChunks.size(), true);
         log.info("资源所有切片已向量化，状态已确认: resourceId={}, chunkCount={}", resourceId, allChunks.size());
       }
       return;
@@ -198,10 +200,10 @@ public class VectorServiceImpl implements VectorService {
 
     // 关键修复：只有存在切片数据时才更新状态
     if (!allChunks.isEmpty()) {
-      boolean allVectorized = allChunks.stream().allMatch(Chunk::getVectorized);
+      boolean allVectorized = VectorizationStatusUtil.calculateVectorizationStatus(allChunks);
+      resourceMapper.updateChunkStatus(resourceId, allChunks.size(), allVectorized);
 
       if (allVectorized) {
-        resourceMapper.updateChunkStatus(resourceId, allChunks.size(), true);
         log.info("资源向量化完成: resourceId={}, chunkCount={}", resourceId, allChunks.size());
       } else {
         long vectorizedCount = allChunks.stream().filter(Chunk::getVectorized).count();
@@ -282,7 +284,7 @@ public class VectorServiceImpl implements VectorService {
       redisTemplate.opsForHash().putAll(key, fields);
 
       // 将向量转换为二进制格式（FLOAT32）
-      byte[] vectorBytes = vectorToBytes(vector);
+      byte[] vectorBytes = VectorUtils.toBytes(vector);
 
       // 使用底层 connection 写入向量字段（必须用 HSET 直接写入字节）
       redisTemplate.execute((RedisCallback<Object>) connection -> {
@@ -299,27 +301,6 @@ public class VectorServiceImpl implements VectorService {
     }
   }
 
-  /**
-   * 将向量转换为 Redis Vector 索引所需的二进制格式（FLOAT32）。
-   *
-   * <p>Redis Stack 向量索引要求向量字段存储为字节序列，而不是字符串。
-   * 每个 float 占 4 字节（FLOAT32），2048 维向量 = 8192 字节。
-   *
-   * @param vector 向量数组
-   * @return 字节数组（FLOAT32 格式）
-   */
-  private byte[] vectorToBytes(float[] vector) {
-    byte[] bytes = new byte[vector.length * 4]; // 每个 float 4 字节
-    for (int i = 0; i < vector.length; i++) {
-      int intBits = Float.floatToIntBits(vector[i]);
-      // 使用小端序（Little-Endian）- Redis/RediSearch 要求
-      bytes[i * 4] = (byte) intBits;              // 最低位字节
-      bytes[i * 4 + 1] = (byte) (intBits >> 8);
-      bytes[i * 4 + 2] = (byte) (intBits >> 16);
-      bytes[i * 4 + 3] = (byte) (intBits >> 24);  // 最高位字节
-    }
-    return bytes;
-  }
 
   @Override
   public void rebuildVectorIndex() {
@@ -467,7 +448,7 @@ public class VectorServiceImpl implements VectorService {
       long vectorizedCount = allChunks.stream().filter(Chunk::getVectorized).count();
 
       // ✅ 关键逻辑：只有存在切片时才标记为已向量化
-      boolean allVectorized = !allChunks.isEmpty() && vectorizedCount == actualChunkCount;
+      boolean allVectorized = VectorizationStatusUtil.calculateVectorizationStatus(allChunks);
 
       // 3. 检查是否需要修复
       boolean needsRepair = false;
@@ -763,10 +744,10 @@ public class VectorServiceImpl implements VectorService {
 
       // 重新查询该资源的所有切片
       List<Chunk> allChunks = chunkMapper.findByResourceId(resourceId);
-      boolean allVectorized = allChunks.stream().allMatch(Chunk::getVectorized);
+      boolean allVectorized = VectorizationStatusUtil.calculateVectorizationStatus(allChunks);
 
       if (allVectorized) {
-        resourceMapper.updateChunkStatus(resourceId, allChunks.size(), true);
+        VectorizationStatusUtil.updateResourceVectorizationStatus(resourceMapper, resourceId, allChunks);
         log.debug("资源向量化完成: resourceId={}, chunkCount={}", resourceId, allChunks.size());
       }
     }

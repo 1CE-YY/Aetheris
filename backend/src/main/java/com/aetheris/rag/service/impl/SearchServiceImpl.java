@@ -13,6 +13,7 @@ import com.aetheris.rag.mapper.ChunkMapper;
 import com.aetheris.rag.mapper.ResourceMapper;
 import com.aetheris.rag.service.SearchService;
 import com.aetheris.rag.util.PerformanceTimer;
+import com.aetheris.rag.util.VectorUtils;
 import io.lettuce.core.RedisFuture;
 import io.lettuce.core.api.async.RedisAsyncCommands;
 import io.lettuce.core.codec.ByteArrayCodec;
@@ -103,7 +104,7 @@ public class SearchServiceImpl implements SearchService {
 
     // 2. 将向量转换为二进制格式（FLOAT32）
     timer.recordStage("vector_conversion");
-    byte[] queryVectorBytes = vectorToBytes(queryVector);
+    byte[] queryVectorBytes = VectorUtils.toBytes(queryVector);
     log.debug("查询向量已转换为二进制格式，大小：{} 字节", queryVectorBytes.length);
     timer.endStage();
 
@@ -561,27 +562,6 @@ public class SearchServiceImpl implements SearchService {
       sb.append(vector[i]);
     }
     return sb.toString();
-  }
-
-  /**
-   * 将向量转换为 Redis Vector 索引所需的二进制格式（FLOAT32）。
-   *
-   * <p>与存储格式保持一致，查询向量也必须是 FLOAT32 字节格式。
-   *
-   * @param vector 向量数组
-   * @return 字节数组（FLOAT32 格式）
-   */
-  private byte[] vectorToBytes(float[] vector) {
-    byte[] bytes = new byte[vector.length * 4]; // 每个 float 4 字节
-    for (int i = 0; i < vector.length; i++) {
-      int intBits = Float.floatToIntBits(vector[i]);
-      // 使用小端序（Little-Endian）- Redis/RediSearch 要求
-      bytes[i * 4] = (byte) intBits;              // 最低位字节
-      bytes[i * 4 + 1] = (byte) (intBits >> 8);
-      bytes[i * 4 + 2] = (byte) (intBits >> 16);
-      bytes[i * 4 + 3] = (byte) (intBits >> 24);  // 最高位字节
-    }
-    return bytes;
   }
 
   /**

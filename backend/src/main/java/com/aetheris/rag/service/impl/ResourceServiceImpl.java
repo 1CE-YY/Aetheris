@@ -15,6 +15,7 @@ import com.aetheris.rag.util.HashUtil;
 import com.aetheris.rag.util.MarkdownProcessor;
 import com.aetheris.rag.util.PdfProcessor;
 import com.aetheris.rag.util.FileValidationUtil;
+import com.aetheris.rag.util.VectorDataDeletionUtil;
 import com.aetheris.rag.exception.ConflictException;
 import com.aetheris.rag.exception.BadRequestException;
 import com.aetheris.rag.exception.InternalServerException;
@@ -389,31 +390,8 @@ public class ResourceServiceImpl implements ResourceService {
    * 批量删除向量数据。
    */
   private void deleteVectorData(List<Long> resourceIds) {
-    try {
-      // 1. 查询所有切片
-      List<Chunk> chunks = chunkMapper.findByResourceIds(resourceIds);
-      if (!chunks.isEmpty()) {
-        // 2. 删除 Redis 键（chunk:xxx）
-        List<String> keys = chunks.stream()
-            .map(chunk -> "chunk:" + chunk.getId())
-            .collect(java.util.stream.Collectors.toList());
-        redisTemplate.delete(keys);
-
-        // 3. 从向量索引中删除记录
-        for (Chunk chunk : chunks) {
-          String docId = "chunk:" + chunk.getId();
-          redisTemplate.execute((RedisCallback<Object>) connection -> {
-            connection.execute("FT.DEL", "chunk_vector_index".getBytes(), docId.getBytes());
-            return null;
-          });
-        }
-
-        log.info("已删除资源的向量数据和索引记录，共 {} 个切片", chunks.size());
-      }
-    } catch (Exception e) {
-      log.warn("批量删除向量数据失败: resourceIds={}", resourceIds, e);
-      // 继续删除数据库记录
-    }
+    VectorDataDeletionUtil.deleteVectorDataByResourceIds(
+        chunkMapper, redisTemplate, resourceIds, "chunk_vector_index");
   }
 
   /**
