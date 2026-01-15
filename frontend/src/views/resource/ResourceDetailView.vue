@@ -129,6 +129,7 @@ import { message, Modal } from 'ant-design-vue'
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue'
 import { useUserStore } from '@/stores/user'
 import ResourceService from '@/services/resource.service'
+import { VectorService } from '@/services/vector.service'
 import type { Resource } from '@/services/resource.service'
 import type { Chunk } from '@/services/resource.service'
 
@@ -219,20 +220,40 @@ const handleBack = () => {
 const handleRevectorize = async () => {
   if (!resource.value) return
 
-  vectorizing.value = true
-  try {
-    await ResourceService.vectorizeResource(resource.value.id)
-    message.success('向量化任务已触发，请稍后查看状态')
+  // 根据资源状态选择不同的操作
+  const hasChunks = resource.value.chunkCount > 0
 
-    // 延迟 2 秒后刷新资源状态
-    setTimeout(() => {
-      loadResource()
-    }, 2000)
-  } catch (error: any) {
-    message.error(error.response?.data?.message || '触发向量化失败')
-  } finally {
-    vectorizing.value = false
-  }
+  Modal.confirm({
+    title: '确认操作',
+    content: hasChunks
+      ? '确认要重新向量化该资源吗？'
+      : '该资源没有切片，将重新处理文档（切片+向量化），确认继续吗？',
+    okText: '确认',
+    cancelText: '取消',
+    onOk: async () => {
+      vectorizing.value = true
+      try {
+        if (hasChunks) {
+          // 有切片，仅向量化
+          await VectorService.vectorizeResource(resource.value.id)
+          message.success('向量化任务已触发，请稍后查看状态')
+        } else {
+          // 无切片，重新处理
+          await VectorService.reprocessResource(resource.value.id)
+          message.success('文档重新处理任务已触发，请稍后查看状态')
+        }
+
+        // 延迟 2 秒后刷新资源状态
+        setTimeout(() => {
+          loadResource()
+        }, 2000)
+      } catch (error: any) {
+        message.error(error.response?.data?.message || '操作失败')
+      } finally {
+        vectorizing.value = false
+      }
+    }
+  })
 }
 
 const handleDelete = () => {

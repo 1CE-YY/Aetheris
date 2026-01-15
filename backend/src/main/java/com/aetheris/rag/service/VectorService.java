@@ -3,6 +3,10 @@
  */
 package com.aetheris.rag.service;
 
+import com.aetheris.rag.dto.request.RebuildConfig;
+import com.aetheris.rag.dto.response.RebuildResult;
+import java.util.List;
+
 /**
  * 向量化服务接口。
  *
@@ -66,4 +70,55 @@ public interface VectorService {
    * @return 修复的资源数量
    */
   int repairAllVectorizationStatus();
+
+  /**
+   * 删除指定资源的向量数据。
+   *
+   * <p>删除 Redis 中的向量数据和索引记录。</p>
+   *
+   * @param resourceIds 资源ID列表
+   */
+  void deleteVectorDataByResourceIds(List<Long> resourceIds);
+
+  /**
+   * 全量重建所有资源。
+   *
+   * <p>删除所有切片，重新解析所有原始文件，生成新切片并触发向量化。</p>
+   *
+   * @return 重建结果
+   * @throws Exception 如果重建失败
+   */
+  RebuildResult rebuildAllResources() throws Exception;
+
+  /**
+   * 全量重建所有资源（使用配置）。
+   *
+   * <p>删除所有切片，重新解析所有原始文件，生成新切片并触发向量化。</p>
+   *
+   * @param config 重建配置
+   * @return 重建结果
+   * @throws Exception 如果重建失败
+   */
+  RebuildResult rebuildAllResourcesWithConfig(RebuildConfig config) throws Exception;
+
+  /**
+   * 取消正在执行的重建任务。
+   *
+   * @return 是否成功取消
+   */
+  boolean cancelRebuild();
+
+  /**
+   * 查询切片总数。
+   *
+   * @return 切片总数
+   */
+  int getTotalChunksCount();
+
+  /**
+   * 查询已向量化的切片数。
+   *
+   * @return 已向量化的切片数
+   */
+  int getVectorizedChunksCount();
 }

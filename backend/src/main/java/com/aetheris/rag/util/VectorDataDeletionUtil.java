@@ -7,7 +7,6 @@ import com.aetheris.rag.entity.Chunk;
 import com.aetheris.rag.mapper.ChunkMapper;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
 /**
@@ -22,6 +21,8 @@ public final class VectorDataDeletionUtil {
 
   /**
    * 删除指定资源的向量数据。
+   *
+   * <p>删除Redis中的向量数据键，索引会自动失效。
    */
   public static int deleteVectorDataByResourceIds(
       ChunkMapper chunkMapper,
@@ -36,66 +37,17 @@ public final class VectorDataDeletionUtil {
         return 0;
       }
 
-      // 删除Redis键
+      // 删除Redis键（删除后索引会自动失效）
       List<String> keys = chunks.stream()
           .map(chunk -> "chunk:" + chunk.getId())
           .toList();
       redisTemplate.delete(keys);
 
-      // 从索引中删除记录
-      for (Chunk chunk : chunks) {
-        String docId = "chunk:" + chunk.getId();
-        redisTemplate.execute((RedisCallback<Object>) connection -> {
-          connection.execute("FT.DEL", indexName.getBytes(), docId.getBytes());
-          return null;
-        });
-      }
-
-      log.info("已删除资源的向量数据和索引记录，共 {} 个切片", chunks.size());
+      log.info("已删除资源的向量数据，共 {} 个切片", chunks.size());
       return chunks.size();
 
     } catch (Exception e) {
       log.warn("批量删除向量数据失败: resourceIds={}", resourceIds, e);
-      return 0;
-    }
-  }
-
-  /**
-   * 删除指定切片的向量数据。
-   */
-  public static int deleteVectorDataByChunkIds(
-      ChunkMapper chunkMapper,
-      StringRedisTemplate redisTemplate,
-      List<Long> chunkIds,
-      String indexName) {
-
-    try {
-      // 查询切片信息
-      List<Chunk> chunks = chunkMapper.findByIds(chunkIds);
-      if (chunks.isEmpty()) {
-        return 0;
-      }
-
-      // 删除Redis键
-      List<String> keys = chunks.stream()
-          .map(chunk -> "chunk:" + chunk.getId())
-          .toList();
-      redisTemplate.delete(keys);
-
-      // 从索引中删除记录
-      for (Chunk chunk : chunks) {
-        String docId = "chunk:" + chunk.getId();
-        redisTemplate.execute((RedisCallback<Object>) connection -> {
-          connection.execute("FT.DEL", indexName.getBytes(), docId.getBytes());
-          return null;
-        });
-      }
-
-      log.info("已删除切片的向量数据和索引记录，共 {} 个切片", chunks.size());
-      return chunks.size();
-
-    } catch (Exception e) {
-      log.warn("批量删除切片向量数据失败: chunkIds={}", chunkIds, e);
       return 0;
     }
   }

@@ -61,8 +61,7 @@ public class VectorIndexScheduler {
           .build();
 
       // ✅ 步骤 1: 重建所有资源（重新切片）
-      ResourceServiceImpl resourceServiceImpl = (ResourceServiceImpl) resourceService;
-      RebuildResult resourceResult = resourceServiceImpl.rebuildAllResources(config);
+      RebuildResult resourceResult = vectorService.rebuildAllResourcesWithConfig(config);
 
       // ✅ 步骤 2: 重建向量索引（删除索引和向量数据，统一批量向量化）
       VectorServiceImpl vectorServiceImpl = (VectorServiceImpl) vectorService;

@@ -438,7 +438,7 @@
 
 ### 6.1 用户画像（MVP：仅基于查询行为）
 
-- [ ] T060 创建 `backend/src/main/java/com/aetheris/rag/model/UserProfile.java`，使用 Lombok 注解
+- [ ] T060 创建 `backend/src/main/java/com/aetheris/rag/entity/UserProfile.java`，使用 Lombok 注解
   - **涉及表**：user_profiles（user_id、profile_vector、window_size、query_count、click_count、favorite_count、updated_at）
 - [ ] T061 [P] 创建 `backend/src/main/java/com/aetheris/rag/mapper/UserProfileMapper.java` 接口和 `UserProfileMapper.xml`
   - **SQL**：UPSERT（INSERT ... ON DUPLICATE KEY UPDATE）、SELECT by user_id、UPDATE query_count/click_count
@@ -556,7 +556,7 @@
     ]
   }
   ```
-- [ ] T074 创建 `backend/src/main/java/com/aetheris/rag/model/EvalQuery.java` 和 `EvalRun.java`，使用 Lombok 注解
+- [ ] T074 创建 `backend/src/main/java/com/aetheris/rag/emtity/EvalQuery.java` 和 `EvalRun.java`，使用 Lombok 注解
   - **涉及表**：eval_queries（query_id、query_text、relevant_resources）、eval_runs（run_name、config、use_profile、metrics）
 - [ ] T075 [P] 创建 `backend/src/main/java/com/aetheris/rag/mapper/EvalMapper.java` 接口和 `EvalMapper.xml`
   - **SQL**：INSERT query、INSERT run、SELECT all queries

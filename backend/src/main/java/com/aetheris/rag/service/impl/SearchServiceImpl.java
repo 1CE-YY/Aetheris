@@ -149,17 +149,9 @@ public class SearchServiceImpl implements SearchService {
 
         // 等待结果
         List<Object> result = future.get();
-        System.out.println("=== FT.SEARCH 原始结果 ===");
-        System.out.println("结果类型: " + (result != null ? result.getClass().getName() : "null"));
-        System.out.println("结果大小: " + (result != null ? result.size() : 0));
-        if (result != null && !result.isEmpty()) {
-          for (int i = 0; i < Math.min(3, result.size()); i++) {
-            Object item = result.get(i);
-            System.out.println("  [" + i + "] 类型: " + item.getClass().getName() + ", 值: " + item);
-          }
-        }
-        log.debug("FT.SEARCH 原始结果: {}", result);
-        log.debug("结果类型: {}, 大小: {}", result != null ? result.getClass().getName() : "null", result != null ? result.size() : 0);
+        log.debug("FT.SEARCH 原始结果类型: {}, 大小: {}",
+            result != null ? result.getClass().getName() : "null",
+            result != null ? result.size() : 0);
         return parseSearchResults(result);
 
       } catch (Exception e) {
@@ -529,8 +521,9 @@ public class SearchServiceImpl implements SearchService {
    * @return CitationLocation 对象（PdfLocation 或 MarkdownLocation）
    */
   private CitationLocation buildLocation(Chunk chunk) {
-    // 优先使用 PDF 页码信息
-    if (chunk.getPageStart() != null && chunk.getPageEnd() != null) {
+    // 优先使用 PDF 页码信息（要求页码 >= 1）
+    if (chunk.getPageStart() != null && chunk.getPageEnd() != null
+        && chunk.getPageStart() >= 1 && chunk.getPageEnd() >= 1) {
       return new CitationLocation.PdfLocation(
           chunk.getPageStart(), chunk.getPageEnd());
     }
@@ -542,7 +535,7 @@ public class SearchServiceImpl implements SearchService {
 
     // 如果都没有，返回一个默认的 PDF 位置（页码范围未知）
     log.warn("切片没有位置信息：chunkId={}", chunk.getId());
-    return new CitationLocation.PdfLocation(0, 0);
+    return new CitationLocation.PdfLocation(1, 1);
   }
 
   /**

@@ -66,6 +66,7 @@
           <CitationCard
             :citation="citation"
             :index="index"
+            :evidence-insufficient="evidenceInsufficient"
             @click="handleCitationClick"
           />
         </a-col>

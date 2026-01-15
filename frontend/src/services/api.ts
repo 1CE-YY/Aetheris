@@ -12,7 +12,7 @@ import { message } from 'ant-design-vue'
  */
 const api: AxiosInstance = axios.create({
   baseURL: '/api',
-  timeout: 10000,
+  timeout: 30000, // 30 秒超时，适应 LLM 调用耗时
   headers: {
     'Content-Type': 'application/json'
   }

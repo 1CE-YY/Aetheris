@@ -42,8 +42,9 @@
       <a-button type="link" size="small" @click.stop="handleViewResource">
         <EyeOutlined /> 查看资源
       </a-button>
+      <!-- 证据不足时隐藏定位切片按钮 -->
       <a-button
-        v-if="citation.location.type === 'pdf'"
+        v-if="!evidenceInsufficient && citation.location.type === 'pdf'"
         type="link"
         size="small"
         @click.stop="handleViewChunk"
@@ -71,10 +72,12 @@ import type { Citation } from '@/services/chat.service'
 interface Props {
   citation: Citation
   index?: number
+  evidenceInsufficient?: boolean // 是否证据不足
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  index: 0
+  index: 0,
+  evidenceInsufficient: false
 })
 
 /**

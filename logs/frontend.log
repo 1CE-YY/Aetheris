@@ -3,7 +3,10 @@
 > vite
 
 
-  VITE v5.4.21  ready in 424 ms
+  VITE v5.4.21  ready in 365 ms
 
   ➜  Local:   http://localhost:5173/
   ➜  Network: use --host to expose
+  ➜  press h + enter to show help
+5:12:30 PM [vite] hmr update /src/components/chat/CitationCard.vue
+5:13:22 PM [vite] hmr update /src/components/chat/AnswerDisplay.vue

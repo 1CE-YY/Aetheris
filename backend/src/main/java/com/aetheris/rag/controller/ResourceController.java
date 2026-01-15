@@ -11,36 +11,49 @@ import com.aetheris.rag.dto.response.ResourceResponse;
 import com.aetheris.rag.entity.Chunk;
 import com.aetheris.rag.entity.Resource;
 import com.aetheris.rag.service.ResourceService;
-import com.aetheris.rag.service.VectorService;
+import com.aetheris.rag.service.ProcessingService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 资源管理 REST 控制器。
  *
- * <p>提供资源上传、查询、切片查询等接口。
+ * <p>提供资源的CRUD操作和基本查询功能。
+ *
+ * <h3>端点分类：</h3>
+ * <ul>
+ *   <li><b>资源CRUD</b>：上传、查询、更新、删除</li>
+ *   <li><b>切片查询</b>：获取资源的切片列表</li>
+ * </ul>
+ *
+ * <p><b>架构说明：</b>向量化相关功能已移至 {@link VectorController}，
+ * 通过 ProcessingService 协调 VectorService 和 DocumentService，
+ * 保持了服务层的职责分离。
  *
  * @author Aetheris Team
- * @version 1.0.0
+ * @version 2.0.0
  * @since 2025-12-30
  */
 @Slf4j
 @RestController
 @RequestMapping("/api/resources")
 @RequiredArgsConstructor
+@Validated
 public class ResourceController {
 
   private final ResourceService resourceService;
-  private final VectorService vectorService;
+  private final ProcessingService processingService;
 
   /**
    * 上传资源。
@@ -64,9 +77,10 @@ public class ResourceController {
     Long userId = (Long) authentication.getPrincipal();
     log.info("POST /api/resources - userId={}, title={}, file={}", userId, title, file.getOriginalFilename());
 
-    // 上传资源（异常由 GlobalExceptionHandler 统一处理）
+    // 上传资源（包含完整的文件保存 + 文档解析 + 切片生成 + 向量化流程）
+    // 异常由 GlobalExceptionHandler 统一处理
     Resource resource =
-        resourceService.uploadResource(file, title, tags, description, userId);
+        processingService.processResourceUpload(file, title, tags, description, userId);
 
     ResourceResponse resourceResponse = ResourceResponse.fromEntity(resource);
     ApiResponse<ResourceResponse> response =
@@ -84,8 +98,8 @@ public class ResourceController {
    */
   @GetMapping
   public ResponseEntity<ApiResponse<PageResponse<ResourceResponse>>> getResourceList(
-      @RequestParam(defaultValue = "0") int page,
-      @RequestParam(defaultValue = "10") int size) {
+      @RequestParam(defaultValue = "0") @Min(0) int page,
+      @RequestParam(defaultValue = "10") @Min(1) @Max(100) int size) {
     log.info("GET /api/resources - page={}, size={}", page, size);
 
     List<Resource> resources = resourceService.getResourceList(page * size, size);
@@ -107,7 +121,7 @@ public class ResourceController {
    * @return 资源响应
    */
   @GetMapping("/{id}")
-  public ResponseEntity<ApiResponse<ResourceResponse>> getResourceById(@PathVariable Long id) {
+  public ResponseEntity<ApiResponse<ResourceResponse>> getResourceById(@PathVariable @Min(1) Long id) {
     log.info("GET /api/resources/{}", id);
 
     Resource resource = resourceService.getResourceById(id);
@@ -129,7 +143,7 @@ public class ResourceController {
    */
   @PutMapping("/{id}")
   public ResponseEntity<ApiResponse<ResourceResponse>> updateResource(
-      @PathVariable Long id,
+      @PathVariable @Min(1) Long id,
       @Valid @RequestBody ResourceUpdateRequest request,
       Authentication authentication) {
     Long userId = (Long) authentication.getPrincipal();
@@ -161,7 +175,7 @@ public class ResourceController {
    */
   @GetMapping("/{id}/chunks")
   public ResponseEntity<ApiResponse<List<ChunkResponse>>> getChunksByResourceId(
-      @PathVariable Long id) {
+      @PathVariable @Min(1) Long id) {
     log.info("GET /api/resources/{}/chunks", id);
 
     List<Chunk> chunks = resourceService.getChunksByResourceId(id);
@@ -180,12 +194,13 @@ public class ResourceController {
    */
   @DeleteMapping("/{id}")
   public ResponseEntity<ApiResponse<ResourceResponse>> deleteResource(
-      @PathVariable Long id, Authentication authentication) {
+      @PathVariable @Min(1) Long id, Authentication authentication) {
 
     Long userId = (Long) authentication.getPrincipal();
     log.info("DELETE /api/resources/{} - userId={}", id, userId);
 
-    Resource deleted = resourceService.deleteResource(id, userId);
+    // 使用 ProcessingService 处理完整的删除流程（向量数据 + 切片 + 资源记录 + 物理文件）
+    Resource deleted = processingService.processResourceDeletion(id, userId);
 
     return ResponseEntity.ok(
         ApiResponse.success(ResourceResponse.fromEntity(deleted), "删除成功"));
@@ -209,7 +224,8 @@ public class ResourceController {
         userId,
         request.getIds().size());
 
-    List<Resource> deleted = resourceService.deleteResources(request.getIds(), userId);
+    // 使用 ProcessingService 处理完整的批量删除流程（向量数据 + 切片 + 资源记录 + 物理文件）
+    List<Resource> deleted = processingService.processBatchResourceDeletion(request.getIds(), userId);
 
     List<ResourceResponse> responses =
         deleted.stream().map(ResourceResponse::fromEntity).toList();
@@ -218,56 +234,5 @@ public class ResourceController {
         ApiResponse.success(
             responses,
             String.format("批量删除完成，成功删除 %d 个资源", deleted.size())));
-  }
-
-  /**
-   * 手动向量化指定资源。
-   *
-   * <p>智能判断资源状态，选择合适的处理方式：
-   * <ul>
-   *   <li>如果 chunkCount=0，重新处理文档（切片+向量化）</li>
-   *   <li>如果 chunkCount>0，仅进行向量化</li>
-   * </ul>
-   *
-   * @param id 资源ID
-   * @param authentication 认证信息
-   * @return 操作结果
-   */
-  @PostMapping("/{id}/vectorize")
-  public ResponseEntity<ApiResponse<String>> vectorizeResource(
-      @PathVariable Long id,
-      Authentication authentication) {
-    Long userId = (Long) authentication.getPrincipal();
-    log.info("POST /api/resources/{}/vectorize - userId={}", id, userId);
-
-    // 检查资源是否存在
-    Resource resource = resourceService.getResourceById(id);
-    if (resource == null) {
-      return ResponseEntity.notFound().build();
-    }
-
-    // ✅ 智能判断：如果没有切片，需要重新处理
-    if (resource.getChunkCount() == 0) {
-      log.info("资源没有切片，触发重新处理: resourceId={}", id);
-      try {
-        int chunkCount = resourceService.reprocessResource(id);
-        String message = String.format("重新处理完成，已生成 %d 个切片并向量化", chunkCount);
-        return ResponseEntity.ok(ApiResponse.success(message, message));
-      } catch (Exception e) {
-        log.error("重新处理失败: resourceId={}", id, e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(ApiResponse.error(500, "重新处理失败: " + e.getMessage()));
-      }
-    } else {
-      // 有切片，仅进行向量化
-      CompletableFuture.runAsync(() -> {
-        try {
-          vectorService.vectorizeChunks(id);
-        } catch (Exception e) {
-          log.error("向量化失败: resourceId={}", id, e);
-        }
-      });
-      return ResponseEntity.ok(ApiResponse.success("向量化任务已触发", "向量化任务已触发"));
-    }
   }
 }

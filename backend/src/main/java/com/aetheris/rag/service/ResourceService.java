@@ -3,40 +3,21 @@
  */
 package com.aetheris.rag.service;
 
-import com.aetheris.rag.dto.response.RebuildResult;
 import com.aetheris.rag.entity.Chunk;
 import com.aetheris.rag.entity.Resource;
 import java.util.List;
-import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 资源服务接口。
  *
- * <p>提供资源上传、查询、切片、向量化等功能。
+ * <p>提供资源查询、更新等CRUD功能。
+ * 文档处理和向量化功能已移至 ProcessingService。
  *
  * @author Aetheris Team
- * @version 1.0.0
+ * @version 2.0.0
  * @since 2025-12-30
  */
 public interface ResourceService {
-
-  /**
-   * 上传资源。
-   *
-   * <p>支持 PDF 和 Markdown 文件，自动提取文本、切片、向量化入库。
-   * 使用内容哈希去重，相同内容不会重复入库（幂等性）。
-   *
-   * @param file 上传的文件
-   * @param title 资源标题
-   * @param tags 标签（逗号分隔）
-   * @param description 描述
-   * @param uploadedBy 上传者用户ID
-   * @return 资源实体（如果已存在则返回现有资源）
-   * @throws Exception 如果文件处理失败
-   */
-  Resource uploadResource(
-      MultipartFile file, String title, String tags, String description, Long uploadedBy)
-      throws Exception;
 
   /**
    * 根据ID查询资源。
@@ -90,50 +71,23 @@ public interface ResourceService {
   Resource updateResource(Long id, String title, String tags, String description);
 
   /**
-   * 删除资源（级联删除切片）。
+   * 更新资源的向量化状态。
    *
-   * @param id 资源ID
-   * @param userId 操作用户ID
-   * @return 被删除的资源
-   * @throws RuntimeException 如果资源不存在或无权删除
-   */
-  Resource deleteResource(Long id, Long userId);
-
-  /**
-   * 批量删除资源。
-   *
-   * @param ids 资源ID列表
-   * @param userId 操作用户ID
-   * @return 删除的资源列表
-   */
-  List<Resource> deleteResources(List<Long> ids, Long userId);
-
-  /**
-   * 重新处理资源 - 删除旧切片并重新生成切片和向量化。
+   * <p>供 VectorService 在向量化完成后回调使用。</p>
    *
    * @param resourceId 资源ID
-   * @return 生成的切片数量
-   * @throws Exception 如果文件处理失败
+   * @param vectorized 是否已向量化
    */
-  int reprocessResource(Long resourceId) throws Exception;
+  void updateVectorizationStatus(Long resourceId, boolean vectorized);
 
   /**
-   * 全量重建所有资源。
+   * 更新资源的切片数量和向量化状态。
    *
-   * <p>删除所有切片，重新解析所有原始文件，生成新切片并触发向量化。
+   * <p>供 VectorService 在向量化完成后回调使用。</p>
    *
-   * <p>流程：
-   * <ol>
-   *   <li>查询所有资源</li>
-   *   <li>逐个删除旧切片</li>
-   *   <li>重新解析原始文件（使用修复后的 PdfProcessor/MarkdownProcessor）</li>
-   *   <li>验证切片长度（严格控制在 1000 字符内）</li>
-   *   <li>插入新切片</li>
-   *   <li>触发向量化</li>
-   * </ol>
-   *
-   * @return 重建结果统计（成功数、失败数、总切片数、耗时）
-   * @throws Exception 如果重建失败
+   * @param resourceId 资源ID
+   * @param chunkCount 切片数量
+   * @param vectorized 是否已向量化
    */
-  RebuildResult rebuildAllResources() throws Exception;
+  void updateChunkVectorizationStatus(Long resourceId, Integer chunkCount, boolean vectorized);
 }
