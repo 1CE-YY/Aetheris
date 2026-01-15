@@ -3,24 +3,37 @@
  */
 package com.aetheris.rag.service.impl;
 
+import com.aetheris.rag.dto.request.RebuildConfig;
+import com.aetheris.rag.dto.response.RebuildResult;
+import com.aetheris.rag.exception.ConflictException;
+import com.aetheris.rag.exception.InternalServerException;
 import com.aetheris.rag.gateway.EmbeddingGateway;
 import com.aetheris.rag.mapper.ChunkMapper;
 import com.aetheris.rag.mapper.ResourceMapper;
 import com.aetheris.rag.entity.Chunk;
+import com.aetheris.rag.entity.Resource;
 import com.aetheris.rag.service.VectorService;
 import jakarta.annotation.PostConstruct;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.connection.RedisServerCommands;
-import java.time.Duration;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
+import java.time.Duration;
 
 /**
  * 向量化服务实现类。
@@ -40,6 +53,7 @@ public class VectorServiceImpl implements VectorService {
   private final ResourceMapper resourceMapper;
   private final EmbeddingGateway embeddingGateway;
   private final StringRedisTemplate redisTemplate;
+  private final RedissonClient redissonClient;
 
   /** 向量维度（智谱 embedding-3，默认 2048 维） */
   @Value("${rag.vector.dimension:2048}")
@@ -54,6 +68,21 @@ public class VectorServiceImpl implements VectorService {
 
   /** 向量索引是否已初始化 */
   private boolean indexInitialized = false;
+
+  /** 全局重建锁 key */
+  private static final String REBUILD_LOCK_KEY = "rebuild:global:lock";
+
+  /** 索引操作锁 key */
+  private static final String INDEX_LOCK_KEY = "rebuild:index:lock";
+
+  /** 默认锁等待时间（秒） */
+  private static final long LOCK_WAIT_TIME = 10;
+
+  /** 默认锁持有时间（秒，2小时） */
+  private static final long LOCK_LEASE_TIME = 7200;
+
+  /** 取消标志 */
+  private volatile boolean cancelled = false;
 
   @Override
   @PostConstruct
@@ -130,7 +159,7 @@ public class VectorServiceImpl implements VectorService {
         indexInitialized = true;
       } else {
         log.error("初始化向量索引失败", e);
-        throw new RuntimeException("向量索引初始化失败: " + e.getMessage(), e);
+        throw new InternalServerException("向量索引初始化失败: " + e.getMessage(), e);
       }
     }
   }
@@ -143,23 +172,44 @@ public class VectorServiceImpl implements VectorService {
     List<Chunk> chunks = chunkMapper.findUnvectorizedByResourceId(resourceId);
 
     if (chunks.isEmpty()) {
-      log.info("没有需要向量化的切片: resourceId={}", resourceId);
+      // ✅ 修复 1：验证资源是否真的有切片数据
+      List<Chunk> allChunks = chunkMapper.findByResourceId(resourceId);
+
+      if (allChunks.isEmpty()) {
+        // 没有任何切片数据，保持 vectorized=false
+        log.warn("资源没有任何切片数据，跳过向量化: resourceId={}", resourceId);
+        return;
+      }
+
+      // 有切片数据且都已向量化，确认状态
+      boolean allVectorized = allChunks.stream().allMatch(Chunk::getVectorized);
+      if (allVectorized) {
+        resourceMapper.updateChunkStatus(resourceId, allChunks.size(), true);
+        log.info("资源所有切片已向量化，状态已确认: resourceId={}, chunkCount={}", resourceId, allChunks.size());
+      }
       return;
     }
 
     // 批量处理切片
     vectorizeBatch(chunks);
 
-    // 检查资源的所有切片是否都已向量化
+    // ✅ 修复 2：检查资源所有切片是否已向量化
     List<Chunk> allChunks = chunkMapper.findByResourceId(resourceId);
-    boolean allVectorized = allChunks.stream().allMatch(Chunk::getVectorized);
 
-    if (allVectorized) {
-      resourceMapper.updateChunkStatus(resourceId, allChunks.size(), true);
-      log.info("资源向量化完成: resourceId={}, chunkCount={}", resourceId, allChunks.size());
+    // 关键修复：只有存在切片数据时才更新状态
+    if (!allChunks.isEmpty()) {
+      boolean allVectorized = allChunks.stream().allMatch(Chunk::getVectorized);
+
+      if (allVectorized) {
+        resourceMapper.updateChunkStatus(resourceId, allChunks.size(), true);
+        log.info("资源向量化完成: resourceId={}, chunkCount={}", resourceId, allChunks.size());
+      } else {
+        long vectorizedCount = allChunks.stream().filter(Chunk::getVectorized).count();
+        log.warn("资源部分切片向量化失败: resourceId={}, 已向量化={}/{}", resourceId, vectorizedCount, allChunks.size());
+      }
     } else {
-      long vectorizedCount = allChunks.stream().filter(Chunk::getVectorized).count();
-      log.warn("资源部分切片向量化失败: resourceId={}, 已向量化={}/{}", resourceId, vectorizedCount, allChunks.size());
+      log.error("严重错误: 向量化后切片数据丢失: resourceId={}", resourceId);
+      // 不更新 vectorized 状态，保持为 false
     }
   }
 
@@ -273,50 +323,562 @@ public class VectorServiceImpl implements VectorService {
 
   @Override
   public void rebuildVectorIndex() {
-    log.info("开始重建向量索引...");
+    // 保持向后兼容，使用默认配置
+    RebuildConfig defaultConfig = RebuildConfig.builder()
+        .dropIndex(true)
+        .rechunk(false)
+        .batchSize(batchSize)
+        .maxRetries(3)
+        .skipOnError(true)
+        .enableConcurrency(false)
+        .build();
 
     try {
-      // 1. 删除旧索引
-      log.info("删除旧索引...");
-      try {
-        redisTemplate.execute((RedisCallback<Object>) connection -> {
-          connection.execute("FT.DROPINDEX", INDEX_NAME.getBytes(), "DD".getBytes());
-          return null;
-        });
-        log.info("旧索引已删除");
-      } catch (Exception e) {
-        log.warn("删除索引失败（可能不存在）: {}", e.getMessage());
+      rebuildVectorIndex(defaultConfig);
+    } catch (Exception e) {
+      throw new InternalServerException("重建向量索引失败: " + e.getMessage(), e);
+    }
+  }
+
+  /**
+   * 重建向量索引（使用配置）。
+   *
+   * @param config 重建配置
+   * @return 重建结果
+   * @throws Exception 如果重建失败
+   */
+  public RebuildResult rebuildVectorIndex(RebuildConfig config) throws Exception {
+    long startTime = System.currentTimeMillis();
+
+    // 1. 获取分布式锁
+    RLock lock = redissonClient.getLock(REBUILD_LOCK_KEY);
+    boolean lockAcquired = false;
+
+    try {
+      lockAcquired = lock.tryLock(LOCK_WAIT_TIME, LOCK_LEASE_TIME, TimeUnit.SECONDS);
+
+      if (!lockAcquired) {
+        throw new ConflictException("系统繁忙，已有重建任务正在执行");
       }
 
-      // 2. 删除所有旧的chunk数据（使用小端序存储的旧数据）
-      log.info("删除所有旧的chunk数据...");
-      try {
-        // 使用keys命令查找所有chunk:开头的key，然后批量删除
-        redisTemplate.delete(redisTemplate.keys("chunk:*"));
-        log.info("所有旧chunk数据已删除");
-      } catch (Exception e) {
-        log.warn("删除chunk数据时出错: {}", e.getMessage());
+      // 2. 检查取消标志
+      if (cancelled) {
+        throw new ConflictException("重建任务已被取消");
       }
 
-      // 3. 重置所有切片的向量化状态
-      log.info("重置所有切片的向量化状态...");
-      chunkMapper.resetAllVectorized();
-      log.info("向量化状态已重置");
+      log.info("========================================");
+      log.info("开始轻量级重建向量索引");
+      log.info("配置: dropIndex={}, batchSize={}, maxRetries={}, skipOnError={}, enableConcurrency={}",
+          config.isDropIndex(), config.getBatchSize(), config.getMaxRetries(),
+          config.isSkipOnError(), config.isEnableConcurrency());
+      log.info("========================================");
 
-      // 4. 重置初始化状态并创建新索引
+      int successCount = 0;
+      int failureCount = 0;
+      List<Long> failedIds = new ArrayList<>();
+
+      // 3. 删除旧索引
+      if (config.isDropIndex()) {
+        log.info("步骤 1/6: 删除旧索引...");
+        dropIndex();
+        log.info("✅ 旧索引已删除");
+      }
+
+      // 4. 清理Redis向量数据
+      log.info("步骤 2/6: 清理Redis向量数据...");
+      long deletedCount = clearVectorData();
+      log.info("✅ 已清理 {} 个向量数据", deletedCount);
+
+      // 5. 重置向量化状态
+      log.info("步骤 3/6: 重置向量化状态...");
+      int resetCount = chunkMapper.resetAllVectorized();
+      int resetResourceCount = resourceMapper.resetAllVectorizedStatus();
+      log.info("✅ 已重置 {} 个资源, {} 个切片的向量化状态",
+          resetResourceCount, resetCount);
+
+      // 6. 创建新索引
+      log.info("步骤 4/6: 创建新索引...");
       indexInitialized = false;
-      log.info("创建新索引...");
       initializeVectorIndex();
-      log.info("新索引已创建");
+      log.info("✅ 新索引已创建");
 
-      // 5. 重新向量化所有资源（使用小端序）
-      log.info("开始重新向量化所有资源...");
-      vectorizeAllUnvectorized();
-      log.info("向量索引重建完成");
+      // 7. 批量向量化
+      log.info("步骤 5/6: 开始批量向量化...");
+      VectorizeResult vectorizeResult = vectorizeAllWithRetry(config);
+      successCount = vectorizeResult.getSuccessCount();
+      failureCount = vectorizeResult.getFailureCount();
+      failedIds = vectorizeResult.getFailedIds();
+      log.info("✅ 向量化完成: 成功={}, 失败={}", successCount, failureCount);
 
+      // 8. 验证
+      log.info("步骤 6/6: 验证向量化状态...");
+      int vectorizedCount = chunkMapper.countVectorized();
+      int totalCount = chunkMapper.countTotal();
+      log.info("✅ 向量化验证: {}/{} ({:.2f}%)",
+          vectorizedCount, totalCount, (vectorizedCount * 100.0 / totalCount));
+
+      // 9. 完成重建
+      long duration = System.currentTimeMillis() - startTime;
+      log.info("========================================");
+      log.info("轻量级重建完成");
+      log.info("成功: {}, 失败: {}, 耗时: {} ms", successCount, failureCount, duration);
+      log.info("========================================");
+
+      return RebuildResult.builder()
+          .successCount(successCount)
+          .failureCount(failureCount)
+          .totalChunks(totalCount)
+          .duration(duration)
+          .failedResourceIds(failedIds)
+          .build();
+
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new ConflictException("重建任务被取消", e);
     } catch (Exception e) {
       log.error("重建向量索引失败", e);
-      throw new RuntimeException("重建向量索引失败: " + e.getMessage(), e);
+      throw new InternalServerException("重建向量索引失败: " + e.getMessage(), e);
+    } finally {
+      // 释放锁
+      if (lockAcquired) {
+        lock.unlock();
+      }
+      // 重置取消标志
+      cancelled = false;
+    }
+  }
+
+  @Override
+  public boolean recalculateVectorizationStatus(Long resourceId) {
+    log.info("重新计算向量化状态: resourceId={}", resourceId);
+
+    try {
+      // 1. 查询资源的所有切片
+      List<Chunk> allChunks = chunkMapper.findByResourceId(resourceId);
+
+      // 2. 查询当前资源状态
+      Resource resource = resourceMapper.findById(resourceId);
+      if (resource == null) {
+        log.warn("资源不存在: resourceId={}", resourceId);
+        return false;
+      }
+
+      int actualChunkCount = allChunks.size();
+      long vectorizedCount = allChunks.stream().filter(Chunk::getVectorized).count();
+
+      // ✅ 关键逻辑：只有存在切片时才标记为已向量化
+      boolean allVectorized = !allChunks.isEmpty() && vectorizedCount == actualChunkCount;
+
+      // 3. 检查是否需要修复
+      boolean needsRepair = false;
+
+      if (!resource.getChunkCount().equals(actualChunkCount)) {
+        log.warn("切片数量不一致: resourceId={}, 数据库={}, 实际={}",
+            resourceId, resource.getChunkCount(), actualChunkCount);
+        needsRepair = true;
+      }
+
+      if (!resource.getVectorized().equals(allVectorized)) {
+        log.warn("向量化状态不一致: resourceId={}, 数据库={}, 应该={}",
+            resourceId, resource.getVectorized(), allVectorized);
+        needsRepair = true;
+      }
+
+      // 4. 执行修复
+      if (needsRepair) {
+        resourceMapper.updateChunkStatus(resourceId, actualChunkCount, allVectorized);
+        log.info("已修复向量化状态: resourceId={}, chunkCount={}, vectorized={}",
+            resourceId, actualChunkCount, allVectorized);
+        return true;
+      } else {
+        log.info("向量化状态正常，无需修复: resourceId={}", resourceId);
+        return false;
+      }
+    } catch (Exception e) {
+      log.error("重新计算向量化状态失败: resourceId={}", resourceId, e);
+      return false;
+    }
+  }
+
+  @Override
+  public int repairAllVectorizationStatus() {
+    log.info("开始批量修复所有资源的向量化状态...");
+
+    // 1. 获取所有资源ID
+    List<Resource> allResources = resourceMapper.findPaged(0, Integer.MAX_VALUE);
+    log.info("找到 {} 个资源需要检查", allResources.size());
+
+    int repairedCount = 0;
+    for (Resource resource : allResources) {
+      boolean repaired = recalculateVectorizationStatus(resource.getId());
+      if (repaired) {
+        repairedCount++;
+      }
+    }
+
+    log.info("批量修复完成: 检查了 {} 个资源，修复了 {} 个资源", allResources.size(), repairedCount);
+    return repairedCount;
+  }
+
+  /**
+   * 批量向量化（支持重试和进度跟踪）。
+   *
+   * @param config 重建配置
+   * @return 向量化结果
+   * @throws Exception 如果向量化失败
+   */
+  private VectorizeResult vectorizeAllWithRetry(RebuildConfig config) throws Exception {
+    int successCount = 0;
+    int failureCount = 0;
+    List<Long> failedIds = new ArrayList<>();
+
+    // 分页查询未向量化的切片
+    int offset = 0;
+    int limit = config.getBatchSize();
+    List<Chunk> batch;
+
+    do {
+      // 检查取消标志
+      if (cancelled) {
+        log.warn("检测到取消标志，停止向量化");
+        break;
+      }
+
+      // 查询一批未向量化的切片
+      batch = chunkMapper.findUnvectorizedPaged(offset, limit);
+
+      if (batch.isEmpty()) {
+        break;
+      }
+
+      // 并发或串行向量化
+      if (config.isEnableConcurrency()) {
+        VectorizeBatchResult batchResult = vectorizeBatchConcurrent(batch, config);
+        successCount += batchResult.getSuccessCount();
+        failureCount += batchResult.getFailureCount();
+        failedIds.addAll(batchResult.getFailedIds());
+      } else {
+        VectorizeBatchResult batchResult = vectorizeBatchSequential(batch, config);
+        successCount += batchResult.getSuccessCount();
+        failureCount += batchResult.getFailureCount();
+        failedIds.addAll(batchResult.getFailedIds());
+      }
+
+      offset += limit;
+
+    } while (batch.size() == limit);
+
+    return new VectorizeResult(successCount, failureCount, failedIds);
+  }
+
+  /**
+   * 顺序向量化一批切片（带重试）。
+   *
+   * @param chunks 切片列表
+   * @param config 重建配置
+   * @return 批次结果
+   */
+  private VectorizeBatchResult vectorizeBatchSequential(List<Chunk> chunks, RebuildConfig config) {
+    List<Long> successIds = new ArrayList<>();
+    List<Long> failedIds = new ArrayList<>();
+
+    for (Chunk chunk : chunks) {
+      // 检查取消
+      if (cancelled) {
+        break;
+      }
+
+      boolean success = false;
+      Exception lastError = null;
+
+      // 重试逻辑
+      for (int attempt = 0; attempt <= config.getMaxRetries(); attempt++) {
+        try {
+          // 获取向量
+          float[] vector = embeddingGateway.embed(chunk.getChunkText());
+
+          // 写入Redis
+          writeVectorToRedis(chunk, vector);
+
+          // 更新状态
+          chunkMapper.updateVectorized(chunk.getId(), true);
+
+          success = true;
+          log.debug("切片向量化成功: chunkId={}", chunk.getId());
+          break;
+
+        } catch (Exception e) {
+          lastError = e;
+          log.warn("切片向量化失败(第{}次尝试): chunkId={}, error={}",
+              attempt + 1, chunk.getId(), e.getMessage());
+
+          if (attempt < config.getMaxRetries()) {
+            // 指数退避
+            try {
+              Thread.sleep(1000L * (1L << attempt));
+            } catch (InterruptedException ie) {
+              Thread.currentThread().interrupt();
+              break;
+            }
+          }
+        }
+      }
+
+      if (success) {
+        successIds.add(chunk.getId());
+      } else {
+        failedIds.add(chunk.getId());
+        log.error("切片向量化失败(已达最大重试次数): chunkId={}", chunk.getId(), lastError);
+
+        if (!config.isSkipOnError()) {
+          throw new InternalServerException(
+              "切片向量化失败: chunkId=" + chunk.getId(), lastError);
+        }
+      }
+    }
+
+    // 更新资源状态
+    updateResourceVectorizationStatus(chunks);
+
+    return new VectorizeBatchResult(successIds.size(), failedIds.size(), failedIds);
+  }
+
+  /**
+   * 并发向量化一批切片（使用虚拟线程）。
+   *
+   * @param chunks 切片列表
+   * @param config 重建配置
+   * @return 批次结果
+   */
+  private VectorizeBatchResult vectorizeBatchConcurrent(List<Chunk> chunks, RebuildConfig config) {
+    List<Long> successIds = Collections.synchronizedList(new ArrayList<>());
+    List<Long> failedIds = Collections.synchronizedList(new ArrayList<>());
+
+    // 使用虚拟线程并发处理
+    ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+    List<Future<?>> futures = new ArrayList<>();
+
+    try {
+      for (Chunk chunk : chunks) {
+        if (cancelled) {
+          break;
+        }
+
+        // 提交任务到虚拟线程池
+        Future<?> future = executor.submit(() -> {
+          boolean success = false;
+          Exception lastError = null;
+
+          // 重试逻辑
+          for (int attempt = 0; attempt <= config.getMaxRetries(); attempt++) {
+            try {
+              // 获取向量
+              float[] vector = embeddingGateway.embed(chunk.getChunkText());
+
+              // 写入Redis
+              writeVectorToRedis(chunk, vector);
+
+              // 更新状态
+              chunkMapper.updateVectorized(chunk.getId(), true);
+
+              successIds.add(chunk.getId());
+              success = true;
+              log.debug("切片向量化成功: chunkId={}", chunk.getId());
+              break;
+
+            } catch (Exception e) {
+              lastError = e;
+              log.warn("切片向量化失败(第{}次尝试): chunkId={}, error={}",
+                  attempt + 1, chunk.getId(), e.getMessage());
+
+              if (attempt < config.getMaxRetries()) {
+                // 指数退避
+                try {
+                  Thread.sleep(1000L * (1L << attempt));
+                } catch (InterruptedException ie) {
+                  Thread.currentThread().interrupt();
+                  break;
+                }
+              }
+            }
+          }
+
+          if (!success) {
+            failedIds.add(chunk.getId());
+            log.error("切片向量化失败(已达最大重试次数): chunkId={}", chunk.getId(), lastError);
+
+            if (!config.isSkipOnError()) {
+              throw new InternalServerException(
+                  "切片向量化失败: chunkId=" + chunk.getId(), lastError);
+            }
+          }
+        });
+
+        futures.add(future);
+      }
+
+      // 等待所有任务完成
+      for (Future<?> future : futures) {
+        try {
+          future.get();
+        } catch (Exception e) {
+          log.error("并发任务执行失败", e);
+        }
+      }
+
+    } finally {
+      executor.shutdown();
+      try {
+        if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+          executor.shutdownNow();
+        }
+      } catch (InterruptedException e) {
+        executor.shutdownNow();
+        Thread.currentThread().interrupt();
+      }
+    }
+
+    // 更新资源状态
+    updateResourceVectorizationStatus(chunks);
+
+    return new VectorizeBatchResult(successIds.size(), failedIds.size(), failedIds);
+  }
+
+  /**
+   * 更新资源的向量化状态。
+   *
+   * @param chunks 切片列表
+   */
+  private void updateResourceVectorizationStatus(List<Chunk> chunks) {
+    // 按资源ID分组
+    Map<Long, List<Chunk>> chunksByResource = new HashMap<>();
+    for (Chunk chunk : chunks) {
+      chunksByResource.computeIfAbsent(chunk.getResourceId(), k -> new ArrayList<>()).add(chunk);
+    }
+
+    // 更新每个资源的状态
+    for (Map.Entry<Long, List<Chunk>> entry : chunksByResource.entrySet()) {
+      Long resourceId = entry.getKey();
+      List<Chunk> resourceChunks = entry.getValue();
+
+      // 重新查询该资源的所有切片
+      List<Chunk> allChunks = chunkMapper.findByResourceId(resourceId);
+      boolean allVectorized = allChunks.stream().allMatch(Chunk::getVectorized);
+
+      if (allVectorized) {
+        resourceMapper.updateChunkStatus(resourceId, allChunks.size(), true);
+        log.debug("资源向量化完成: resourceId={}, chunkCount={}", resourceId, allChunks.size());
+      }
+    }
+  }
+
+  /**
+   * 删除索引。
+   */
+  private void dropIndex() {
+    RLock lock = redissonClient.getLock(INDEX_LOCK_KEY);
+
+    try {
+      lock.lock();
+
+      redisTemplate.execute((RedisCallback<Object>) connection -> {
+        connection.execute("FT.DROPINDEX", INDEX_NAME.getBytes(), "DD".getBytes());
+        return null;
+      });
+
+      indexInitialized = false;
+      log.info("向量索引已删除");
+
+    } catch (Exception e) {
+      log.warn("删除索引失败（可能不存在）: {}", e.getMessage());
+    } finally {
+      if (lock.isHeldByCurrentThread()) {
+        lock.unlock();
+      }
+    }
+  }
+
+  /**
+   * 清理Redis向量数据。
+   *
+   * @return 删除的数量
+   */
+  private long clearVectorData() {
+    try {
+      Set<String> keys = redisTemplate.keys("chunk:*");
+      if (keys != null && !keys.isEmpty()) {
+        redisTemplate.delete(keys);
+        return keys.size();
+      }
+      return 0;
+    } catch (Exception e) {
+      log.error("清理向量数据失败", e);
+      return 0;
+    }
+  }
+
+  /**
+   * 取消重建任务。
+   *
+   * @return 是否成功取消
+   */
+  public boolean cancelRebuild() {
+    cancelled = true;
+    log.info("已设置重建任务取消标志");
+    return true;
+  }
+
+  /**
+   * 向量化结果辅助类。
+   */
+  private static class VectorizeResult {
+    private final int successCount;
+    private final int failureCount;
+    private final List<Long> failedIds;
+
+    VectorizeResult(int successCount, int failureCount, List<Long> failedIds) {
+      this.successCount = successCount;
+      this.failureCount = failureCount;
+      this.failedIds = failedIds;
+    }
+
+    int getSuccessCount() {
+      return successCount;
+    }
+
+    int getFailureCount() {
+      return failureCount;
+    }
+
+    List<Long> getFailedIds() {
+      return failedIds;
+    }
+  }
+
+  /**
+   * 批次向量化结果辅助类。
+   */
+  private static class VectorizeBatchResult {
+    private final int successCount;
+    private final int failureCount;
+    private final List<Long> failedIds;
+
+    VectorizeBatchResult(int successCount, int failureCount, List<Long> failedIds) {
+      this.successCount = successCount;
+      this.failureCount = failureCount;
+      this.failedIds = failedIds;
+    }
+
+    int getSuccessCount() {
+      return successCount;
+    }
+
+    int getFailureCount() {
+      return failureCount;
+    }
+
+    List<Long> getFailedIds() {
+      return failedIds;
     }
   }
 }

@@ -86,27 +86,37 @@ public class MarkdownProcessor {
         currentChapterPath.add(block.getText());
       }
 
-      // 检查是否需要创建新切片
-      if (currentText.length() + block.getText().length() > chunkSize && currentText.length() > 0) {
-        // 创建切片
-        String chapterPath = String.join(">", currentChapterPath);
-        Chunk chunk =
-            Chunk.builder()
-                .chunkIndex(chunkIndex++)
-                .chunkText(currentText.toString())
-                .locationInfo(chapterPath.isEmpty() ? "文档开头" : chapterPath)
-                .chapterPath(chapterPath.isEmpty() ? null : chapterPath)
-                .build();
+      // 处理文本块（支持超长块分割）
+      String blockText = block.getText();
+      int textOffset = 0;
+      while (textOffset < blockText.length()) {
+        int remainingSpace = chunkSize - currentText.length();
 
-        chunks.add(chunk);
-        log.debug("创建切片 {}: 章节 {}, 长度 {}", chunkIndex - 1, chapterPath, currentText.length());
+        // 如果剩余空间不足，立即保存当前切片
+        if (remainingSpace <= 0 || (remainingSpace <= (blockText.length() - textOffset) && remainingSpace < chunkSize)) {
+          String chapterPath = String.join(">", currentChapterPath);
+          Chunk chunk =
+              Chunk.builder()
+                  .chunkIndex(chunkIndex++)
+                  .chunkText(currentText.toString())
+                  .locationInfo(chapterPath.isEmpty() ? "文档开头" : chapterPath)
+                  .chapterPath(chapterPath.isEmpty() ? null : chapterPath)
+                  .build();
 
-        // 处理重叠
-        String overlapText = getOverlapText(currentText.toString(), chunkOverlap);
-        currentText = new StringBuilder(overlapText);
+          chunks.add(chunk);
+          log.debug("创建切片 {}: 章节 {}, 长度 {}", chunkIndex - 1, chapterPath, currentText.length());
+
+          // 重置为重叠文本
+          String overlapText = getOverlapText(currentText.toString(), chunkOverlap);
+          currentText = new StringBuilder(overlapText);
+          remainingSpace = chunkSize - currentText.length();
+        }
+
+        // 追加文本
+        int appendLength = Math.min(remainingSpace, blockText.length() - textOffset);
+        currentText.append(blockText, textOffset, textOffset + appendLength);
+        textOffset += appendLength;
       }
-
-      currentText.append(block.getText());
     }
 
     // 处理最后一个切片

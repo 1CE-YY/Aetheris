@@ -11,9 +11,11 @@ import com.aetheris.rag.dto.response.ResourceResponse;
 import com.aetheris.rag.entity.Chunk;
 import com.aetheris.rag.entity.Resource;
 import com.aetheris.rag.service.ResourceService;
+import com.aetheris.rag.service.VectorService;
 import jakarta.validation.Valid;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -38,6 +40,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class ResourceController {
 
   private final ResourceService resourceService;
+  private final VectorService vectorService;
 
   /**
    * 上传资源。
@@ -182,22 +185,10 @@ public class ResourceController {
     Long userId = (Long) authentication.getPrincipal();
     log.info("DELETE /api/resources/{} - userId={}", id, userId);
 
-    try {
-      // 删除资源（Service 层会检查权限）
-      Resource deleted = resourceService.deleteResource(id, userId);
+    Resource deleted = resourceService.deleteResource(id, userId);
 
-      return ResponseEntity.ok(
-          ApiResponse.success(ResourceResponse.fromEntity(deleted), "删除成功"));
-    } catch (RuntimeException e) {
-      if (e.getMessage().contains("资源不存在")) {
-        return ResponseEntity.notFound().build();
-      }
-      if (e.getMessage().contains("无权删除")) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-            .body(ApiResponse.error(403, e.getMessage()));
-      }
-      throw e;
-    }
+    return ResponseEntity.ok(
+        ApiResponse.success(ResourceResponse.fromEntity(deleted), "删除成功"));
   }
 
   /**
@@ -227,5 +218,56 @@ public class ResourceController {
         ApiResponse.success(
             responses,
             String.format("批量删除完成，成功删除 %d 个资源", deleted.size())));
+  }
+
+  /**
+   * 手动向量化指定资源。
+   *
+   * <p>智能判断资源状态，选择合适的处理方式：
+   * <ul>
+   *   <li>如果 chunkCount=0，重新处理文档（切片+向量化）</li>
+   *   <li>如果 chunkCount>0，仅进行向量化</li>
+   * </ul>
+   *
+   * @param id 资源ID
+   * @param authentication 认证信息
+   * @return 操作结果
+   */
+  @PostMapping("/{id}/vectorize")
+  public ResponseEntity<ApiResponse<String>> vectorizeResource(
+      @PathVariable Long id,
+      Authentication authentication) {
+    Long userId = (Long) authentication.getPrincipal();
+    log.info("POST /api/resources/{}/vectorize - userId={}", id, userId);
+
+    // 检查资源是否存在
+    Resource resource = resourceService.getResourceById(id);
+    if (resource == null) {
+      return ResponseEntity.notFound().build();
+    }
+
+    // ✅ 智能判断：如果没有切片，需要重新处理
+    if (resource.getChunkCount() == 0) {
+      log.info("资源没有切片，触发重新处理: resourceId={}", id);
+      try {
+        int chunkCount = resourceService.reprocessResource(id);
+        String message = String.format("重新处理完成，已生成 %d 个切片并向量化", chunkCount);
+        return ResponseEntity.ok(ApiResponse.success(message, message));
+      } catch (Exception e) {
+        log.error("重新处理失败: resourceId={}", id, e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(ApiResponse.error(500, "重新处理失败: " + e.getMessage()));
+      }
+    } else {
+      // 有切片，仅进行向量化
+      CompletableFuture.runAsync(() -> {
+        try {
+          vectorService.vectorizeChunks(id);
+        } catch (Exception e) {
+          log.error("向量化失败: resourceId={}", id, e);
+        }
+      });
+      return ResponseEntity.ok(ApiResponse.success("向量化任务已触发", "向量化任务已触发"));
+    }
   }
 }

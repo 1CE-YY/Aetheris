@@ -295,11 +295,25 @@ function Start-BackendService {
     }
 
     # 使用 Start-Job 后台运行 Maven
+    $envPath = Join-Path $PROJECT_ROOT ".env"
     $job = Start-Job -ScriptBlock {
-        param($ProjectRoot, $LogPath)
+        param($ProjectRoot, $LogPath, $EnvPath)
         Set-Location $ProjectRoot\backend
+
+        # 加载环境变量
+        if (Test-Path $EnvPath) {
+            Get-Content $EnvPath | ForEach-Object {
+                if ($_ -match '^\s*#' -or $_ -match '^\s*$') { return }
+                if ($_ -match '^(.+?)=(.+)$') {
+                    $key = $matches[1].Trim()
+                    $value = $matches[2].Trim() -replace '^"|"$', ''
+                    [Environment]::SetEnvironmentVariable($key, $value, "Process")
+                }
+            }
+        }
+
         mvn spring-boot:run *> $LogPath
-    } -ArgumentList $PROJECT_ROOT, $logPath
+    } -ArgumentList $PROJECT_ROOT, $logPath, $envPath
 
     $BACKEND_PID = $job.Id
     $STARTED_AT = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
@@ -385,11 +399,25 @@ function Start-FrontendService {
     }
 
     # 使用 Start-Job 后台运行 npm
+    $envPath = Join-Path $PROJECT_ROOT ".env"
     $job = Start-Job -ScriptBlock {
-        param($ProjectRoot, $LogPath)
+        param($ProjectRoot, $LogPath, $EnvPath)
         Set-Location $ProjectRoot\frontend
+
+        # 加载环境变量（前端可能也需要）
+        if (Test-Path $EnvPath) {
+            Get-Content $EnvPath | ForEach-Object {
+                if ($_ -match '^\s*#' -or $_ -match '^\s*$') { return }
+                if ($_ -match '^(.+?)=(.+)$') {
+                    $key = $matches[1].Trim()
+                    $value = $matches[2].Trim() -replace '^"|"$', ''
+                    [Environment]::SetEnvironmentVariable($key, $value, "Process")
+                }
+            }
+        }
+
         npm run dev *> $LogPath
-    } -ArgumentList $PROJECT_ROOT, $logPath
+    } -ArgumentList $PROJECT_ROOT, $logPath, $envPath
 
     $FRONTEND_PID = $job.Id
     $STARTED_AT = (Get-Date).ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ssZ")
@@ -426,6 +454,16 @@ function Start-FrontendService {
                 Write-Host "  - node 进程 (Vite): $($_.Id)" -ForegroundColor Cyan
             }
         }
+    }
+
+    # 检查前端是否启动成功
+    try {
+        $response = Invoke-WebRequest -Uri "http://localhost:5173" -UseBasicParsing -TimeoutSec 5 -ErrorAction Stop
+        if ($response.StatusCode -eq 200) {
+            Write-Success "前端启动成功"
+        }
+    } catch {
+        Write-Warning "前端可能还在启动中，请稍后访问"
     }
 
     Set-Location $PROJECT_ROOT

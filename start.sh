@@ -13,9 +13,13 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-# 项目根目录
-PROJECT_ROOT="/Users/hubin5/app/Aetheris"
+# 项目根目录（动态获取脚本所在目录）
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$SCRIPT_DIR"
 cd "$PROJECT_ROOT"
+
+# Docker Compose 命令（全局变量，在 check_environment 中设置）
+DOCKER_COMPOSE_CMD=""
 
 # ========================================
 # 环境检查函数
@@ -29,17 +33,23 @@ check_environment() {
         return 1
     fi
 
-    # 设置 Java 21
-    export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.9/Contents/Home
-    export PATH=$JAVA_HOME/bin:$PATH
+    # 自动检测或使用系统默认 JAVA_HOME
+    if [ -z "$JAVA_HOME" ]; then
+        # macOS: 尝试自动检测 Java 21
+        if [[ "$OSTYPE" == "darwin"* ]]; then
+            JAVA_HOME=$(/usr/libexec/java_home -v 21 2>/dev/null || true)
+        fi
+    fi
+
+    if [ -n "$JAVA_HOME" ]; then
+        export PATH=$JAVA_HOME/bin:$PATH
+    fi
 
     JAVA_VERSION=$(java -version 2>&1 | head -n 1 | cut -d'"' -f2 | cut -d'.' -f1)
     if [ "$JAVA_VERSION" -ne 21 ]; then
         echo -e "${RED}❌ Java 版本错误: 当前版本 $JAVA_VERSION, 需要 Java 21${NC}"
-        echo -e "${YELLOW}正在设置 Java 21...${NC}"
-        export JAVA_HOME=/Users/hubin5/Library/Java/JavaVirtualMachines/corretto-21.0.9/Contents/Home
-        export PATH=$JAVA_HOME/bin:$PATH
-        echo -e "${GREEN}✅ Java 21 已设置${NC}"
+        echo -e "${YELLOW}请安装 Java 21 或设置 JAVA_HOME 环境变量${NC}"
+        return 1
     else
         echo -e "${GREEN}✅ Java 版本正确: $(java -version 2>&1 | head -n 1)${NC}"
     fi
@@ -65,12 +75,18 @@ check_environment() {
     fi
     echo -e "${GREEN}✅ Docker 版本: $(docker --version | cut -d' ' -f3)${NC}"
 
-    # 检查 Docker Compose
-    if ! command -v docker-compose &> /dev/null; then
+    # 检查 Docker Compose（支持新版和旧版）
+    DOCKER_COMPOSE_CMD=""
+    if command -v docker-compose &> /dev/null; then
+        DOCKER_COMPOSE_CMD="docker-compose"
+        echo -e "${GREEN}✅ Docker Compose 版本: $(docker-compose --version | cut -d' ' -f4)${NC}"
+    elif docker compose version &> /dev/null 2>&1; then
+        DOCKER_COMPOSE_CMD="docker compose"
+        echo -e "${GREEN}✅ Docker Compose 版本: $(docker compose version)${NC}"
+    else
         echo -e "${RED}❌ Docker Compose 未安装${NC}"
         return 1
     fi
-    echo -e "${GREEN}✅ Docker Compose 版本: $(docker-compose --version | cut -d' ' -f4)${NC}"
 
     echo ""
     return 0
@@ -99,21 +115,21 @@ start_docker() {
     echo -e "${YELLOW}[启动 Docker 服务]${NC}"
 
     # 检查是否已运行
-    if docker-compose ps | grep -q "Up"; then
+    if $DOCKER_COMPOSE_CMD ps | grep -q "Up"; then
         echo -e "${YELLOW}⚠️  Docker 服务已在运行${NC}"
         return 0
     fi
 
     echo -e "${BLUE}正在启动 Docker Compose 服务...${NC}"
-    docker-compose up -d
+    $DOCKER_COMPOSE_CMD up -d
 
     # 检查服务状态
-    if docker-compose ps | grep -q "Up"; then
+    if $DOCKER_COMPOSE_CMD ps | grep -q "Up"; then
         echo -e "${BLUE}检查服务健康状态...${NC}"
 
         # 快速检查（最多等待 10 秒）
         for i in {1..2}; do
-            if docker-compose ps | grep -q "healthy"; then
+            if $DOCKER_COMPOSE_CMD ps | grep -q "healthy"; then
                 echo -e "${GREEN}✅ 基础设施启动成功${NC}"
                 return 0
             fi
@@ -122,12 +138,12 @@ start_docker() {
         done
 
         # 如果仍未健康，显示提示但继续
-        if ! docker-compose ps | grep -q "healthy"; then
+        if ! $DOCKER_COMPOSE_CMD ps | grep -q "healthy"; then
             echo -e "${YELLOW}⚠️  服务启动中，请稍后检查...${NC}"
         fi
     else
         echo -e "${RED}❌ 基础设施启动失败${NC}"
-        docker-compose ps
+        $DOCKER_COMPOSE_CMD ps
         return 1
     fi
 }
@@ -136,7 +152,7 @@ start_backend() {
     echo -e "${YELLOW}[启动后端服务]${NC}"
 
     # 检查后端是否已运行
-    if pgrep -f "rag-backend-.*\.jar|spring-boot:run|AetherisRagApplication" > /dev/null; then
+    if pgrep -f "spring-boot:run" > /dev/null || pgrep -f "AetherisRagApplication" > /dev/null; then
         echo -e "${YELLOW}⚠️  后端已在运行${NC}"
         return 0
     fi
@@ -152,16 +168,37 @@ start_backend() {
     # 加载 .env 文件中的环境变量
     echo -e "${BLUE}加载环境变量...${NC}"
     if [ -f "$PROJECT_ROOT/.env" ]; then
-        while IFS='=' read -r key value; do
-            [[ "$key" =~ ^#.*$ ]] && continue
-            [[ -z "$key" ]] && continue
-            value=$(echo "$value" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' | sed 's/^"//;s/"$//')
-            export "$key=$value"
+        while IFS= read -r line || [[ -n "$line" ]]; do
+            # 跳过注释和空行
+            [[ "$line" =~ ^[[:space:]]*# ]] && continue
+            [[ "$line" =~ ^[[:space:]]*$ ]] && continue
+
+            # 移除行尾注释
+            line="${line%%#*}"
+
+            # 解析 KEY=VALUE
+            if [[ "$line" =~ ^([A-Z_][A-Z0-9_]*)=(.*)$ ]]; then
+                key="${BASH_REMATCH[1]}"
+                value="${BASH_REMATCH[2]}"
+
+                # 去除首尾空格
+                value=$(echo "$value" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+
+                # 去除引号（单引或双引）
+                if [[ "$value" =~ ^\".*\"$ ]] || [[ "$value" =~ ^\'.*\'$ ]]; then
+                    value="${value:1:${#value}-2}"
+                fi
+
+                export "$key=$value"
+            fi
         done < "$PROJECT_ROOT/.env"
         echo -e "${GREEN}✅ 环境变量已加载${NC}"
     else
         echo -e "${YELLOW}⚠️  .env 文件不存在，使用 application.yml 默认配置${NC}"
     fi
+
+    # 确保日志目录存在
+    mkdir -p "$PROJECT_ROOT/logs"
 
     # 启动后端（后台运行）
     echo -e "${BLUE}启动 Spring Boot 应用...${NC}"
@@ -189,8 +226,8 @@ start_backend() {
     sleep 10
 
     # 检测并显示进程信息
-    MVN_PID=$(pgrep -f "java.*spring-boot:run" || true)
-    APP_PID=$(pgrep -f "java.*AetherisRagApplication" || true)
+    MVN_PID=$(pgrep -f "spring-boot:run" | head -1 || true)
+    APP_PID=$(pgrep -f "AetherisRagApplication" | head -1 || true)
 
     if [ -n "$MVN_PID" ] || [ -n "$APP_PID" ]; then
         echo -e "${BLUE}后端进程信息:${NC}"
@@ -212,7 +249,7 @@ start_frontend() {
     echo -e "${YELLOW}[启动前端服务]${NC}"
 
     # 检查前端是否已运行
-    if pgrep -f "vite.*frontend|npm.*dev|node.*vite" > /dev/null; then
+    if pgrep -f "npm.*dev" > /dev/null || pgrep -f "node.*vite" > /dev/null; then
         echo -e "${YELLOW}⚠️  前端已在运行${NC}"
         return 0
     fi
@@ -224,6 +261,9 @@ start_frontend() {
         echo -e "${BLUE}node_modules 不存在，开始安装依赖...${NC}"
         npm install
     fi
+
+    # 确保日志目录存在
+    mkdir -p "$PROJECT_ROOT/logs"
 
     # 启动前端（后台运行）
     echo -e "${BLUE}启动 Vite 开发服务器...${NC}"
@@ -251,13 +291,20 @@ start_frontend() {
     sleep 5
 
     # 检测并显示进程信息
-    NPM_PID=$(pgrep -f "npm.*dev" || true)
-    NODE_PID=$(pgrep -f "node.*vite" || true)
+    NPM_PID=$(pgrep -f "npm.*dev" | head -1 || true)
+    NODE_PID=$(pgrep -f "node.*vite" | head -1 || true)
 
     if [ -n "$NPM_PID" ] || [ -n "$NODE_PID" ]; then
         echo -e "${BLUE}前端进程信息:${NC}"
         [ -n "$NPM_PID" ] && echo -e "  ${CYAN}- npm 进程: $NPM_PID${NC}"
         [ -n "$NODE_PID" ] && echo -e "  ${CYAN}- node 进程 (Vite): $NODE_PID${NC}"
+    fi
+
+    # 检查前端是否启动成功
+    if curl -s http://localhost:5173 > /dev/null 2>&1; then
+        echo -e "${GREEN}✅ 前端启动成功${NC}"
+    else
+        echo -e "${YELLOW}⚠️  前端可能还在启动中，请稍后访问${NC}"
     fi
 
     return 0
@@ -431,6 +478,24 @@ parse_arguments() {
 # ========================================
 
 main() {
+    # 初始化 .pids.json
+    if [ ! -f ".pids.json" ]; then
+        cat > .pids.json << 'EOF'
+{
+  "backend": {
+    "pid": null,
+    "status": "stopped",
+    "started_at": null
+  },
+  "frontend": {
+    "pid": null,
+    "status": "stopped",
+    "started_at": null
+  }
+}
+EOF
+    fi
+
     if [ $# -eq 0 ]; then
         handle_interactive_mode
     else

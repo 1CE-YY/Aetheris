@@ -20,6 +20,13 @@
             <a-tag :color="resource?.vectorized ? 'green' : 'orange'">
               {{ resource?.vectorized ? '已向量化' : '处理中' }}
             </a-tag>
+            <a-button
+              type="default"
+              @click="handleRevectorize"
+              :loading="vectorizing"
+            >
+              重新向量化
+            </a-button>
             <a-button type="default" @click="handleEdit">编辑</a-button>
             <a-button type="primary" danger @click="handleDelete">删除资源</a-button>
           </a-space>
@@ -132,6 +139,7 @@ const userStore = useUserStore()
 const loading = ref(false)
 const resource = ref<Resource>()
 const chunks = ref<Chunk[]>([])
+const vectorizing = ref(false)
 
 // 编辑相关状态
 const editModalVisible = ref(false)
@@ -206,6 +214,25 @@ const loadChunks = async () => {
 
 const handleBack = () => {
   router.push('/resources')
+}
+
+const handleRevectorize = async () => {
+  if (!resource.value) return
+
+  vectorizing.value = true
+  try {
+    await ResourceService.vectorizeResource(resource.value.id)
+    message.success('向量化任务已触发，请稍后查看状态')
+
+    // 延迟 2 秒后刷新资源状态
+    setTimeout(() => {
+      loadResource()
+    }, 2000)
+  } catch (error: any) {
+    message.error(error.response?.data?.message || '触发向量化失败')
+  } finally {
+    vectorizing.value = false
+  }
 }
 
 const handleDelete = () => {

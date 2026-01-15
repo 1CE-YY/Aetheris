@@ -15,6 +15,7 @@ import com.aetheris.rag.service.SearchService;
 import com.aetheris.rag.util.PerformanceTimer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -46,7 +47,8 @@ public class RagServiceImpl implements RagService {
   private final BehaviorService behaviorService;
 
   /** 相似度阈值（低于此值认为证据不足） */
-  private static final double SCORE_THRESHOLD = 0.5;
+  @Value("${rag.retrieval.score-threshold:0.5}")
+  private double scoreThreshold;
 
   /** 最少检索结果数量（少于此值认为证据不足） */
   private static final int MIN_CITATIONS = 2;
@@ -162,8 +164,8 @@ public class RagServiceImpl implements RagService {
     }
 
     double avgScore = getAverageScore(citations);
-    if (avgScore < SCORE_THRESHOLD) {
-      log.debug("证据不足：平均相似度 {} 低于阈值 {}", avgScore, SCORE_THRESHOLD);
+    if (avgScore < scoreThreshold) {
+      log.debug("证据不足：平均相似度 {} 低于阈值 {}", avgScore, scoreThreshold);
       return true;
     }
 

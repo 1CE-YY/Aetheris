@@ -74,28 +74,38 @@ public class PdfProcessor {
         PageText pageText = pageTexts.get(i);
         String text = pageText.getText();
 
-        if (currentText.length() + text.length() > chunkSize && currentText.length() > 0) {
-          // 创建切片
-          Chunk chunk =
-              Chunk.builder()
-                  .chunkIndex(chunkIndex++)
-                  .chunkText(currentText.toString())
-                  .locationInfo(String.format("第%d-%d页", currentPageStart, currentPageEnd))
-                  .pageStart(currentPageStart)
-                  .pageEnd(currentPageEnd)
-                  .build();
+        // 处理页面文本（支持超长页面分割）
+        int textOffset = 0;
+        while (textOffset < text.length()) {
+          int remainingSpace = chunkSize - currentText.length();
 
-          chunks.add(chunk);
-          log.debug("创建切片 {}: 页 {}-{}, 长度 {}", chunkIndex - 1, currentPageStart, currentPageEnd, currentText.length());
+          // 如果剩余空间不足，立即保存当前切片
+          if (remainingSpace <= 0 || (remainingSpace <= (text.length() - textOffset) && remainingSpace < chunkSize)) {
+            Chunk chunk =
+                Chunk.builder()
+                    .chunkIndex(chunkIndex++)
+                    .chunkText(currentText.toString())
+                    .locationInfo(String.format("第%d-%d页", currentPageStart, currentPageEnd))
+                    .pageStart(currentPageStart)
+                    .pageEnd(currentPageEnd)
+                    .build();
 
-          // 处理重叠
-          String overlapText = getOverlapText(currentText.toString(), chunkOverlap);
-          currentText = new StringBuilder(overlapText);
-          currentPageStart = pageText.getPageNumber();
+            chunks.add(chunk);
+            log.debug("创建切片 {}: 页 {}-{}, 长度 {}", chunkIndex - 1, currentPageStart, currentPageEnd, currentText.length());
+
+            // 重置为重叠文本
+            String overlapText = getOverlapText(currentText.toString(), chunkOverlap);
+            currentText = new StringBuilder(overlapText);
+            currentPageStart = pageText.getPageNumber();
+            remainingSpace = chunkSize - currentText.length();
+          }
+
+          // 追加文本
+          int appendLength = Math.min(remainingSpace, text.length() - textOffset);
+          currentText.append(text, textOffset, textOffset + appendLength);
+          textOffset += appendLength;
+          currentPageEnd = pageText.getPageNumber();
         }
-
-        currentText.append(text);
-        currentPageEnd = pageText.getPageNumber();
       }
 
       // 处理最后一个切片

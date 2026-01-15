@@ -7,6 +7,7 @@ import com.aetheris.rag.dto.response.Citation;
 import com.aetheris.rag.dto.response.CitationLocation;
 import com.aetheris.rag.entity.Chunk;
 import com.aetheris.rag.entity.Resource;
+import com.aetheris.rag.exception.InternalServerException;
 import com.aetheris.rag.gateway.EmbeddingGateway;
 import com.aetheris.rag.mapper.ChunkMapper;
 import com.aetheris.rag.mapper.ResourceMapper;
@@ -114,7 +115,7 @@ public class SearchServiceImpl implements SearchService {
         Object nativeConnection = connection.getNativeConnection();
 
         if (!(nativeConnection instanceof RedisAsyncCommands)) {
-          throw new RuntimeException("无法获取 RedisAsyncCommands，当前类型: " + nativeConnection.getClass().getName());
+          throw new InternalServerException("无法获取 RedisAsyncCommands，当前类型: " + nativeConnection.getClass().getName());
         }
 
         @SuppressWarnings("unchecked")
@@ -162,7 +163,7 @@ public class SearchServiceImpl implements SearchService {
 
       } catch (Exception e) {
         log.error("向量搜索失败", e);
-        throw new RuntimeException("向量搜索失败: " + e.getMessage(), e);
+        throw new InternalServerException("向量搜索失败: " + e.getMessage(), e);
       }
     });
     timer.endStage();
@@ -253,6 +254,9 @@ public class SearchServiceImpl implements SearchService {
             log.debug("文档 {} 解析到 {} 个字段: {}", docId, fields.size(), fields.keySet());
 
             Citation citation = mapFieldsToCitation(fields);
+            if (citation == null) {
+              continue;
+            }
             log.info("文档 {} 评分: {}", docId, citation.getScore());
 
             if (citation.getScore() >= scoreThreshold) {
@@ -381,7 +385,7 @@ public class SearchServiceImpl implements SearchService {
                 log.debug("文档 {} 解析到 {} 个字段: {}", docId, fields.size(), fields.keySet());
 
                 Citation citation = mapFieldsToCitation(fields);
-                if (citation.getScore() >= scoreThreshold) {
+                if (citation != null && citation.getScore() >= scoreThreshold) {
                   citations.add(citation);
                 }
               } catch (Exception e) {
@@ -420,7 +424,7 @@ public class SearchServiceImpl implements SearchService {
                 log.debug("文档字段: {}", fields.keySet());
 
                 Citation citation = mapFieldsToCitation(fields);
-                if (citation.getScore() >= scoreThreshold) {
+                if (citation != null && citation.getScore() >= scoreThreshold) {
                   citations.add(citation);
                 }
               } catch (Exception e) {
@@ -469,8 +473,8 @@ public class SearchServiceImpl implements SearchService {
     Resource resource = resourceMapper.findById(resourceId);
 
     if (chunk == null || resource == null) {
-      log.warn("切片或资源不存在：chunkId={}, resourceId={}", chunkId, resourceId);
-      throw new IllegalArgumentException("切片或资源不存在");
+      log.warn("切片或资源不存在，跳过该结果：chunkId={}, resourceId={}", chunkId, resourceId);
+      return null;
     }
 
     // 构建位置信息

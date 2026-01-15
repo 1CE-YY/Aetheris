@@ -88,8 +88,18 @@ public class EmbeddingGateway {
     // 规范化文本（去除冗余空白、统一换行）
     String normalizedText = text.trim().replaceAll("\\s+", " ");
 
+    // ✅ 文本长度限制（智谱 API 请求体限制约 8KB，安全限制 4000 字符）
+    final int MAX_TEXT_LENGTH = 4000;
+    final String textToEmbed;
+    if (normalizedText.length() > MAX_TEXT_LENGTH) {
+      log.warn("文本过长，已截断：原长度={}, 截断到={}", normalizedText.length(), MAX_TEXT_LENGTH);
+      textToEmbed = normalizedText.substring(0, MAX_TEXT_LENGTH);
+    } else {
+      textToEmbed = normalizedText;
+    }
+
     // 计算文本哈希
-    String textHash = HashUtil.sha256(normalizedText);
+    String textHash = HashUtil.sha256(textToEmbed);
 
     // 查询缓存
     if (cacheEnabled) {
@@ -101,16 +111,16 @@ public class EmbeddingGateway {
     }
 
     // 记录日志（脱敏）
-    String sanitizedText = LogSanitizer.sanitize(normalizedText);
+    String sanitizedText = LogSanitizer.sanitize(textToEmbed);
     log.info("调用 Embedding API：model={}, textPreview={}", modelName, sanitizedText);
 
     // 使用重试策略调用 API
-    float[] embedding =
+    final float[] embedding =
         retryStrategy.executeWithRetry(
             () -> {
               // LangChain4j 1.9.1: 使用 embedAll 方法，传入 TextSegment 列表
               List<dev.langchain4j.data.embedding.Embedding> embeddings =
-                  embeddingModel.embedAll(List.of(TextSegment.from(normalizedText))).content();
+                  embeddingModel.embedAll(List.of(TextSegment.from(textToEmbed))).content();
 
               // 转换为 float 数组
               return embeddings.get(0).vector();

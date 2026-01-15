@@ -3,6 +3,7 @@
  */
 package com.aetheris.rag.service;
 
+import com.aetheris.rag.dto.response.RebuildResult;
 import com.aetheris.rag.entity.Chunk;
 import com.aetheris.rag.entity.Resource;
 import java.util.List;
@@ -115,4 +116,24 @@ public interface ResourceService {
    * @throws Exception 如果文件处理失败
    */
   int reprocessResource(Long resourceId) throws Exception;
+
+  /**
+   * 全量重建所有资源。
+   *
+   * <p>删除所有切片，重新解析所有原始文件，生成新切片并触发向量化。
+   *
+   * <p>流程：
+   * <ol>
+   *   <li>查询所有资源</li>
+   *   <li>逐个删除旧切片</li>
+   *   <li>重新解析原始文件（使用修复后的 PdfProcessor/MarkdownProcessor）</li>
+   *   <li>验证切片长度（严格控制在 1000 字符内）</li>
+   *   <li>插入新切片</li>
+   *   <li>触发向量化</li>
+   * </ol>
+   *
+   * @return 重建结果统计（成功数、失败数、总切片数、耗时）
+   * @throws Exception 如果重建失败
+   */
+  RebuildResult rebuildAllResources() throws Exception;
 }

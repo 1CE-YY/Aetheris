@@ -25,12 +25,11 @@ stop_backend() {
     echo -e "${YELLOW}[停止后端]${NC}"
 
     # 匹配多种后端启动方式：
-    # 1. java -jar rag-backend-*.jar
-    # 2. spring-boot:run (Maven)
-    # 3. AetherisRagApplication (主类)
+    # 1. spring-boot:run (Maven)
+    # 2. AetherisRagApplication (主类)
     # 分别获取 Maven 和应用进程
-    MVN_PID=$(pgrep -f "java.*spring-boot:run" || true)
-    APP_PID=$(pgrep -f "java.*AetherisRagApplication" || true)
+    MVN_PID=$(pgrep -f "spring-boot:run" | head -1 || true)
+    APP_PID=$(pgrep -f "AetherisRagApplication" | head -1 || true)
 
     if [ -n "$MVN_PID" ] || [ -n "$APP_PID" ]; then
         echo -e "${BLUE}找到后端进程:${NC}"
@@ -38,14 +37,14 @@ stop_backend() {
         [ -n "$APP_PID" ] && echo -e "  ${CYAN}- 应用进程: $APP_PID${NC}"
 
         # 优雅关闭
-        pkill -TERM -f "rag-backend-.*\.jar|spring-boot:run|AetherisRagApplication" || true
+        pkill -TERM -f "spring-boot:run|AetherisRagApplication" || true
         sleep 3
 
         # 检查并强制关闭
-        REMAINING_PIDS=$(pgrep -f "rag-backend-.*\.jar|spring-boot:run|AetherisRagApplication" || true)
+        REMAINING_PIDS=$(pgrep -f "spring-boot:run|AetherisRagApplication" || true)
         if [ -n "$REMAINING_PIDS" ]; then
             echo -e "${YELLOW}进程仍在运行，强制关闭...${NC}"
-            pkill -9 -f "rag-backend-.*\.jar|spring-boot:run|AetherisRagApplication" || true
+            pkill -9 -f "spring-boot:run|AetherisRagApplication" || true
             sleep 1
         fi
 
@@ -64,8 +63,8 @@ stop_frontend() {
     echo -e "${YELLOW}[停止前端]${NC}"
 
     # 分别获取 npm 和 node 进程
-    NPM_PID=$(pgrep -f "npm.*dev" || true)
-    NODE_PID=$(pgrep -f "node.*vite" || true)
+    NPM_PID=$(pgrep -f "npm.*dev" | head -1 || true)
+    NODE_PID=$(pgrep -f "node.*vite" | head -1 || true)
 
     if [ -n "$NPM_PID" ] || [ -n "$NODE_PID" ]; then
         echo -e "${BLUE}找到前端进程:${NC}"
@@ -73,14 +72,14 @@ stop_frontend() {
         [ -n "$NODE_PID" ] && echo -e "  ${CYAN}- node 进程 (Vite): $NODE_PID${NC}"
 
         # 优雅关闭
-        pkill -TERM -f "vite.*frontend|npm.*dev|node.*vite" || true
+        pkill -TERM -f "npm.*dev|node.*vite" || true
         sleep 2
 
         # 检查并强制关闭
-        REMAINING_PIDS=$(pgrep -f "vite.*frontend|npm.*dev|node.*vite" || true)
+        REMAINING_PIDS=$(pgrep -f "npm.*dev|node.*vite" || true)
         if [ -n "$REMAINING_PIDS" ]; then
             echo -e "${YELLOW}进程仍在运行，强制关闭...${NC}"
-            pkill -9 -f "vite.*frontend|npm.*dev|node.*vite" || true
+            pkill -9 -f "npm.*dev|node.*vite" || true
             sleep 1
         fi
 
@@ -98,9 +97,20 @@ stop_frontend() {
 stop_docker() {
     echo -e "${YELLOW}[停止 Docker 服务]${NC}"
 
+    # 确定使用的命令
+    DOCKER_COMPOSE_CMD=""
+    if command -v docker-compose &> /dev/null; then
+        DOCKER_COMPOSE_CMD="docker-compose"
+    elif docker compose version &> /dev/null 2>&1; then
+        DOCKER_COMPOSE_CMD="docker compose"
+    else
+        echo -e "${RED}❌ 无法找到 Docker Compose 命令${NC}"
+        return 1
+    fi
+
     # 检查 Docker 服务是否在运行
-    if docker-compose ps | grep -q "Up"; then
-        docker-compose down
+    if $DOCKER_COMPOSE_CMD ps | grep -q "Up"; then
+        $DOCKER_COMPOSE_CMD down
         echo -e "${GREEN}✅ Docker 服务已停止${NC}"
         return 0
     else
@@ -112,7 +122,25 @@ stop_docker() {
 update_pids_json() {
     local service=$1
 
-    if [ -f ".pids.json" ] && command -v jq &> /dev/null; then
+    if [ ! -f ".pids.json" ]; then
+        # 文件不存在，创建默认结构
+        cat > .pids.json << 'EOF'
+{
+  "backend": {
+    "pid": null,
+    "status": "stopped",
+    "started_at": null
+  },
+  "frontend": {
+    "pid": null,
+    "status": "stopped",
+    "started_at": null
+  }
+}
+EOF
+    fi
+
+    if command -v jq &> /dev/null; then
         case $service in
             "backend")
                 jq '.backend.pid = null | .backend.status = "stopped" | .backend.started_at = null' .pids.json > .pids.json.tmp
@@ -121,6 +149,15 @@ update_pids_json() {
             "frontend")
                 jq '.frontend.pid = null | .frontend.status = "stopped" | .frontend.started_at = null' .pids.json > .pids.json.tmp
                 mv .pids.json.tmp .pids.json
+                ;;
+        esac
+    else
+        # jq 不可用时使用 sed
+        case $service in
+            "backend"|"frontend")
+                sed -i '' 's/"pid": [0-9]*/"pid": null/' .pids.json
+                sed -i '' 's/"status": "running"/"status": "stopped"/' .pids.json
+                sed -i '' 's/"started_at": "[^"]*"/"started_at": null/' .pids.json
                 ;;
         esac
     fi
@@ -253,6 +290,24 @@ parse_arguments() {
 # ========================================
 
 main() {
+    # 初始化 .pids.json
+    if [ ! -f ".pids.json" ]; then
+        cat > .pids.json << 'EOF'
+{
+  "backend": {
+    "pid": null,
+    "status": "stopped",
+    "started_at": null
+  },
+  "frontend": {
+    "pid": null,
+    "status": "stopped",
+    "started_at": null
+  }
+}
+EOF
+    fi
+
     if [ $# -eq 0 ]; then
         handle_interactive_mode
     else

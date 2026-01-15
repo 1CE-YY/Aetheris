@@ -199,4 +199,11 @@
     </foreach>
   </delete>
 
+  <!-- 重置所有资源的向量化状态 -->
+  <update id="resetAllVectorizedStatus">
+    UPDATE resources
+    SET vectorized = 0,
+        chunk_count = 0
+  </update>
+
 </mapper>

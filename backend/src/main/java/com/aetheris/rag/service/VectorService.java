@@ -46,4 +46,24 @@ public interface VectorService {
    * </p>
    */
   void rebuildVectorIndex();
+
+  /**
+   * 重新计算并修复资源的向量化状态。
+   *
+   * <p>用于修复数据不一致问题：检查资源的实际切片数量和向量化状态，
+   * 确保数据库状态与实际情况一致。</p>
+   *
+   * @param resourceId 资源ID
+   * @return 是否修复了不一致状态
+   */
+  boolean recalculateVectorizationStatus(Long resourceId);
+
+  /**
+   * 批量修复所有资源的向量化状态。
+   *
+   * <p>遍历所有资源，检查并修复向量化状态不一致的问题。</p>
+   *
+   * @return 修复的资源数量
+   */
+  int repairAllVectorizationStatus();
 }

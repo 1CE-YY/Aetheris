@@ -3,6 +3,8 @@
  */
 package com.aetheris.rag.service.impl;
 
+import com.aetheris.rag.dto.request.RebuildConfig;
+import com.aetheris.rag.dto.response.RebuildResult;
 import com.aetheris.rag.mapper.ChunkMapper;
 import com.aetheris.rag.mapper.ResourceMapper;
 import com.aetheris.rag.entity.Chunk;
@@ -15,6 +17,7 @@ import com.aetheris.rag.util.PdfProcessor;
 import com.aetheris.rag.util.FileValidationUtil;
 import com.aetheris.rag.exception.ConflictException;
 import com.aetheris.rag.exception.BadRequestException;
+import com.aetheris.rag.exception.InternalServerException;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,17 +26,19 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.multipart.MultipartFile;
 import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 资源服务实现类。
@@ -74,6 +79,15 @@ public class ResourceServiceImpl implements ResourceService {
 
   /** 分布式锁自动释放时间（秒） */
   private static final int LOCK_LEASE_TIME = 60;
+
+  /** 资源重建锁 key */
+  private static final String RESOURCE_REBUILD_LOCK_KEY = "rebuild:resource:lock";
+
+  /** 资源重建锁等待时间（秒） */
+  private static final long RESOURCE_REBUILD_LOCK_WAIT = 10;
+
+  /** 资源重建锁持有时间（秒，2小时） */
+  private static final long RESOURCE_REBUILD_LOCK_LEASE = 7200;
 
   /**
    * 保存上传的文件到指定目录
@@ -282,7 +296,7 @@ public class ResourceServiceImpl implements ResourceService {
 
   @Override
   public Long getResourceCount() {
-    return Long.valueOf(resourceMapper.count());
+    return (long) resourceMapper.count();
   }
 
   @Override
@@ -376,16 +390,25 @@ public class ResourceServiceImpl implements ResourceService {
    */
   private void deleteVectorData(List<Long> resourceIds) {
     try {
-      // 批量查询所有切片
+      // 1. 查询所有切片
       List<Chunk> chunks = chunkMapper.findByResourceIds(resourceIds);
       if (!chunks.isEmpty()) {
-        // 批量删除 Redis keys
+        // 2. 删除 Redis 键（chunk:xxx）
         List<String> keys = chunks.stream()
             .map(chunk -> "chunk:" + chunk.getId())
             .collect(java.util.stream.Collectors.toList());
-
         redisTemplate.delete(keys);
-        log.info("已删除资源的向量数据，共 {} 个切片", chunks.size());
+
+        // 3. 从向量索引中删除记录
+        for (Chunk chunk : chunks) {
+          String docId = "chunk:" + chunk.getId();
+          redisTemplate.execute((RedisCallback<Object>) connection -> {
+            connection.execute("FT.DEL", "chunk_vector_index".getBytes(), docId.getBytes());
+            return null;
+          });
+        }
+
+        log.info("已删除资源的向量数据和索引记录，共 {} 个切片", chunks.size());
       }
     } catch (Exception e) {
       log.warn("批量删除向量数据失败: resourceIds={}", resourceIds, e);
@@ -511,5 +534,195 @@ public class ResourceServiceImpl implements ResourceService {
     }
 
     return chunks.size();
+  }
+
+  @Override
+  @Transactional
+  public RebuildResult rebuildAllResources() throws Exception {
+    long startTime = System.currentTimeMillis();
+
+    // 使用默认配置（不跳过向量化，保持向后兼容）
+    RebuildConfig config = RebuildConfig.builder()
+        .dropIndex(true)
+        .rechunk(true)
+        .batchSize(10)
+        .maxRetries(2)
+        .skipOnError(true)
+        .enableConcurrency(false)
+        .skipVectorization(false)  // 不跳过向量化，保持向后兼容
+        .build();
+
+    // 步骤 1: 重建所有资源（包括切片生成）
+    RebuildResult resourceResult = rebuildAllResources(config);
+
+    // 步骤 2: 重建向量索引（统一批量向量化）
+    // 注意：这里会重新向量化所有切片，即使步骤1中已经向量化过
+    // 这确保了最终的向量化状态是一致的
+    VectorServiceImpl vectorServiceImpl = (VectorServiceImpl) vectorService;
+    RebuildConfig indexConfig = RebuildConfig.builder()
+        .dropIndex(true)
+        .batchSize(10)
+        .maxRetries(2)
+        .skipOnError(true)
+        .enableConcurrency(false)
+        .build();
+    RebuildResult indexResult = vectorServiceImpl.rebuildVectorIndex(indexConfig);
+
+    // 合并结果
+    long duration = System.currentTimeMillis() - startTime;
+    return RebuildResult.builder()
+        .successCount(resourceResult.getSuccessCount())
+        .failureCount(resourceResult.getFailureCount())
+        .totalChunks(resourceResult.getTotalChunks())
+        .duration(duration)
+        .failedResourceIds(resourceResult.getFailedResourceIds())
+        .build();
+  }
+
+  /**
+   * 重建所有资源（使用配置）。
+   *
+   * @param config 重建配置
+   * @return 重建结果
+   * @throws Exception 如果重建失败
+   */
+  public RebuildResult rebuildAllResources(RebuildConfig config) throws Exception {
+    long startTime = System.currentTimeMillis();
+
+    // 1. 获取分布式锁
+    RLock lock = redissonClient.getLock(RESOURCE_REBUILD_LOCK_KEY);
+    boolean lockAcquired = false;
+
+    try {
+      lockAcquired = lock.tryLock(RESOURCE_REBUILD_LOCK_WAIT, RESOURCE_REBUILD_LOCK_LEASE, TimeUnit.SECONDS);
+
+      if (!lockAcquired) {
+        throw new ConflictException("系统繁忙，已有资源重建任务正在执行");
+      }
+
+      log.info("========================================");
+      log.info("开始完全重建所有资源");
+      log.info("配置: rechunk={}, batchSize={}, skipOnError={}",
+          config.isRechunk(), config.getBatchSize(), config.isSkipOnError());
+      log.info("========================================");
+
+      // 2. 查询所有资源
+      log.info("步骤 1/4: 查询所有资源...");
+      List<Resource> resources = new ArrayList<>();
+      int offset = 0;
+      int limit = 100;
+      List<Resource> page;
+      do {
+        page = resourceMapper.findPaged(offset, limit);
+        resources.addAll(page);
+        offset += limit;
+      } while (!page.isEmpty());
+      log.info("✅ 找到 {} 个资源", resources.size());
+
+      int totalResources = resources.size();
+      int successCount = 0;
+      int failureCount = 0;
+      int totalChunks = 0;
+      List<Long> failedIds = new ArrayList<>();
+
+      // 3. 按批次处理资源
+      log.info("步骤 2/4: 批量处理资源...");
+      for (int i = 0; i < resources.size(); i += config.getBatchSize()) {
+        int end = Math.min(i + config.getBatchSize(), resources.size());
+        List<Resource> batch = resources.subList(i, end);
+
+        log.info("处理批次 [{}/{}]: 资源 {}-{}",
+            (i / config.getBatchSize()) + 1,
+            (resources.size() + config.getBatchSize() - 1) / config.getBatchSize(),
+            i + 1, end);
+
+        // 处理这一批
+        for (Resource resource : batch) {
+          try {
+            // 删除旧向量数据
+            List<Chunk> oldChunks = chunkMapper.findByResourceId(resource.getId());
+            if (!oldChunks.isEmpty()) {
+              deleteVectorData(List.of(resource.getId()));
+              log.debug("已删除 {} 个切片的向量数据", oldChunks.size());
+            }
+
+            // 删除旧切片
+            if (!oldChunks.isEmpty()) {
+              chunkMapper.deleteByResourceId(resource.getId());
+              log.debug("已删除 {} 个旧切片", oldChunks.size());
+            }
+
+            // 重新处理文档
+            String filePath = resource.getFilePath();
+            String fileType = resource.getFileType();
+            List<Chunk> chunks = processDocument(filePath, fileType, resource.getId());
+
+            // 插入新切片
+            if (!chunks.isEmpty()) {
+              chunkMapper.batchInsert(chunks);
+              resourceMapper.updateChunkStatus(resource.getId(), chunks.size(), false);
+              log.debug("重新生成了 {} 个切片", chunks.size());
+              totalChunks += chunks.size();
+
+              // 根据配置决定是否触发向量化
+              if (!config.isSkipVectorization()) {
+                // 触发向量化
+                vectorService.vectorizeChunks(resource.getId());
+                log.debug("向量化任务已触发: 资源ID={}", resource.getId());
+              } else {
+                log.debug("跳过向量化（完全重建模式）: 资源ID={}", resource.getId());
+              }
+            }
+
+            successCount++;
+            log.debug("✅ 资源处理成功: id={}, 切片数={}", resource.getId(), chunks.size());
+
+          } catch (Exception e) {
+            failureCount++;
+            failedIds.add(resource.getId());
+            log.error("❌ 资源处理失败: id={}, error={}", resource.getId(), e.getMessage(), e);
+
+            if (!config.isSkipOnError()) {
+              throw new InternalServerException("资源重建失败: id=" + resource.getId(), e);
+            }
+          }
+        }
+
+        log.info("批次完成: 成功={}, 失败={}", successCount, failureCount);
+      }
+
+      log.info("✅ 资源处理完成: 成功={}, 失败={}", successCount, failureCount);
+
+      // 4. 验证数据一致性
+      log.info("步骤 3/4: 数据一致性验证...");
+      int finalChunkCount = chunkMapper.countTotal();
+      int finalVectorizedCount = chunkMapper.countVectorized();
+      log.info("✅ 验证完成: 总切片={}, 已向量化={}", finalChunkCount, finalVectorizedCount);
+
+      // 5. 完成汇总
+      long duration = System.currentTimeMillis() - startTime;
+      log.info("步骤 4/4: 重建完成");
+      log.info("========================================");
+      log.info("重量级重建统计:");
+      log.info("  总资源数: {}", totalResources);
+      log.info("  成功: {}", successCount);
+      log.info("  失败: {}", failureCount);
+      log.info("  总切片数: {}", totalChunks);
+      log.info("  耗时: {} ms ({} 秒)", duration, duration / 1000);
+      log.info("========================================");
+
+      return RebuildResult.builder()
+          .successCount(successCount)
+          .failureCount(failureCount)
+          .totalChunks(totalChunks)
+          .duration(duration)
+          .failedResourceIds(failedIds)
+          .build();
+
+    } finally {
+      if (lockAcquired) {
+        lock.unlock();
+      }
+    }
   }
 }

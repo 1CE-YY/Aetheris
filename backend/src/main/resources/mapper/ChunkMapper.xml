@@ -11,7 +11,7 @@
     <id column="id" property="id" jdbcType="BIGINT"/>
     <result column="resource_id" property="resourceId" jdbcType="BIGINT"/>
     <result column="chunk_index" property="chunkIndex" jdbcType="INTEGER"/>
-    <result column="chunk_text" property="chunkText" jdbcType="LONGVARCHAR"/>
+    <result column="chunk_text" property="chunkText" jdbcType="VARCHAR"/>
     <result column="location_info" property="locationInfo" jdbcType="VARCHAR"/>
     <result column="page_start" property="pageStart" jdbcType="INTEGER"/>
     <result column="page_end" property="pageEnd" jdbcType="INTEGER"/>
@@ -212,6 +212,7 @@
            page_start,
            page_end,
            chapter_path,
+           text_hash,
            vectorized,
            created_at
     FROM resource_chunks
@@ -220,6 +221,38 @@
       #{resourceId}
     </foreach>
     ORDER BY resource_id, chunk_index
+  </select>
+
+  <!-- 分页查询未向量化的切片 -->
+  <select id="findUnvectorizedPaged" resultMap="ChunkResultMap">
+    SELECT id,
+           resource_id,
+           chunk_index,
+           chunk_text,
+           location_info,
+           page_start,
+           page_end,
+           chapter_path,
+           text_hash,
+           vectorized,
+           created_at
+    FROM resource_chunks
+    WHERE vectorized = FALSE
+    ORDER BY resource_id ASC, chunk_index ASC
+    LIMIT #{offset}, #{limit}
+  </select>
+
+  <!-- 统计总切片数 -->
+  <select id="countTotal" resultType="int">
+    SELECT COUNT(*)
+    FROM resource_chunks
+  </select>
+
+  <!-- 统计已向量化的切片数 -->
+  <select id="countVectorized" resultType="int">
+    SELECT COUNT(*)
+    FROM resource_chunks
+    WHERE vectorized = TRUE
   </select>
 
 </mapper>

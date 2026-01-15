@@ -397,6 +397,31 @@ function Invoke-ArgumentMode {
 # 主流程
 # ========================================
 
+# 初始化 PID 文件
+function Initialize-PidsFile {
+    $pidsPath = Join-Path $PROJECT_ROOT ".pids.json"
+
+    if (-not (Test-Path $pidsPath)) {
+        $initialJson = @{
+            backend = @{
+                pid = $null
+                status = "stopped"
+                started_at = $null
+            }
+            frontend = @{
+                pid = $null
+                status = "stopped"
+                started_at = $null
+            }
+        }
+
+        $initialJson | ConvertTo-Json -Depth 10 | Set-Content $pidsPath
+    }
+}
+
+# 在主流程开始时调用
+Initialize-PidsFile
+
 # 解析参数或进入交互模式
 if ($args.Count -eq 0) {
     Invoke-InteractiveMode

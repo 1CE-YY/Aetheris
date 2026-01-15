@@ -31,18 +31,28 @@
     <maven.compiler.target>21</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-    <!-- Dependency versions -->
+    <!-- 核心依赖版本 -->
     <mybatis-spring-boot.version>3.0.5</mybatis-spring-boot.version>
-    <mybatis.version>3.5.19</mybatis.version>
-    <lombok.version>1.18.42</lombok.version>
     <langchain4j.version>1.9.1</langchain4j.version>
     <langchain4j-community-zhipu-ai.version>1.9.1-beta17</langchain4j-community-zhipu-ai.version>
     <guava.version>33.5.0-jre</guava.version>
-    <commons-lang3.version>3.20.0</commons-lang3.version>
 
-    <!-- Test dependencies -->
-    <testcontainers.version>1.21.4</testcontainers.version>
-    <rest-assured.version>5.5.6</rest-assured.version>
+    <!-- JWT 相关版本 -->
+    <jjwt.version>0.12.7</jjwt.version>
+
+    <!-- Redisson 版本 -->
+    <redisson.version>3.52.0</redisson.version>
+
+    <!-- 文档处理版本 -->
+    <pdfbox.version>3.0.6</pdfbox.version>
+    <commonmark.version>0.27.0</commonmark.version>
+
+    <!-- 配置管理版本 -->
+    <dotenv-java.version>3.2.0</dotenv-java.version>
+
+    <!-- 构建插件版本 -->
+    <maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
+    <checkstyle.version>12.3.1</checkstyle.version>
   </properties>
 
   <dependencies>
@@ -74,17 +84,10 @@
       <version>${mybatis-spring-boot.version}</version>
     </dependency>
 
-    <dependency>
-      <groupId>org.mybatis</groupId>
-      <artifactId>mybatis</artifactId>
-      <version>${mybatis.version}</version>
-    </dependency>
-
     <!-- Lombok -->
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>${lombok.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -130,27 +133,26 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
-      <version>${commons-lang3.version}</version>
     </dependency>
 
     <!-- JWT -->
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-api</artifactId>
-      <version>0.12.7</version>
+      <version>${jjwt.version}</version>
     </dependency>
 
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-impl</artifactId>
-      <version>0.12.7</version>
+      <version>${jjwt.version}</version>
       <scope>runtime</scope>
     </dependency>
 
     <dependency>
       <groupId>io.jsonwebtoken</groupId>
       <artifactId>jjwt-jackson</artifactId>
-      <version>0.12.7</version>
+      <version>${jjwt.version}</version>
       <scope>runtime</scope>
     </dependency>
 
@@ -164,20 +166,20 @@
     <dependency>
       <groupId>org.redisson</groupId>
       <artifactId>redisson</artifactId>
-      <version>3.25.0</version>
+      <version>${redisson.version}</version>
     </dependency>
 
     <!-- Document Processing -->
     <dependency>
       <groupId>org.apache.pdfbox</groupId>
       <artifactId>pdfbox</artifactId>
-      <version>3.0.1</version>
+      <version>${pdfbox.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.commonmark</groupId>
       <artifactId>commonmark</artifactId>
-      <version>0.21.0</version>
+      <version>${commonmark.version}</version>
     </dependency>
 
     <!-- Monitoring -->
@@ -213,28 +215,24 @@
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>testcontainers</artifactId>
-      <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>mysql</artifactId>
-      <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>junit-jupiter</artifactId>
-      <version>${testcontainers.version}</version>
       <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>io.rest-assured</groupId>
       <artifactId>rest-assured</artifactId>
-      <version>${rest-assured.version}</version>
       <scope>test</scope>
     </dependency>
 
@@ -242,7 +240,7 @@
     <dependency>
       <groupId>io.github.cdimascio</groupId>
       <artifactId>dotenv-java</artifactId>
-      <version>3.0.0</version>
+      <version>${dotenv-java.version}</version>
     </dependency>
   </dependencies>
 
@@ -266,15 +264,23 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
         <configuration>
           <source>21</source>
           <target>21</target>
+          <release>21</release>
           <compilerArgs>
             <arg>-parameters</arg>
+            <arg>--enable-preview</arg>
           </compilerArgs>
           <fork>true</fork>
           <compilerVersion>21</compilerVersion>
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <version>${lombok.version}</version>
+            </path>
+          </annotationProcessorPaths>
         </configuration>
         <inherited>true</inherited>
       </plugin>
@@ -283,12 +289,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.0.0</version>
         <configuration>
           <includes>
             <include>**/*Test.java</include>
             <include>**/*Tests.java</include>
           </includes>
+          <argLine>--enable-preview</argLine>
         </configuration>
       </plugin>
 
@@ -296,12 +302,12 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>3.0.0</version>
         <configuration>
           <includes>
             <include>**/*IT.java</include>
             <include>**/*IntegrationTest.java</include>
           </includes>
+          <argLine>--enable-preview</argLine>
         </configuration>
         <executions>
           <execution>
@@ -317,7 +323,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>3.3.0</version>
+        <version>${maven-checkstyle-plugin.version}</version>
         <configuration>
           <configLocation>google_checks.xml</configLocation>
           <consoleOutput>true</consoleOutput>
@@ -328,7 +334,7 @@
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>10.12.4</version>
+            <version>${checkstyle.version}</version>
           </dependency>
         </dependencies>
       </plugin>

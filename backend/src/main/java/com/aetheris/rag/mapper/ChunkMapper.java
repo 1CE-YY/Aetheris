@@ -124,4 +124,27 @@ public interface ChunkMapper {
    * @return 切片列表
    */
   List<Chunk> findByResourceIds(@Param("resourceIds") List<Long> resourceIds);
+
+  /**
+   * 分页查询未向量化的切片。
+   *
+   * @param offset 偏移量
+   * @param limit 限制数量
+   * @return 切片列表
+   */
+  List<Chunk> findUnvectorizedPaged(@Param("offset") int offset, @Param("limit") int limit);
+
+  /**
+   * 统计总切片数。
+   *
+   * @return 总数
+   */
+  int countTotal();
+
+  /**
+   * 统计已向量化的切片数。
+   *
+   * @return 总数
+   */
+  int countVectorized();
 }

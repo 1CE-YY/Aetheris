@@ -58,7 +58,8 @@ public class SecurityConfig {
                     .requestMatchers(
                         "/api/auth/register",
                         "/api/auth/login",
-                        "/api/test/**")
+                        "/api/test/**",
+                        "/api/admin/debug/**")  // 🔧 临时允许调试接口
                     .permitAll()
                     .anyRequest()
                     .authenticated())

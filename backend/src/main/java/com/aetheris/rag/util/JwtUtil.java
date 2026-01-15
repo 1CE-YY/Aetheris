@@ -1,5 +1,6 @@
 package com.aetheris.rag.util;
 
+import com.aetheris.rag.exception.UnauthorizedException;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -82,14 +83,14 @@ public class JwtUtil {
               .getBody();
       return Long.parseLong(claims.getSubject());
     } catch (ExpiredJwtException e) {
-      log.error("Token 已过期: {}", e.getMessage());
-      throw new RuntimeException("Token 已过期", e);
+      log.debug("Token 已过期: {}", e.getMessage());
+      throw new UnauthorizedException("Token 已过期", e);
     } catch (MalformedJwtException e) {
-      log.error("Token 格式错误: {}", e.getMessage());
-      throw new RuntimeException("Token 格式错误", e);
+      log.debug("Token 格式错误: {}", e.getMessage());
+      throw new UnauthorizedException("Token 格式错误", e);
     } catch (Exception e) {
-      log.error("解析 Token 失败: {}", e.getMessage(), e);
-      throw new RuntimeException("无效的 Token", e);
+      log.debug("无效的 Token: {}", e.getMessage());
+      throw new UnauthorizedException("无效的 Token", e);
     }
   }
 
@@ -151,20 +152,20 @@ public class JwtUtil {
           .parseClaimsJws(token)
           .getBody();
     } catch (ExpiredJwtException e) {
-      log.error("Token 已过期: {}", e.getMessage());
-      throw new RuntimeException("Token 已过期", e);
+      log.debug("Token 已过期: {}", e.getMessage());
+      throw new UnauthorizedException("Token 已过期", e);
     } catch (MalformedJwtException e) {
-      log.error("Token 格式错误: {}", e.getMessage());
-      throw new RuntimeException("Token 格式错误", e);
+      log.debug("Token 格式错误: {}", e.getMessage());
+      throw new UnauthorizedException("Token 格式错误", e);
     } catch (UnsupportedJwtException e) {
-      log.error("不支持的 Token 类型: {}", e.getMessage());
-      throw new RuntimeException("不支持的 Token 类型", e);
+      log.debug("不支持的 Token 类型: {}", e.getMessage());
+      throw new UnauthorizedException("不支持的 Token 类型", e);
     } catch (IllegalArgumentException e) {
-      log.error("Token 参数非法: {}", e.getMessage());
-      throw new RuntimeException("Token 参数非法", e);
+      log.debug("Token 参数非法: {}", e.getMessage());
+      throw new UnauthorizedException("Token 参数非法", e);
     } catch (Exception e) {
-      log.error("解析 Token 失败: {}", e.getMessage(), e);
-      throw new RuntimeException("无效的 Token", e);
+      log.debug("无效的 Token: {}", e.getMessage());
+      throw new UnauthorizedException("无效的 Token", e);
     }
   }
 }

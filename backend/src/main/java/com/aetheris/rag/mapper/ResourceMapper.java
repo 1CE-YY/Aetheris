@@ -128,4 +128,11 @@ public interface ResourceMapper {
    * @return 删除的行数
    */
   int deleteChunksByResourceIds(@Param("resourceIds") List<Long> resourceIds);
+
+  /**
+   * 重置所有资源的向量化状态。
+   *
+   * @return 影响行数
+   */
+  int resetAllVectorizedStatus();
 }

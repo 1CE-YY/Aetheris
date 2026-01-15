@@ -124,6 +124,13 @@ export class ResourceService {
   static async batchDeleteResources(ids: number[]): Promise<void> {
     await api.delete('/resources/batch', { data: { ids } })
   }
+
+  /**
+   * 手动向量化资源
+   */
+  static async vectorizeResource(id: number): Promise<void> {
+    await api.post(`/resources/${id}/vectorize`)
+  }
 }
 
 export default ResourceService
