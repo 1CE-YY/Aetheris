@@ -5,7 +5,7 @@ package com.aetheris.rag.service.impl;
 
 import com.aetheris.rag.entity.Chunk;
 import com.aetheris.rag.service.DocumentService;
-import com.aetheris.rag.util.FileValidationUtil;
+import com.aetheris.rag.util.FileUtil;
 import com.aetheris.rag.util.HashUtil;
 import com.aetheris.rag.util.MarkdownProcessor;
 import com.aetheris.rag.util.PdfProcessor;
@@ -66,9 +66,9 @@ public class DocumentServiceImpl implements DocumentService {
   }
 
   @Override
-  public FileValidationUtil.ValidationResult validateFileFormat(byte[] fileBytes,
+  public FileUtil.ValidationResult validateFileFormat(byte[] fileBytes,
       String fileName) {
-    return FileValidationUtil.validateFileFormat(fileBytes, fileName);
+    return FileUtil.validateFileFormat(fileBytes, fileName);
   }
 
   @Override

@@ -4,7 +4,7 @@
 package com.aetheris.rag.service;
 
 import com.aetheris.rag.entity.Chunk;
-import com.aetheris.rag.util.FileValidationUtil;
+import com.aetheris.rag.util.FileUtil;
 import java.util.List;
 
 /**
@@ -39,7 +39,7 @@ public interface DocumentService {
    * @param fileName 文件名
    * @return 验证结果
    */
-  FileValidationUtil.ValidationResult validateFileFormat(byte[] fileBytes, String fileName);
+  FileUtil.ValidationResult validateFileFormat(byte[] fileBytes, String fileName);
 
   /**
    * 计算文件内容哈希。

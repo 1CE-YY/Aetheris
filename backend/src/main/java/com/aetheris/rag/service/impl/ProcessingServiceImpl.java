@@ -15,8 +15,7 @@ import com.aetheris.rag.service.DocumentService;
 import com.aetheris.rag.service.ProcessingService;
 import com.aetheris.rag.service.ResourceService;
 import com.aetheris.rag.service.VectorService;
-import com.aetheris.rag.util.FileOperationUtil;
-import com.aetheris.rag.util.FileValidationUtil;
+import com.aetheris.rag.util.FileUtil;
 import com.aetheris.rag.util.PermissionCheckUtil;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -76,10 +75,10 @@ public class ProcessingServiceImpl implements ProcessingService {
     log.info("开始处理资源上传: title={}, file={}", title, file.getOriginalFilename());
 
     // 1. 文件验证
-    FileOperationUtil.validateFile(file);
+    FileUtil.validateFile(file);
 
     byte[] fileBytes = file.getBytes();
-    FileValidationUtil.ValidationResult validationResult =
+    FileUtil.ValidationResult validationResult =
         documentService.validateFileFormat(fileBytes, file.getOriginalFilename());
     if (!validationResult.isValid()) {
       throw new BadRequestException(validationResult.getErrorMessage());
@@ -117,7 +116,7 @@ public class ProcessingServiceImpl implements ProcessingService {
       }
 
       // 5. 保存文件
-      filePath = FileOperationUtil.saveUploadedFile(file, uploadDir);
+      filePath = FileUtil.saveUploadedFile(file, uploadDir);
 
       // 6. 创建资源记录
       Resource resource = createResourceRecord(file, title, tags, description, contentHash,
@@ -186,7 +185,7 @@ public class ProcessingServiceImpl implements ProcessingService {
     vectorService.deleteVectorDataByResourceIds(List.of(resource.getId()));
 
     // 4. 删除物理文件
-    FileOperationUtil.deletePhysicalFile(resource.getFilePath());
+    FileUtil.deletePhysicalFile(resource.getFilePath());
 
     // 5. 删除切片和资源记录
     resourceMapper.deleteChunksByResourceId(id);
@@ -218,7 +217,7 @@ public class ProcessingServiceImpl implements ProcessingService {
 
     // 4. 批量删除物理文件
     for (Resource resource : authorizedResources) {
-      FileOperationUtil.deletePhysicalFile(resource.getFilePath());
+      FileUtil.deletePhysicalFile(resource.getFilePath());
     }
 
     // 5. 批量删除切片和资源记录
@@ -315,7 +314,7 @@ public class ProcessingServiceImpl implements ProcessingService {
       String description, String contentHash, Long uploadedBy, Path filePath)
       throws IOException {
     String savedFileName = filePath.getFileName().toString();
-    String fileType = FileOperationUtil.getFileType(savedFileName);
+    String fileType = FileUtil.getFileType(savedFileName);
     long fileSize = Files.size(filePath);
 
     return Resource.builder()

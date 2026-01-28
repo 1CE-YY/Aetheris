@@ -17,7 +17,6 @@ import com.aetheris.rag.service.VectorService;
 import com.aetheris.rag.service.ProcessingService;
 import com.aetheris.rag.service.DocumentService;
 import com.aetheris.rag.util.VectorUtils;
-import com.aetheris.rag.util.VectorizationStatusUtil;
 import com.aetheris.rag.util.VectorDataDeletionUtil;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
@@ -210,8 +209,8 @@ public class VectorServiceImpl implements VectorService {
       }
 
       // 有切片数据且都已向量化，确认状态
-      VectorizationStatusUtil.updateResourceVectorizationStatus(resourceMapper, resourceId, allChunks);
-      boolean allVectorized = VectorizationStatusUtil.calculateVectorizationStatus(allChunks);
+      updateResourceVectorizationStatus(resourceMapper, resourceId, allChunks);
+      boolean allVectorized = calculateVectorizationStatus(allChunks);
       if (allVectorized) {
         log.info("资源所有切片已向量化，状态已确认: resourceId={}, chunkCount={}", resourceId, allChunks.size());
       }
@@ -226,7 +225,7 @@ public class VectorServiceImpl implements VectorService {
 
     // 关键修复：只有存在切片数据时才更新状态
     if (!allChunks.isEmpty()) {
-      boolean allVectorized = VectorizationStatusUtil.calculateVectorizationStatus(allChunks);
+      boolean allVectorized = calculateVectorizationStatus(allChunks);
       resourceService.updateChunkVectorizationStatus(resourceId, allChunks.size(), allVectorized);
 
       if (allVectorized) {
@@ -475,7 +474,7 @@ public class VectorServiceImpl implements VectorService {
       long vectorizedCount = allChunks.stream().filter(Chunk::getVectorized).count();
 
       // ✅ 关键逻辑：只有存在切片时才标记为已向量化
-      boolean allVectorized = VectorizationStatusUtil.calculateVectorizationStatus(allChunks);
+      boolean allVectorized = calculateVectorizationStatus(allChunks);
 
       // 3. 检查是否需要修复
       boolean needsRepair = false;
@@ -771,10 +770,10 @@ public class VectorServiceImpl implements VectorService {
 
       // 重新查询该资源的所有切片
       List<Chunk> allChunks = chunkMapper.findByResourceId(resourceId);
-      boolean allVectorized = VectorizationStatusUtil.calculateVectorizationStatus(allChunks);
+      boolean allVectorized = calculateVectorizationStatus(allChunks);
 
       if (allVectorized) {
-        VectorizationStatusUtil.updateResourceVectorizationStatus(resourceMapper, resourceId, allChunks);
+        updateResourceVectorizationStatus(resourceMapper, resourceId, allChunks);
         log.debug("资源向量化完成: resourceId={}, chunkCount={}", resourceId, allChunks.size());
       }
     }
@@ -1101,5 +1100,37 @@ public class VectorServiceImpl implements VectorService {
     List<Long> getFailedIds() {
       return failedIds;
     }
+  }
+
+  // ==================== 向量化状态管理私有方法 ====================
+
+  /**
+   * 计算资源的向量化状态。
+   *
+   * @param allChunks 所有切片列表
+   * @return 是否所有切片都已向量化
+   */
+  private boolean calculateVectorizationStatus(List<Chunk> allChunks) {
+    return !allChunks.isEmpty() && allChunks.stream().allMatch(Chunk::getVectorized);
+  }
+
+  /**
+   * 更新资源的向量化状态。
+   *
+   * @param resourceMapper 资源Mapper
+   * @param resourceId 资源ID
+   * @param allChunks 所有切片列表
+   */
+  private void updateResourceVectorizationStatus(
+      ResourceMapper resourceMapper,
+      Long resourceId,
+      List<Chunk> allChunks) {
+
+    if (allChunks.isEmpty()) {
+      return;
+    }
+
+    boolean allVectorized = calculateVectorizationStatus(allChunks);
+    resourceMapper.updateChunkStatus(resourceId, allChunks.size(), allVectorized);
   }
 }
