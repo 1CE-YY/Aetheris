@@ -180,7 +180,7 @@ CREATE TABLE eval_runs (
     "overlap": 200,
     "topK": 5,
     "embeddingModel": "embedding-3",
-    "chatModel": "glm-4.5-flash"
+    "chatModel": "glm-4-flash"
   },
   "metrics": {
     "precision@5": 0.65,

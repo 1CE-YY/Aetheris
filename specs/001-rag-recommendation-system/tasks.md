@@ -72,7 +72,7 @@
   - **原因**: langchain4j-zhipu-ai 包依赖问题，需要在 Phase 5 (RAG Q&A) 时完整实现
   - **目标**：封装 LLM 调用，实现 Prompt 构建、超时/重试/限流、降级处理、日志脱敏
   - **涉及表**：无（调用外部 API）
-  - **配置项**：`chat.modelName`（glm-4.5-flash）、`chat.temperature`（0.7）、`chat.topP`（0.9）、`chat.maxTokens`（2000）、`chat.timeout`（60s）
+  - **配置项**：`chat.modelName`（glm-4-flash）、`chat.temperature`（0.7）、`chat.topP`（0.9）、`chat.maxTokens`（2000）、`chat.timeout`（60s）
   - **测试要点**：单测验证降级策略（LLM 不可用时返回检索结果+引用摘要）
   - **验收标准**：FR-015（证据不足时的降级返回）
   - **Phase 5 任务**: 完整实现 Zhipu AI Chat API 调用、Prompt 构建、降级策略
@@ -585,7 +585,7 @@
         "overlap": 200,
         "topK": 5,
         "embeddingModel": "embedding-3",
-        "chatModel": "glm-4.5-flash"
+        "chatModel": "glm-4-flash"
       },
       "useProfile": false,
       "metrics": {

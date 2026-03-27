@@ -24,7 +24,7 @@
       <secret-storage>master_key</secret-storage>
       <schema-mapping>
         <introspection-scope>
-          <node kind="schema" qname="@" />
+          <node kind="schema" qname="0" />
         </introspection-scope>
       </schema-mapping>
     </data-source>

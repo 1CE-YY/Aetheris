@@ -17,25 +17,25 @@ import lombok.Getter;
 @Getter
 public class BaseException extends RuntimeException {
 
-    /**
-     * 错误码
-     */
-    private final String code;
+  /**
+   * 错误码
+   */
+  private final String code;
 
-    /**
-     * HTTP 状态码
-     */
-    private final int httpStatus;
+  /**
+   * HTTP 状态码
+   */
+  private final int httpStatus;
 
-    public BaseException(String code, String message, int httpStatus) {
-        super(message);
-        this.code = code;
-        this.httpStatus = httpStatus;
-    }
+  public BaseException(String code, String message, int httpStatus) {
+    super(message);
+    this.code = code;
+    this.httpStatus = httpStatus;
+  }
 
-    public BaseException(String code, String message, int httpStatus, Throwable cause) {
-        super(message, cause);
-        this.code = code;
-        this.httpStatus = httpStatus;
-    }
+  public BaseException(String code, String message, int httpStatus, Throwable cause) {
+    super(message, cause);
+    this.code = code;
+    this.httpStatus = httpStatus;
+  }
 }

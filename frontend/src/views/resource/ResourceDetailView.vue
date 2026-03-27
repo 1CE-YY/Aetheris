@@ -72,6 +72,9 @@
             <template v-else-if="column.key === 'locationInfo'">
               <a-tag color="blue">{{ record.locationInfo }}</a-tag>
             </template>
+            <template v-else-if="column.key === 'createdAt'">
+              {{ formatTime(record.createdAt) }}
+            </template>
           </template>
         </a-table>
       </a-card>

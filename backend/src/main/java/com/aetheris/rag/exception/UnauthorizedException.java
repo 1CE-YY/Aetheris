@@ -14,11 +14,11 @@ package com.aetheris.rag.exception;
  */
 public class UnauthorizedException extends BaseException {
 
-    public UnauthorizedException(String message) {
-        super("UNAUTHORIZED", message, 401);
-    }
+  public UnauthorizedException(String message) {
+    super("UNAUTHORIZED", message, 401);
+  }
 
-    public UnauthorizedException(String message, Throwable cause) {
-        super("UNAUTHORIZED", message, 401, cause);
-    }
+  public UnauthorizedException(String message, Throwable cause) {
+    super("UNAUTHORIZED", message, 401, cause);
+  }
 }

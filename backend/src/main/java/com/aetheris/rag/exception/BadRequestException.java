@@ -14,11 +14,11 @@ package com.aetheris.rag.exception;
  */
 public class BadRequestException extends BaseException {
 
-    public BadRequestException(String message) {
-        super("BAD_REQUEST", message, 400);
-    }
+  public BadRequestException(String message) {
+    super("BAD_REQUEST", message, 400);
+  }
 
-    public BadRequestException(String message, Throwable cause) {
-        super("BAD_REQUEST", message, 400, cause);
-    }
+  public BadRequestException(String message, Throwable cause) {
+    super("BAD_REQUEST", message, 400, cause);
+  }
 }

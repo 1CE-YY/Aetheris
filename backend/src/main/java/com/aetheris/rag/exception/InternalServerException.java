@@ -14,11 +14,11 @@ package com.aetheris.rag.exception;
  */
 public class InternalServerException extends BaseException {
 
-    public InternalServerException(String message) {
-        super("INTERNAL_ERROR", message, 500);
-    }
+  public InternalServerException(String message) {
+    super("INTERNAL_ERROR", message, 500);
+  }
 
-    public InternalServerException(String message, Throwable cause) {
-        super("INTERNAL_ERROR", message, 500, cause);
-    }
+  public InternalServerException(String message, Throwable cause) {
+    super("INTERNAL_ERROR", message, 500, cause);
+  }
 }

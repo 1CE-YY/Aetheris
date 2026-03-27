@@ -19,11 +19,11 @@ package com.aetheris.rag.exception;
  */
 public class ConflictException extends BaseException {
 
-    public ConflictException(String message) {
-        super("CONFLICT", message, 409);
-    }
+  public ConflictException(String message) {
+    super("CONFLICT", message, 409);
+  }
 
-    public ConflictException(String message, Throwable cause) {
-        super("CONFLICT", message, 409, cause);
-    }
+  public ConflictException(String message, Throwable cause) {
+    super("CONFLICT", message, 409, cause);
+  }
 }

@@ -14,11 +14,11 @@ package com.aetheris.rag.exception;
  */
 public class ForbiddenException extends BaseException {
 
-    public ForbiddenException(String message) {
-        super("FORBIDDEN", message, 403);
-    }
+  public ForbiddenException(String message) {
+    super("FORBIDDEN", message, 403);
+  }
 
-    public ForbiddenException(String message, Throwable cause) {
-        super("FORBIDDEN", message, 403, cause);
-    }
+  public ForbiddenException(String message, Throwable cause) {
+    super("FORBIDDEN", message, 403, cause);
+  }
 }

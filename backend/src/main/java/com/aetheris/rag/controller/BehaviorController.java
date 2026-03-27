@@ -13,6 +13,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -48,21 +49,19 @@ public class BehaviorController {
    *
    * <p>用于个人中心展示用户最近的行为历史，包括查询、点击、收藏等行为。
    *
-   * @param userId 用户ID
    * @param limit 返回数量限制（可选，默认 10 条）
+   * @param authentication Spring Security 认证对象（用于获取当前用户 ID）
    * @return 最近的行为列表，按行为时间倒序排列
    */
   @GetMapping("/recent")
   public ResponseEntity<ApiResponse<List<BehaviorResponse>>> getRecentBehaviors(
-      @RequestParam Long userId,
-      @RequestParam(defaultValue = "10") int limit) {
+      @RequestParam(defaultValue = "10") int limit,
+      Authentication authentication) {
+
+    // 从认证对象中获取用户 ID
+    Long userId = (Long) authentication.getPrincipal();
 
     log.info("查询用户最近行为: userId={}, limit={}", userId, limit);
-
-    if (userId == null || userId <= 0) {
-      log.warn("无效的用户ID: {}", userId);
-      throw new BadRequestException("用户ID不能为空或小于等于0");
-    }
 
     if (limit <= 0 || limit > 100) {
       log.warn("无效的 limit 值: {}", limit);
@@ -83,17 +82,15 @@ public class BehaviorController {
   /**
    * 统计用户查询行为数量。
    *
-   * @param userId 用户ID
+   * @param authentication Spring Security 认证对象（用于获取当前用户 ID）
    * @return 查询行为数量
    */
   @GetMapping("/count/query")
-  public ResponseEntity<ApiResponse<BehaviorCountResponse>> countQueries(@RequestParam Long userId) {
-    log.info("统计用户查询行为数量: userId={}", userId);
+  public ResponseEntity<ApiResponse<BehaviorCountResponse>> countQueries(Authentication authentication) {
+    // 从认证对象中获取用户 ID
+    Long userId = (Long) authentication.getPrincipal();
 
-    if (userId == null || userId <= 0) {
-      log.warn("无效的用户ID: {}", userId);
-      throw new BadRequestException("用户ID不能为空或小于等于0");
-    }
+    log.info("统计用户查询行为数量: userId={}", userId);
 
     int count = behaviorService.countByType(userId, UserBehavior.BehaviorType.QUERY);
     log.info("用户查询行为统计: userId={}, count={}", userId, count);
@@ -107,17 +104,15 @@ public class BehaviorController {
   /**
    * 统计用户点击行为数量。
    *
-   * @param userId 用户ID
+   * @param authentication Spring Security 认证对象（用于获取当前用户 ID）
    * @return 点击行为数量
    */
   @GetMapping("/count/click")
-  public ResponseEntity<ApiResponse<BehaviorCountResponse>> countClicks(@RequestParam Long userId) {
-    log.info("统计用户点击行为数量: userId={}", userId);
+  public ResponseEntity<ApiResponse<BehaviorCountResponse>> countClicks(Authentication authentication) {
+    // 从认证对象中获取用户 ID
+    Long userId = (Long) authentication.getPrincipal();
 
-    if (userId == null || userId <= 0) {
-      log.warn("无效的用户ID: {}", userId);
-      throw new BadRequestException("用户ID不能为空或小于等于0");
-    }
+    log.info("统计用户点击行为数量: userId={}", userId);
 
     int count = behaviorService.countByType(userId, UserBehavior.BehaviorType.CLICK);
     log.info("用户点击行为统计: userId={}, count={}", userId, count);
@@ -131,17 +126,15 @@ public class BehaviorController {
   /**
    * 统计用户收藏行为数量。
    *
-   * @param userId 用户ID
+   * @param authentication Spring Security 认证对象（用于获取当前用户 ID）
    * @return 收藏行为数量
    */
   @GetMapping("/count/favorite")
-  public ResponseEntity<ApiResponse<BehaviorCountResponse>> countFavorites(@RequestParam Long userId) {
-    log.info("统计用户收藏行为数量: userId={}", userId);
+  public ResponseEntity<ApiResponse<BehaviorCountResponse>> countFavorites(Authentication authentication) {
+    // 从认证对象中获取用户 ID
+    Long userId = (Long) authentication.getPrincipal();
 
-    if (userId == null || userId <= 0) {
-      log.warn("无效的用户ID: {}", userId);
-      throw new BadRequestException("用户ID不能为空或小于等于0");
-    }
+    log.info("统计用户收藏行为数量: userId={}", userId);
 
     int count = behaviorService.countByType(userId, UserBehavior.BehaviorType.FAVORITE);
     log.info("用户收藏行为统计: userId={}, count={}", userId, count);

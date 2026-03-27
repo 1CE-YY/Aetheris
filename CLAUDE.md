@@ -11,7 +11,7 @@
 
 **用途**: 面向高校的 RAG 检索与推荐系统
 **架构**: Spring Boot 3.5.x + Vue 3 + Redis Stack (向量数据库)
-**AI 提供商**: 智谱 AI (GLM-4)
+**AI 提供商**: 智谱 AI (GLM)
 
 **核心功能**:
 - 学习资源入库（PDF/Markdown）

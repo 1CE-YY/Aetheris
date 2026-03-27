@@ -14,11 +14,11 @@ package com.aetheris.rag.exception;
  */
 public class NotFoundException extends BaseException {
 
-    public NotFoundException(String message) {
-        super("NOT_FOUND", message, 404);
-    }
+  public NotFoundException(String message) {
+    super("NOT_FOUND", message, 404);
+  }
 
-    public NotFoundException(String message, Throwable cause) {
-        super("NOT_FOUND", message, 404, cause);
-    }
+  public NotFoundException(String message, Throwable cause) {
+    super("NOT_FOUND", message, 404, cause);
+  }
 }

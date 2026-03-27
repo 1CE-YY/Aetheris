@@ -113,7 +113,7 @@ model-gateway:
 
   # Chat model configuration
   chat:
-    model-name: ${CHAT_MODEL:glm-4.5-flash}
+    model-name: ${CHAT_MODEL:glm-4-flash}
     base-url: ${CHAT_BASE_URL:https://open.bigmodel.cn/api/paas/v4/}
     api-key: ${ZHIPU_API_KEY:}
     temperature: ${CHAT_TEMPERATURE:0.7}
@@ -136,7 +136,7 @@ rag:
   # Retrieval configuration
   retrieval:
     top-k: ${RETRIEVAL_TOP_K:5}
-    score-threshold: ${RETRIEVAL_SCORE_THRESHOLD:0.35}
+    score-threshold: ${RETRIEVAL_SCORE_THRESHOLD:0.4}
 
   # Vector index configuration
   vector:

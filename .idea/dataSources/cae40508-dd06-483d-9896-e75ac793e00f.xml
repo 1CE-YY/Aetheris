@@ -22,5 +22,35 @@
     <schema id="15" parent="1" name="7"/>
     <schema id="16" parent="1" name="8"/>
     <schema id="17" parent="1" name="9"/>
+    <redis-key id="18" parent="2" name="chunk:1">
+      <Type>hash-table</Type>
+    </redis-key>
+    <redis-key id="19" parent="2" name="chunk:2">
+      <Type>hash-table</Type>
+    </redis-key>
+    <redis-key id="20" parent="2" name="chunk:3">
+      <Type>hash-table</Type>
+    </redis-key>
+    <redis-key id="21" parent="2" name="chunk:4">
+      <Type>hash-table</Type>
+    </redis-key>
+    <redis-key id="22" parent="2" name="embedding:cache:17115de0a759a3c68d18c436ee929bdff754db7118a5998bdab5eb22ff8f0bd7">
+      <Type>string</Type>
+    </redis-key>
+    <redis-key id="23" parent="2" name="embedding:cache:2dd4bcb26ec28c945fe27bc45ce9f903881b48e8ff99b9f121933db6079e8334">
+      <Type>string</Type>
+    </redis-key>
+    <redis-key id="24" parent="2" name="embedding:cache:6673760409a16079183c7943f376624cccc7343113b8ac17f41cca28650782f8">
+      <Type>string</Type>
+    </redis-key>
+    <redis-key id="25" parent="2" name="embedding:cache:887d89ae77d8eab46ead252af20adf8771719b3188866b1a8064d90c49edc08b">
+      <Type>string</Type>
+    </redis-key>
+    <redis-key id="26" parent="2" name="embedding:cache:9908dd1457f6983144babf739ebff59bf260fc8dac371ad54afe6b04ecb27f0d">
+      <Type>string</Type>
+    </redis-key>
+    <redis-key id="27" parent="2" name="embedding:cache:eb6b86c933294ca91d8169f3fb97ca828c016bfbdd7707022a805be154806145">
+      <Type>string</Type>
+    </redis-key>
   </database-model>
 </dataSource>

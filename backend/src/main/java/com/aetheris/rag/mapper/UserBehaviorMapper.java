@@ -33,56 +33,56 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface UserBehaviorMapper {
 
-    /**
-     * 插入用户行为记录
-     *
-     * @param behavior 用户行为实体
-     * @return 影响行数（1 表示插入成功，0 表示插入失败）
-     */
-    int insert(UserBehavior behavior);
+  /**
+   * 插入用户行为记录
+   *
+   * @param behavior 用户行为实体
+   * @return 影响行数（1 表示插入成功，0 表示插入失败）
+   */
+  int insert(UserBehavior behavior);
 
-    /**
-     * 查询用户最近的查询行为（按时间倒序）
-     *
-     * <p>用于用户画像更新时获取最近 N 次查询记录
-     *
-     * @param userId 用户ID
-     * @param limit 返回数量限制
-     * @return 查询行为列表，按行为时间倒序排列
-     */
-    java.util.List<UserBehavior> findRecentQueries(@Param("userId") Long userId, @Param("limit") int limit);
+  /**
+   * 查询用户最近的查询行为（按时间倒序）
+   *
+   * <p>用于用户画像更新时获取最近 N 次查询记录
+   *
+   * @param userId 用户ID
+   * @param limit  返回数量限制
+   * @return 查询行为列表，按行为时间倒序排列
+   */
+  java.util.List<UserBehavior> findRecentQueries(@Param("userId") Long userId, @Param("limit") int limit);
 
-    /**
-     * 查询用户在指定时间之后的所有行为
-     *
-     * <p>用于分析用户在某个时间范围内的行为序列
-     *
-     * @param userId 用户ID
-     * @param startTime 起始时间
-     * @return 行为列表，按行为时间倒序排列
-     */
-    java.util.List<UserBehavior> findByUserIdAndTimeRange(@Param("userId") Long userId,
-                                                           @Param("startTime") java.time.Instant startTime);
+  /**
+   * 查询用户在指定时间之后的所有行为
+   *
+   * <p>用于分析用户在某个时间范围内的行为序列
+   *
+   * @param userId    用户ID
+   * @param startTime 起始时间
+   * @return 行为列表，按行为时间倒序排列
+   */
+  java.util.List<UserBehavior> findByUserIdAndTimeRange(@Param("userId") Long userId,
+                                                        @Param("startTime") java.time.Instant startTime);
 
-    /**
-     * 统计用户指定类型的的行为数量
-     *
-     * <p>用于统计用户的查询、点击、收藏次数
-     *
-     * @param userId 用户ID
-     * @param type 行为类型（QUERY、CLICK、FAVORITE）
-     * @return 行为数量
-     */
-    int countByType(@Param("userId") Long userId, @Param("type") UserBehavior.BehaviorType type);
+  /**
+   * 统计用户指定类型的的行为数量
+   *
+   * <p>用于统计用户的查询、点击、收藏次数
+   *
+   * @param userId 用户ID
+   * @param type   行为类型（QUERY、CLICK、FAVORITE）
+   * @return 行为数量
+   */
+  int countByType(@Param("userId") Long userId, @Param("type") UserBehavior.BehaviorType type);
 
-    /**
-     * 查询用户最近的所有行为（按时间倒序）
-     *
-     * <p>用于个人中心展示用户最近的行为历史
-     *
-     * @param userId 用户ID
-     * @param limit 返回数量限制
-     * @return 所有类型的行为列表，按行为时间倒序排列
-     */
-    java.util.List<UserBehavior> findRecentBehaviors(@Param("userId") Long userId, @Param("limit") int limit);
+  /**
+   * 查询用户最近的所有行为（按时间倒序）
+   *
+   * <p>用于个人中心展示用户最近的行为历史
+   *
+   * @param userId 用户ID
+   * @param limit  返回数量限制
+   * @return 所有类型的行为列表，按行为时间倒序排列
+   */
+  java.util.List<UserBehavior> findRecentBehaviors(@Param("userId") Long userId, @Param("limit") int limit);
 }
