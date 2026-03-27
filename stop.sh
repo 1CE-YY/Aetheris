@@ -13,8 +13,9 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
-# 项目根目录
-PROJECT_ROOT="/Users/hubin5/app/Aetheris"
+# 项目根目录（动态获取脚本所在目录）
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+PROJECT_ROOT="$SCRIPT_DIR"
 cd "$PROJECT_ROOT"
 
 # ========================================

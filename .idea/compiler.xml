@@ -21,7 +21,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
-      <module name="rag-backend" options="-parameters -parameters --enable-preview" />
+      <module name="rag-backend" options="-parameters --enable-preview" />
     </option>
   </component>
 </project>

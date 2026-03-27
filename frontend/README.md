@@ -94,15 +94,6 @@ TypeScript 配置，包含：
 
 ### .env.development
 
-开发环境变量：
-
-```bash
-VITE_API_BASE_URL=http://localhost:8080
-VITE_API_TIMEOUT=30000
-VITE_APP_TITLE=Aetheris RAG System
-VITE_APP_VERSION=1.0.0
-```
-
 ---
 
 ## 🎨 组件库
@@ -442,23 +433,3 @@ kill -9 <PID>
 **A**: 运行 `pnpm type-check` 查看详细错误信息
 
 ---
-
-## 📚 相关文档
-
-- [Vue 3 文档](https://vuejs.org/)
-- [Vite 文档](https://vitejs.dev/)
-- [Ant Design Vue 文档](https://antdv.com/)
-- [Pinia 文档](https://pinia.vuejs.org/)
-- [Vue Router 文档](https://router.vuejs.org/)
-
----
-
-## 📮 联系方式
-
-- 问题反馈：提交 GitHub Issue
-- 技术支持：1307792296@qq.com
-
----
-
-**最后更新**: 2025-12-29
-**版本**: v1.0.0

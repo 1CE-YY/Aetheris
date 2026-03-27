@@ -167,6 +167,9 @@ start_backend() {
 
     # 加载 .env 文件中的环境变量
     echo -e "${BLUE}加载环境变量...${NC}"
+
+    # 构建环境变量字符串，用于传递给 mvn
+    ENV_VARS=""
     if [ -f "$PROJECT_ROOT/.env" ]; then
         while IFS= read -r line || [[ -n "$line" ]]; do
             # 跳过注释和空行
@@ -189,7 +192,11 @@ start_backend() {
                     value="${value:1:${#value}-2}"
                 fi
 
+                # 导出变量（用于当前 shell）
                 export "$key=$value"
+
+                # 构建 env 参数（用于传递给子进程）
+                ENV_VARS="$ENV_VARS $key='$value'"
             fi
         done < "$PROJECT_ROOT/.env"
         echo -e "${GREEN}✅ 环境变量已加载${NC}"
@@ -202,7 +209,8 @@ start_backend() {
 
     # 启动后端（后台运行）
     echo -e "${BLUE}启动 Spring Boot 应用...${NC}"
-    nohup mvn spring-boot:run > "$PROJECT_ROOT/logs/backend.log" 2>&1 &
+    # 使用 env 显式传递环境变量，确保 mvn 进程能获取到所有变量
+    eval "env $ENV_VARS nohup mvn spring-boot:run > '$PROJECT_ROOT/logs/backend.log' 2>&1 &"
     BACKEND_PID=$!
     STARTED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
@@ -407,7 +415,7 @@ handle_interactive_mode() {
             echo -e "${YELLOW}📝 查看日志:${NC}"
             echo -e "  - 后端: tail -f $PROJECT_ROOT/logs/backend.log"
             echo -e "  - 前端: tail -f $PROJECT_ROOT/logs/frontend.log"
-            echo -e "  - Docker: docker-compose logs -f"
+            echo -e "  - Docker: docker compose logs -f"
             echo ""
             echo -e "${YELLOW}🛑 停止服务:${NC}"
             echo -e "  - 停止所有: ./stop.sh"

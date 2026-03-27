@@ -1,4 +1,4 @@
-# Aetheris RAG 系统 - AI 上下文记忆
+# Aetheris RAG 系统
 
 **项目**: Aetheris RAG 系统
 **版本**: Phase 1-4 已完成，Phase 5 进行中
@@ -10,7 +10,7 @@
 ## 项目概述
 
 **用途**: 面向高校的 RAG 检索与推荐系统
-**架构**: Spring Boot 3.5 + Vue 3 + Redis Stack (向量数据库)
+**架构**: Spring Boot 3.5.x + Vue 3 + Redis Stack (向量数据库)
 **AI 提供商**: 智谱 AI (GLM-4)
 
 **核心功能**:
@@ -29,10 +29,6 @@
 - ✅ Phase 4: 资源入库 + 向量化
 - 🚧 Phase 5: RAG 问答系统（进行中）
 
-### 默认账户
-- 用户名：`123`
-- 邮箱：`123@123.com`
-- 密码：`1234qwer`
 
 一些接口测试时显示没有权限403，需要先登陆获取token再测试
 ---
@@ -135,13 +131,13 @@ spring:
 ## 技术栈
 
 ### 后端
-- **Java**: 21（虚拟线程）
+- **Java**: 21
 - **框架**: Spring Boot 3.5.9
-- **数据库**: MyBatis 3.5（SQL 在 XML）
-- **RAG**: LangChain4j 0.35
-- **向量数据库**: Redis Stack（6 个模块已加载）
+- **数据库**: MyBatis
+- **RAG**: LangChain4j
+- **向量数据库**: Redis Stack
 - **关系数据库**: MySQL 8
-- **安全**: JWT (jjwt 0.12.3) + BCrypt
+- **安全**: JWT + BCrypt
 - **类库**: Lombok、Guava、Commons Lang3
 
 ### 前端
@@ -153,8 +149,8 @@ spring:
 
 ### 基础设施
 - **容器**: Docker Compose
-- **MySQL**: 端口 3306，用户：`aetheris`，密码：`aetheris123`，数据库：`aetheris_rag`
-- **Redis**: 端口 6379，密码：`aetheris123`
+- **MySQL**: 端口 3306，用户：`aetheris`，密码：`040316`，数据库：`aetheris_rag`
+- **Redis**: 端口 6379，密码：`040316`
 
 ---
 
@@ -163,7 +159,6 @@ spring:
 ### 配置文件
 - `backend/src/main/resources/application.yml` - Spring Boot 主配置
 - `docker-compose.yml` - Docker 编排配置
-- `.env.example` - 环境变量模板
 - `.env` - 环境变量文件
 - `.pids.json` - 进程管理文件（由脚本自动管理）
 
@@ -171,7 +166,7 @@ spring:
 - `backend/src/main/java/com/aetheris/rag/controller/` - REST API
 - `backend/src/main/java/com/aetheris/rag/service/` - 业务接口
 - `backend/src/main/java/com/aetheris/rag/gateway/` - ModelGateway 框架
-- `backend/src/main/java/com/aetheris/rag/entity/` - 实体类（原 model 包）
+- `backend/src/main/java/com/aetheris/rag/entity/` - 实体类
 - `backend/src/main/resources/mapper/` - MyBatis XML
 
 ### 文档
@@ -182,31 +177,6 @@ spring:
 
 ---
 
-## 常用命令
-
-### 后端开发
-```bash
-cd backend
-# ⚠️ 注意：脚本已自动配置 Java 21 环境变量，无需手动 export
-mvn clean compile            # 编译
-mvn test                     # 运行测试
-mvn clean package            # 构建 JAR
-```
-
-### 数据库操作
-```bash
-# MySQL 连接
-docker exec -it aetheris-mysql mysql -u aetheris -paetheris123
-
-# Redis 连接
-docker exec -it aetheris-redis redis-cli -a aetheris123
-
-# 查看数据库表
-docker exec -i aetheris-mysql mysql -u aetheris -paetheris123 aetheris_rag -e "SHOW TABLES;"
-```
-
----
-
 ## 服务端点
 
 - **前端**: http://localhost:5173
@@ -214,33 +184,3 @@ docker exec -i aetheris-mysql mysql -u aetheris -paetheris123 aetheris_rag -e "S
 - **健康检查**: http://localhost:8080/actuator/health
 
 ---
-
-## 故障排除
-
-### 问题：Java 版本不匹配
-**解决方案**：`start.sh` 脚本已自动处理 Java 21 环境配置，无需手动设置。如果仍有问题：
-```bash
-# 检查脚本是否正确设置
-java -version  # 应显示 openjdk version "21.x.x"
-
-# 如果仍显示错误版本，检查 Java 21 安装路径
-ls -la /Users/hubin5/Library/Java/JavaVirtualMachines/
-```
-
-### 问题：端口被占用
-```bash
-lsof -i :8080  # 或 :5173
-kill -9 <PID>
-```
-
-### 问题：Flyway 迁移失败
-```bash
-docker exec -i aetheris-mysql mysql -u aetheris -paetheris123 aetheris_rag -e "
-DROP TABLE IF EXISTS flyway_schema_history;
-"
-```
-
----
-
-**记忆版本**: v3.2.0
-**更新内容**：优化 start.sh 和 stop.sh 脚本，支持选择性启动/停止，自动环境配置
