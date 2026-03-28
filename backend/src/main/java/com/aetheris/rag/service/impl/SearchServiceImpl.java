@@ -20,19 +20,18 @@ import io.lettuce.core.codec.ByteArrayCodec;
 import io.lettuce.core.output.ArrayOutput;
 import io.lettuce.core.protocol.CommandArgs;
 import io.lettuce.core.protocol.ProtocolKeyword;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisCallback;
-import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisCallback;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
 
 /**
  * 语义检索服务实现类。
@@ -102,15 +101,81 @@ public class SearchServiceImpl implements SearchService {
     log.debug("查询向量化完成，维度：{}", queryVector.length);
     timer.endStage();
 
-    // 2. 将向量转换为二进制格式（FLOAT32）
-    timer.recordStage("vector_conversion");
-    byte[] queryVectorBytes = VectorUtils.toBytes(queryVector);
-    log.debug("查询向量已转换为二进制格式，大小：{} 字节", queryVectorBytes.length);
+    // 2. 使用共享的向量搜索方法
+    timer.recordStage("vector_search");
+    List<Citation> citations = executeVectorSearch(queryVector, topK);
     timer.endStage();
 
-    // 3. 执行向量搜索
+    // 3. 记录性能统计
+    long totalTime = timer.getElapsedMs();
+    Long embeddingTime = timer.getStageDuration("embedding");
+    Long vectorSearchTime = timer.getStageDuration("vector_search");
+
+    log.info("向量搜索完成，找到 {} 个结果，总耗时 {}ms（向量化 {}ms，搜索 {}ms）",
+        citations.size(), totalTime, embeddingTime, vectorSearchTime);
+
+    return citations;
+  }
+
+  @Override
+  public List<Citation> searchByVector(float[] vector, int topK) {
+    log.info("执行向量检索（预计算向量）：维度={}, topK={}", vector.length, topK);
+
+    PerformanceTimer timer = new PerformanceTimer();
     timer.recordStage("vector_search");
-    List<Citation> citations = redisTemplate.execute((RedisCallback<List<Citation>>) connection -> {
+
+    List<Citation> citations = executeVectorSearch(vector, topK);
+
+    timer.endStage();
+    log.info("向量检索完成，找到 {} 个结果，耗时 {}ms", citations.size(), timer.getElapsedMs());
+
+    return citations;
+  }
+
+  @Override
+  public List<Citation> searchByVectorAggregated(float[] vector, int topK) {
+    log.info("执行聚合向量检索（预计算向量）：维度={}, topK={}", vector.length, topK);
+
+    // 1. 检索更多结果用于聚合
+    List<Citation> allCitations = searchByVector(vector, topK * 2);
+    log.debug("检索到 {} 个切片，开始按资源聚合", allCitations.size());
+
+    // 2. 按资源 ID 聚合，保留每个资源相似度最高的切片
+    Map<String, Citation> bestCitations =
+        allCitations.stream()
+            .collect(
+                Collectors.toMap(
+                    Citation::getResourceId,
+                    citation -> citation,
+                    (existing, incoming) ->
+                        incoming.getScore() > existing.getScore() ? incoming : existing));
+
+    // 3. 按相似度排序并取 Top-K
+    List<Citation> aggregatedCitations =
+        bestCitations.values().stream()
+            .sorted(Comparator.comparingDouble(Citation::getScore).reversed())
+            .limit(topK)
+            .toList();
+
+    log.info("聚合后的结果数量：{}", aggregatedCitations.size());
+    return aggregatedCitations;
+  }
+
+  /**
+   * 执行 Redis 向量搜索的共享方法。
+   *
+   * <p>被 {@link #search} 和 {@link #searchByVector} 共享，
+   * 封装了 Redis FT.SEARCH + KNN 向量检索 + 结果解析的完整流程。
+   *
+   * @param queryVector 查询向量
+   * @param topK 返回结果数量
+   * @return Citation 列表
+   */
+  private List<Citation> executeVectorSearch(float[] queryVector, int topK) {
+    byte[] queryVectorBytes = VectorUtils.toBytes(queryVector);
+    log.debug("查询向量已转换为二进制格式，大小：{} 字节", queryVectorBytes.length);
+
+    return redisTemplate.execute((RedisCallback<List<Citation>>) connection -> {
       try {
         // 获取 Lettuce 原生连接 - 使用反射处理代理
         Object nativeConnection = connection.getNativeConnection();
@@ -140,7 +205,7 @@ public class SearchServiceImpl implements SearchService {
             .add("DIALECT".getBytes())
             .add("2".getBytes());
 
-        // 使用 dispatch 执行自定义命令，用 ArrayOutput 替代 NestedMultiOutput
+        // 使用 dispatch 执行自定义命令
         RedisFuture<List<Object>> future = async.dispatch(
             CustomCommand.FT_SEARCH,
             new ArrayOutput<>(ByteArrayCodec.INSTANCE),
@@ -159,17 +224,6 @@ public class SearchServiceImpl implements SearchService {
         throw new InternalServerException("向量搜索失败: " + e.getMessage(), e);
       }
     });
-    timer.endStage();
-
-    // 4. 记录性能统计
-    long totalTime = timer.getElapsedMs();
-    Long embeddingTime = timer.getStageDuration("embedding");
-    Long vectorSearchTime = timer.getStageDuration("vector_search");
-
-    log.info("向量搜索完成，找到 {} 个结果，总耗时 {}ms（向量化 {}ms，搜索 {}ms）",
-        citations.size(), totalTime, embeddingTime, vectorSearchTime);
-
-    return citations;
   }
 
   /**

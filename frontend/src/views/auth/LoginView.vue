@@ -118,7 +118,7 @@ async function handleLogin() {
     console.log('[Login] userStore.login 返回:', response)
     console.log('[Login] token:', userStore.token)
     console.log('[Login] userInfo:', userStore.userInfo)
-    console.log('[Login] tokenValidated:', userStore.tokenValidated)
+    console.log('[Login] validatingToken:', userStore.validatingToken)
     console.log('[Login] isLoggedIn:', userStore.isLoggedIn)
 
     // 跳转到首页或之前的页面

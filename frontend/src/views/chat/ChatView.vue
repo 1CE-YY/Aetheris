@@ -20,6 +20,12 @@
 
     <!-- 主内容区 -->
     <a-layout-content class="content">
+      <a-page-header
+        title="智能问答"
+        @back="() => router.push('/')"
+        class="page-header"
+      />
+
       <!-- 问答输入区域 -->
       <a-card class="input-card" title="提问">
         <a-form
@@ -315,6 +321,14 @@ onBeforeRouteLeave((to, from, next) => {
   padding: 24px;
   max-width: 1200px;
   margin: 0 auto;
+  background: #f0f2f5;
+}
+
+.page-header {
+  background: #fff;
+  padding: 16px 24px;
+  margin-bottom: 16px;
+  border-radius: 4px;
 }
 
 .input-card {

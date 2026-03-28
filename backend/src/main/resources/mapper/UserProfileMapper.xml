@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aetheris.rag.mapper.UserProfileMapper">
+
+  <!-- ResultMap 定义 -->
+  <resultMap id="UserProfileResultMap" type="com.aetheris.rag.entity.UserProfile">
+    <id column="id" property="id"/>
+    <result column="user_id" property="userId"/>
+    <result column="profile_vector" property="profileVector"/>
+    <result column="window_size" property="windowSize"/>
+    <result column="query_count" property="queryCount"/>
+    <result column="click_count" property="clickCount"/>
+    <result column="favorite_count" property="favoriteCount"/>
+    <result column="updated_at" property="updatedAt"/>
+  </resultMap>
+
+  <!-- 插入或更新用户画像（UPSERT） -->
+  <insert id="upsert" parameterType="com.aetheris.rag.entity.UserProfile"
+      useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO user_profiles (
+      user_id, profile_vector, window_size, query_count, click_count, favorite_count, updated_at
+    )
+    VALUES (
+      #{userId}, #{profileVector}, #{windowSize}, #{queryCount}, #{clickCount}, #{favoriteCount}, CURRENT_TIMESTAMP
+    )
+    ON DUPLICATE KEY UPDATE
+      profile_vector = VALUES(profile_vector),
+      window_size = VALUES(window_size),
+      updated_at = CURRENT_TIMESTAMP
+  </insert>
+
+  <!-- 根据用户ID查询画像 -->
+  <select id="findByUserId" resultMap="UserProfileResultMap">
+    SELECT * FROM user_profiles
+    WHERE user_id = #{userId}
+  </select>
+
+  <!-- 更新用户的行为计数 -->
+  <update id="updateCounts">
+    UPDATE user_profiles
+    SET query_count = #{queryCount},
+        click_count = #{clickCount},
+        favorite_count = #{favoriteCount},
+        updated_at = CURRENT_TIMESTAMP
+    WHERE user_id = #{userId}
+  </update>
+
+  <!-- 仅更新画像向量 -->
+  <update id="updateProfileVector">
+    UPDATE user_profiles
+    SET profile_vector = #{profileVector},
+        updated_at = CURRENT_TIMESTAMP
+    WHERE user_id = #{userId}
+  </update>
+
+</mapper>

@@ -59,12 +59,12 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/chat/ChatView.vue'),
     meta: { requiresAuth: true, title: '智能问答' }
   },
-  // {
-  //   path: '/recommendations',
-  //   name: 'Recommendations',
-  //   component: () => import('@/views/recommendation/RecommendationView.vue'),
-  //   meta: { requiresAuth: true }
-  // },
+  {
+    path: '/recommendations',
+    name: 'Recommendations',
+    component: () => import('@/views/recommendation/RecommendationView.vue'),
+    meta: { requiresAuth: true, title: '个性化推荐' }
+  },
   // {
   //   path: '/profile',
   //   name: 'Profile',

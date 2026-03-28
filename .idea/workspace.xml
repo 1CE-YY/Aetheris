@@ -5,52 +5,50 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="32fc4432-e9ba-4631-8df4-5780ae2a154e" name="更改" comment="调试完成，进行下一步前准备完成">
-      <change afterPath="$PROJECT_DIR$/.idea/encodings.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env" beforeDir="false" afterPath="$PROJECT_DIR$/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/8419bb53-05b9-4922-aea3-a689852c51af.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/8419bb53-05b9-4922-aea3-a689852c51af.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources/cae40508-dd06-483d-9896-e75ac793e00f.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/cae40508-dd06-483d-9896-e75ac793e00f.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CLAUDE.md" beforeDir="false" afterPath="$PROJECT_DIR$/CLAUDE.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/config/DotenvConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/config/DotenvConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/controller/BehaviorController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/controller/BehaviorController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/entity/UserBehavior.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/entity/UserBehavior.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/exception/BadRequestException.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/exception/BadRequestException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/exception/BaseException.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/exception/BaseException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/exception/ConflictException.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/exception/ConflictException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/exception/ForbiddenException.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/exception/ForbiddenException.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.pids.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/maven-settings-temp.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/exception/GlobalExceptionHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/exception/InternalServerException.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/exception/InternalServerException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/exception/NotFoundException.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/exception/NotFoundException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/exception/UnauthorizedException.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/exception/UnauthorizedException.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/mapper/UserBehaviorMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/mapper/UserBehaviorMapper.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/service/BehaviorService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/service/BehaviorService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/service/impl/BehaviorServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/service/impl/BehaviorServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/test/integration/UserBehaviorIntegrationTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/integration/UserBehaviorIntegrationTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/test/unit/BehaviorServiceTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/unit/BehaviorServiceTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/service/SearchService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/service/SearchService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/service/impl/SearchServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/java/com/aetheris/rag/service/impl/SearchServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/mysql/#ib_16384_0.dblwr" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/#ib_16384_0.dblwr" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/mysql/#innodb_redo/#ib_redo9" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/#innodb_redo/#ib_redo9" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/mysql/aetheris_rag/resource_chunks.ibd" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/aetheris_rag/resource_chunks.ibd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/mysql/aetheris_rag/resources.ibd" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/aetheris_rag/resources.ibd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/mysql/#innodb_temp/temp_1.ibt" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/#innodb_temp/temp_1.ibt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/mysql/#innodb_temp/temp_10.ibt" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/#innodb_temp/temp_10.ibt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/mysql/#innodb_temp/temp_2.ibt" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/#innodb_temp/temp_2.ibt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/mysql/#innodb_temp/temp_3.ibt" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/#innodb_temp/temp_3.ibt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/mysql/#innodb_temp/temp_4.ibt" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/#innodb_temp/temp_4.ibt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/mysql/#innodb_temp/temp_5.ibt" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/#innodb_temp/temp_5.ibt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/mysql/#innodb_temp/temp_6.ibt" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/#innodb_temp/temp_6.ibt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/mysql/#innodb_temp/temp_7.ibt" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/#innodb_temp/temp_7.ibt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/mysql/#innodb_temp/temp_8.ibt" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/#innodb_temp/temp_8.ibt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/mysql/#innodb_temp/temp_9.ibt" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/#innodb_temp/temp_9.ibt" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/mysql/aetheris_rag/user_behaviors.ibd" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/aetheris_rag/user_behaviors.ibd" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/mysql/aetheris_rag/user_profiles.ibd" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/aetheris_rag/user_profiles.ibd" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/mysql/aetheris_rag/users.ibd" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/aetheris_rag/users.ibd" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/mysql/binlog.000007" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/binlog.000007" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/mysql/ib_buffer_pool" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/ib_buffer_pool" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/mysql/binlog.index" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/binlog.index" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/mysql/ibdata1" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/ibdata1" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/mysql/ibtmp1" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/ibtmp1" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/mysql/mysql.ibd" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/mysql.ibd" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/mysql/undo_001" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/undo_001" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/mysql/undo_002" beforeDir="false" afterPath="$PROJECT_DIR$/data/mysql/undo_002" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/redis/redis-aof.aof/appendonly.aof.1.incr.aof" beforeDir="false" afterPath="$PROJECT_DIR$/data/redis/redis-aof.aof/appendonly.aof.1.incr.aof" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/redis/redis-rdb.rdb" beforeDir="false" afterPath="$PROJECT_DIR$/data/redis/redis-rdb.rdb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/views/resource/ResourceDetailView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/resource/ResourceDetailView.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/router/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/router/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/auth/LoginView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/auth/LoginView.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/chat/ChatView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/chat/ChatView.vue" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/views/resource/ResourceListView.vue" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/views/resource/ResourceListView.vue" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/logs/application.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/application.log" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/logs/application.log.2026-03-25.0.gz" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/logs/backend.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/backend.log" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/logs/frontend.log" beforeDir="false" afterPath="$PROJECT_DIR$/logs/frontend.log" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/specs/001-rag-recommendation-system/contracts/api-examples.json" beforeDir="false" afterPath="$PROJECT_DIR$/specs/001-rag-recommendation-system/contracts/api-examples.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/specs/001-rag-recommendation-system/contracts/openapi.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/specs/001-rag-recommendation-system/contracts/openapi.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/specs/001-rag-recommendation-system/data-model.md" beforeDir="false" afterPath="$PROJECT_DIR$/specs/001-rag-recommendation-system/data-model.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/specs/001-rag-recommendation-system/quickstart.md" beforeDir="false" afterPath="$PROJECT_DIR$/specs/001-rag-recommendation-system/quickstart.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/specs/001-rag-recommendation-system/research.md" beforeDir="false" afterPath="$PROJECT_DIR$/specs/001-rag-recommendation-system/research.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/phase1-5-checklist.md" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/specs/001-rag-recommendation-system/tasks.md" beforeDir="false" afterPath="$PROJECT_DIR$/specs/001-rag-recommendation-system/tasks.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -76,7 +74,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="main" />
+        <entry key="$PROJECT_DIR$" value="001-rag-recommendation-system" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -87,16 +85,16 @@
     &quot;assignee&quot;: &quot;1CE-YY&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/1CE-YY/Aetheris.git",
-    "accountId": "b9cdacac-4f90-4c65-8488-b5c9a9a99fd1"
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/1CE-YY/Aetheris.git&quot;,
+    &quot;accountId&quot;: &quot;b9cdacac-4f90-4c65-8488-b5c9a9a99fd1&quot;
   }
-}]]></component>
-  <component name="KubernetesApiPersistence"><![CDATA[{}]]></component>
-  <component name="KubernetesApiProvider"><![CDATA[{
-  "isMigrated": true
-}]]></component>
+}</component>
+  <component name="KubernetesApiPersistence">{}</component>
+  <component name="KubernetesApiProvider">{
+  &quot;isMigrated&quot;: true
+}</component>
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
@@ -106,6 +104,9 @@
         <option name="userSettingsFile" value="$USER_HOME$/.m2/settings.xml" />
       </MavenGeneralSettings>
     </option>
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0,
@@ -125,13 +126,14 @@
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "SHELLCHECK.PATH": "我会在意",
-    "git-widget-placeholder": "优化phase5及之前的代码",
+    "git-widget-placeholder": "phase6",
     "kotlin-language-version-configured": "true",
     "nodejs_package_manager_path": "npm",
     "project.structure.last.edited": "库",
     "project.structure.proportion": "0.0",
     "project.structure.side.proportion": "0.2",
     "settings.editor.selected.configurable": "MavenSettings",
+    "ts.external.directory.path": "/Users/ice/Projects/Aetheris/frontend/node_modules/typescript/lib",
     "vue.rearranger.settings.migration": "true"
   },
   "keyToStringList": {
@@ -183,6 +185,7 @@
       <workItem from="1774431637433" duration="8614000" />
       <workItem from="1774509759364" duration="624000" />
       <workItem from="1774580955380" duration="9501000" />
+      <workItem from="1774668875664" duration="9834000" />
     </task>
     <task id="LOCAL-00001" summary="调试完成，进行下一步前准备完成">
       <option name="closed" value="true" />
@@ -217,7 +220,7 @@
                   <entry key="branch">
                     <value>
                       <list>
-                        <option value="origin/优化phase5及之前的代码" />
+                        <option value="phase6" />
                       </list>
                     </value>
                   </entry>

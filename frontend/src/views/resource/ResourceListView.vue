@@ -1,8 +1,15 @@
+<!--
+  Copyright 2025 Aetheris RAG Team. All rights reserved.
+-->
+
 <template>
   <div class="resource-list-container">
     <a-layout-header class="header">
       <div class="header-content">
-        <div class="logo">Aetheris RAG - 学习资源管理</div>
+        <div class="logo">
+          <LinkOutlined class="logo-icon" />
+          <span>Aetheris RAG - 学习资源管理</span>
+        </div>
         <div class="user-info">
           <span class="username">欢迎，{{ userStore.username }}</span>
           <a-button type="link" @click="handleLogout">退出登录</a-button>
@@ -75,7 +82,7 @@
 import { ref, onMounted, h } from 'vue'
 import { useRouter } from 'vue-router'
 import { message, Modal } from 'ant-design-vue'
-import { PlusOutlined, ExclamationCircleOutlined } from '@ant-design/icons-vue'
+import { PlusOutlined, ExclamationCircleOutlined, LinkOutlined } from '@ant-design/icons-vue'
 import { useUserStore } from '@/stores/user'
 import ResourceService from '@/services/resource.service'
 import type { Resource } from '@/services/resource.service'
@@ -260,11 +267,20 @@ onMounted(() => {
   align-items: center;
   max-width: 1200px;
   margin: 0 auto;
+  height: 64px;
 }
 
 .logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
   font-size: 20px;
   font-weight: bold;
+  color: #1890ff;
+}
+
+.logo-icon {
+  font-size: 24px;
 }
 
 .user-info {

@@ -5,6 +5,8 @@ package com.aetheris.rag.exception;
 
 import com.aetheris.rag.common.response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -164,6 +166,27 @@ public class GlobalExceptionHandler {
         errors.entrySet().stream()
             .map(e -> e.getKey() + ": " + e.getValue())
             .collect(Collectors.joining(", "));
+
+    ApiResponse<Void> response = ApiResponse.error(400, "参数校验失败: " + detailMessage);
+
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+  }
+
+  /**
+   * 处理约束校验异常（@Validated + @RequestParam 触发）。
+   *
+   * @param ex      约束校验异常
+   * @param request HTTP 请求
+   * @return 统一错误响应
+   */
+  @ExceptionHandler(ConstraintViolationException.class)
+  public ResponseEntity<ApiResponse<Void>> handleConstraintViolationException(
+      ConstraintViolationException ex, HttpServletRequest request) {
+    log.warn("约束校验失败: {}", ex.getMessage());
+
+    String detailMessage = ex.getConstraintViolations().stream()
+        .map(ConstraintViolation::getMessage)
+        .collect(Collectors.joining(", "));
 
     ApiResponse<Void> response = ApiResponse.error(400, "参数校验失败: " + detailMessage);
 

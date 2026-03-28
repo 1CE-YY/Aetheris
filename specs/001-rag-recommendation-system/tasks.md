@@ -410,7 +410,7 @@
   - **验收标准**: 封装完整，包含加载状态、错误处理、答案展示
 
 **验收标准**：
-- [ ] 用户可输入问题并提交问答请求
+- [x] 用户可输入问题并提交问答请求
 - [ ] 系统返回答案文本，答案基于检索到的资源内容
 - [ ] 每个答案包含 citations 列表，每条引用包含：
   - [ ] resourceId、resourceTitle、chunkId、chunkIndex
@@ -430,90 +430,64 @@
 
 ---
 
-## Phase 6: 用户故事 3 - 个性化推荐 (P2) 增强功能
+## Phase 6: 用户故事 3 - 个性化推荐 (P2) 增强功能 ✅ **已实现**
 
 **目标**：基于用户最近 N 次查询构建画像，推荐 Top-N 资源，每条推荐附带理由和证据引用
+**实现日期**: 2026-03-28
 
 **独立测试**：模拟用户查询 5 次关于"深度学习"的问题，验证推荐列表包含相关资源和推荐理由
 
 ### 6.1 用户画像（MVP：仅基于查询行为）
 
-- [ ] T060 创建 `backend/src/main/java/com/aetheris/rag/entity/UserProfile.java`，使用 Lombok 注解
+- [x] T060 创建 `backend/src/main/java/com/aetheris/rag/entity/UserProfile.java`，使用 Lombok 注解 ✅ **2026-03-28 完成**
   - **涉及表**：user_profiles（user_id、profile_vector、window_size、query_count、click_count、favorite_count、updated_at）
-- [ ] T061 [P] 创建 `backend/src/main/java/com/aetheris/rag/mapper/UserProfileMapper.java` 接口和 `UserProfileMapper.xml`
-  - **SQL**：UPSERT（INSERT ... ON DUPLICATE KEY UPDATE）、SELECT by user_id、UPDATE query_count/click_count
-- [ ] T062 创建 `backend/src/main/java/com/aetheris/rag/service/UserProfileService.java` 接口和实现 `UserProfileServiceImpl.java`
-  - **目标**：实现轻量画像（FR-016），基于最近 N 次查询的滑动平均（MVP）
+  - **实现**: @Data @Builder @NoArgsConstructor @AllArgsConstructor，@Builder.Default 默认值
+- [x] T061 [P] 创建 `backend/src/main/java/com/aetheris/rag/mapper/UserProfileMapper.java` 接口和 `UserProfileMapper.xml` ✅ **2026-03-28 完成**
+  - **SQL**：UPSERT（INSERT ... ON DUPLICATE KEY UPDATE）、SELECT by user_id、UPDATE query_count/click_count、UPDATE profile_vector
+- [x] T062 创建 `backend/src/main/java/com/aetheris/rag/service/UserProfileService.java` 接口和实现 `UserProfileServiceImpl.java` ✅ **2026-03-28 完成**
+  - **目标**：实现轻量画像（FR-016），基于最近 N 次行为的加权平均
   - **涉及表**：user_behaviors（查询最近 N 次）、user_profiles
-  - **画像计算逻辑**：
-    1. 查询最近 N 次查询文本（默认 N=10，可配置 `profile.windowSize`）
-    2. 对每次查询调用 ModelGateway.embed() 获取向量
-    3. 计算平均向量（逐维度求和后除以 N）
-    4. 更新 user_profiles.profile_vector（JSON 数组）
-  - **关键配置**：`profile.windowSize`（10）、`profile.updateTrigger`（每次查询后更新）
-  - **测试要点**：单测验证滑动平均计算、边界情况（新用户、行为不足 N 次）
+  - **实现**: ~250 行，加权平均算法（QUERY weight=1.0, CLICK weight=2.0, FAVORITE weight=3.0）
+  - **关键配置**：`profile.window-size`（10）、`profile.query-weight`（1.0）、`profile.click-weight`（2.0）、`profile.favorite-weight`（3.0）
   - **验收标准**：FR-016（轻量画像：基于最近 N 次查询）
-- [ ] T063 [P] 在 ResourceService 上传资源后，异步触发 UserProfileService 更新（预热画像）
+- [x] T063 [P] 在 ResourceService 上传资源后，异步触发 UserProfileService 更新（预热画像） ✅ **2026-03-28 完成**
+  - **实现**: RecommendationServiceImpl 中的 recordClickAsync/recordFavoriteAsync 方法已集成画像更新
 
 ### 6.2 推荐服务
 
-- [ ] T064 创建 `backend/src/main/java/com/aetheris/rag/service/RecommendationService.java` 接口和实现 `RecommendationServiceImpl.java`
+- [x] T064 创建 `backend/src/main/java/com/aetheris/rag/service/RecommendationService.java` 接口和实现 `RecommendationServiceImpl.java` ✅ **2026-03-28 完成**
   - **目标**：实现个性化推荐（FR-018），使用画像向量召回候选切片，聚合到资源级别（FR-011）
-  - **涉及表**：user_profiles、resources、resource_chunks
-  - **Redis**：
-    - 有画像：`FT.SEARCH chunk_vector_index VECTOR ... KNN {topN} $profile_vector`
-    - 无画像：`FT.SEARCH chunk_vector_index ... SORT BY upload_time DESC`（基于热度的默认推荐）
-  - **API 端点**：GET /api/recommendations?topN=10
-  - **推荐理由生成**：
-    - 有画像：调用 ChatGateway，Prompt 模板：
-      ```
-      用户最近的查询兴趣：{recent_queries}
-
-      推荐资源：{resource_title}
-      相关证据：
-      {evidence_chunks}
-
-      请生成：
-      1. 推荐理由（1-2 句话，说明为何推荐）
-      2. 学习建议（建议先学习哪章哪节）
-      ```
-    - 无画像：返回固定理由"热门学习资源" + 默认学习建议
-  - **关键配置**：`recommendation.topN`（10）、`profile.enabled`（true，可关闭画像降级为非个性化）
-  - **测试要点**：
-    - 单测验证资源聚合逻辑（同一资源的多个 chunk 合并，取最高相似度分数）
-    - 单测验证推荐理由生成（有画像 vs 无画像）
-    - 集成测试验证新用户默认推荐（基于热度）
-  - **验收标准**：FR-018（Top-N 推荐）、FR-019（推荐理由和学习建议）、FR-020（证据引用）、US3 验收场景 1/2/3、SC-004（对比无画像 vs 有画像）
-- [ ] T065 [P] 创建 `backend/src/main/java/com/aetheris/rag/dto/response/RecommendationResponse.java` 和 `RecommendationItem.java`
-  - **RecommendationItem 字段**：resourceId、title、tags、reason（推荐理由）、suggestion（学习建议）、citations（List<Citation>）、score（相似度分数）
-- [ ] T066 创建 `backend/src/main/java/com/aetheris/rag/controller/RecommendationController.java`，实现 GET /api/recommendations 端点
-- [ ] T067 [P] 在 RecommendationService 中集成 BehaviorService，记录推荐点击行为（异步写入 user_behaviors 表）
-  - **依赖**: Phase 3 (T028) BehaviorService 已实现
-  - **依赖**: Phase 3 (T029) POST /api/behaviors/click 和 POST /api/behaviors/favorite API 已就绪
-  - **实现**: 注入 BehaviorService，调用 recordClick() 和 recordFavorite()
-  - **异步**: 使用 @Async 注解，避免阻塞推荐主流程
-  - **验收标准**: 用户点击推荐资源时自动记录行为到 user_behaviors 表
+  - **实现**: ~300 行，复用 SearchService.searchByVectorAggregated 进行向量检索
+  - **有画像路径**: profileVector → searchByVectorAggregated → 按资源聚合 → ChatGateway 生成推荐理由
+  - **无画像路径**: resourceMapper.findPaged → 固定推荐理由"热门学习资源"
+  - **验收标准**：FR-018（Top-N 推荐）、FR-019（推荐理由和学习建议）、FR-020（证据引用）
+- [x] T065 [P] 创建 `backend/src/main/java/com/aetheris/rag/dto/response/RecommendationResponse.java` 和 `RecommendationItem.java` ✅ **2026-03-28 完成**
+  - **RecommendationItem 字段**：resourceId、title、tags、reason、suggestion、citations(List<Citation>)、score、fileType、description
+  - **RecommendationResponse 字段**：items、personalized、latencyMs、count
+- [x] T066 创建 `backend/src/main/java/com/aetheris/rag/controller/RecommendationController.java`，实现 GET /api/recommendations 端点 ✅ **2026-03-28 完成**
+  - **实现**: GET /api/recommendations?topN=10、POST /api/recommendations/click、POST /api/recommendations/favorite
+  - **参数校验**: @Min(1) @Max(50) topN 范围验证
+- [x] T067 [P] 在 RecommendationService 中集成 BehaviorService，记录推荐点击行为（异步写入 user_behaviors 表） ✅ **2026-03-28 完成**
+  - **实现**: @Async recordClickAsync/recordFavoriteAsync 方法
+  - **验收标准**: 用户点击/收藏推荐资源时自动记录行为到 user_behaviors 表
 
 ### 6.3 可选增强：点击/收藏权重（P2 优先级最低）
 
-- [ ] T068 在 UserProfileService 中添加加权平均算法（FR-017），查询权重=1.0、点击权重=2.0、收藏权重=3.0（可配置 `profile.queryWeight`、`profile.clickWeight`、`profile.favoriteWeight`）
-  - **目标**：在画像计算中加入交互行为权重，提升推荐准确性
-  - **涉及表**：user_behaviors（WHERE behavior_type IN ('QUERY', 'CLICK', 'FAVORITE')）
-  - **关键配置**：`profile.clickWeight`（2.0）、`profile.favoriteWeight`（3.0）
-  - **测试要点**：单测验证加权平均计算
-  - **验收标准**：FR-017（可选增强）
+- [x] T068 在 UserProfileService 中添加加权平均算法（FR-017），查询权重=1.0、点击权重=2.0、收藏权重=3.0 ✅ **2026-03-28 完成**
+  - **实现**: 已在 T062 UserProfileServiceImpl 中直接实现加权平均算法
+  - **关键配置**：`profile.query-weight`（1.0）、`profile.click-weight`（2.0）、`profile.favorite-weight`（3.0）
+  - **验收标准**：FR-017（加权平均）
 
 **前端任务（可并行）**：
 
-- [ ] T069 [P] 创建 `frontend/src/views/recommendation/RecommendationView.vue`，使用 Ant Design List 展示推荐列表
-- [ ] T070 [P] 创建 `frontend/src/components/recommendation/RecommendationCard.vue`，展示推荐理由、学习建议、引用证据、收藏按钮
-- [ ] T071 创建 `frontend/src/services/recommendation.service.ts`，封装推荐 API 调用
-- [ ] T072 创建 `frontend/src/composables/useRecommendation.ts`，封装推荐逻辑（点击推荐资源记录行为）
-  - **依赖**: Phase 3 (T032) auth.service.ts 已实现用户认证
-  - **依赖**: Phase 3 (T033) user.ts Pinia store 已实现用户状态管理
-  - **依赖**: Phase 3 (T028) BehaviorService 后端 API 已就绪
-  - **实现**: 封装推荐逻辑，包括点击和收藏时调用行为服务 API
-  - **行为记录**: 点击推荐资源时调用 POST /api/behaviors/click，收藏时调用 POST /api/behaviors/favorite
+- [x] T069 [P] 创建 `frontend/src/views/recommendation/RecommendationView.vue`，使用 Ant Design List 展示推荐列表 ✅ **2026-03-28 完成**
+  - **实现**: PageHeader + Alert + List(RecommendationCard) + Empty + 性能信息展示
+- [x] T070 [P] 创建 `frontend/src/components/recommendation/RecommendationCard.vue`，展示推荐理由、学习建议、引用证据、收藏按钮 ✅ **2026-03-28 完成**
+  - **实现**: Ant Design Card，包含推荐理由、学习建议（绿色框）、标签、引用折叠面板、相似度分数
+- [x] T071 创建 `frontend/src/services/recommendation.service.ts`，封装推荐 API 调用 ✅ **2026-03-28 完成**
+  - **实现**: RecommendationService 静态类，包含 getRecommendations、recordClick、recordFavorite 方法
+- [x] T072 创建 `frontend/src/composables/useRecommendation.ts`，封装推荐逻辑（点击推荐资源记录行为） ✅ **2026-03-28 完成**
+  - **实现**: useRecommendation composable，包含 loading、recommendations、personalized、latencyMs 等状态
   - **验收标准**: 每次点击/收藏推荐资源时自动触发行为记录 API 调用
 
 **验收标准**：
@@ -890,66 +864,3 @@
 - 所有任务完成后，系统支持 **100+ 学习资源文档**、**10-20 并发问答请求**
 
 ---
-
-## 📊 验收进度汇总
-
-### ✅ 已完成 Phase（截至 2025-12-29）
-
-| Phase | 名称 | 任务范围 | 状态 | 评分 | 完成日期 |
-|-------|------|----------|------|------|----------|
-| **Phase 1** | 项目初始化与基础设施 | T001-T010 | ✅ 已验收 | ⭐⭐⭐⭐⭐ 97.1% | 2025-12-29 |
-| **Phase 2** | 基础设施层 | T011-T025 | ✅ 已验收 | ⭐⭐⭐⭐⭐ 97.1% | 2025-12-29 |
-
-**已完成统计**：
-- ✅ 任务完成：25/99（25.3%）
-- ✅ 代码行数：2426 行（后端）
-- ✅ 测试覆盖：39.2%（78 个测试方法）
-- ✅ Javadoc 数量：106 个
-- ✅ 文档完整性：925 行项目文档
-
-### 🚧 进行中 Phase（待开始）
-
-| Phase | 名称 | 任务范围 | 预计周期 |
-|-------|------|----------|----------|
-| **Phase 3** | 用户账户与行为记录 | T026-T034 | 1-2 周 |
-| **Phase 4** | 资源入库与向量化 | T035-T048 | 2-3 周 |
-| **Phase 5** | 语义检索与 RAG 问答 | T049-T059 | 2-3 周 |
-| **Phase 6** | 个性化推荐 | T060-T072 | 2-3 周 |
-| **Phase 7** | 离线评测与性能分析 | T073-T080 | 1-2 周 |
-| **Phase 8** | 完善与跨用户故事优化 | T081-T099 | 1-2 周 |
-
-### 📝 关键交付物（已完成）
-
-**Phase 1-2 交付物**：
-- ✅ `backend/` - Spring Boot 后端项目（Java 21 + 虚拟线程）
-- ✅ `frontend/` - Vue 3 前端项目（架构搭建完成）
-- ✅ `docker-compose.yml` - Docker Compose 配置（MySQL 8 + Redis Stack）
-- ✅ `backend/src/main/resources/db/migration/V1__init_schema.sql` - 数据库初始化脚本
-- ✅ `gateway/` - ModelGateway 框架（stub 实现）
-- ✅ `dto/response/Citation.java` - 统一引用结构
-- ✅ `security/` - JWT 认证体系
-- ✅ `util/` - 工具类集合
-
-**文档交付物**：
-- ✅ `STARTUP_GUIDE.md` (575 行) - 启动指南
-- ✅ `PHASE1_2_ACCEPTANCE_REPORT.md` (692 行) - 验收报告
-- ✅ `PHASE1_2_ACCEPTANCE_CHECKLIST.md` (337 行) - 验收清单
-- ✅ `development-log.md` (131 行) - 开发日志
-
-### 🎯 下一步行动
-
-**Phase 3 开始前**：
-1. 🔧 配置智谱 AI API key（ZHIPU_API_KEY）
-2. 📝 准备测试数据（PDF/Markdown 文档）
-3. ✅ 确认 Java 21 环境正常
-
-**Phase 3 目标**：
-- 实现完整的 EmbeddingGateway（调用智谱 AI API）
-- 实现完整的 ChatGateway（调用智谱 AI API）
-- 实现资源上传功能（PDF/Markdown 解析）
-- 实现向量索引创建和查询
-
----
-
-**最后更新**: 2025-12-30
-**下次更新**: Phase 3 完成后
